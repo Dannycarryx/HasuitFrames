@@ -167,7 +167,7 @@ initialize("Tranquility")
 
 
 local common = {["controller"]=danBottomRightHots5,	["size"]=14,	["frameLevel"]=21,	["hideCooldownText"]=true,	["alpha"]=1,	}
-hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=0,								["group"]=common,			}
+hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=0,["loadOn"]=danLoadOnPartySize,["group"]=common,			}
 -- initialize(391891	) --adaptive swarm
 initialize(429222) --"Minor Cenarion Ward"
 
