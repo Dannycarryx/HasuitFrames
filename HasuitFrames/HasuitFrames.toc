@@ -1,0 +1,27 @@
+## Interface: 110002
+## Title: HasuitFrames
+## Author: Dannycarry
+## DefaultState: Enabled
+## SavedVariables: hasuitSavedEasyChecks, hasuitSavedUserOptions, hasuitSavedVariables
+
+center.lua
+HasuitFrames.lua
+general.lua
+
+classSpecific\Druid.lua
+classSpecific\Monk.lua
+classSpecific\DeathKnight.lua
+classSpecific\DemonHunter.lua
+classSpecific\Evoker.lua
+classSpecific\Hunter.lua
+classSpecific\Paladin.lua
+classSpecific\Priest.lua
+classSpecific\Rogue.lua
+classSpecific\Shaman.lua
+classSpecific\Warlock.lua
+classSpecific\Warrior.lua
+
+cooldowns.lua
+UnitFrames2.lua
+UserOptions.lua
+disableSomeBlizzardFrames.lua
