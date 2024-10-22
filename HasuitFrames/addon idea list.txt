@@ -133,3 +133,4 @@ cooldown text color could signify something like green is always hard cc etc?
 
 how do onupdate functions get prioritized? will certain frames always come before others or is it based on setscript time?
 
+adding test note
