@@ -137,7 +137,8 @@ hasuitDoThisGroup_Roster_UpdateGroupSizeChanged = {}
 -- hasuitDoThisGroup_Roster_UpdateWidthChanged
 -- hasuitDoThisGroup_Roster_UpdateHeightChanged
 -- hasuitDoThisGroup_Roster_UpdateColumnsChanged
--- hasuitDoThisGroup_Roster_UpdateGroupSize_5_8_40
+-- hasuitDoThisGroup_Roster_UpdateGroupSize_5
+-- hasuitDoThisGroup_Roster_UpdateGroupSize_5_8
 
 hasuitDoThisPlayer_Target_Changed = {}
 
@@ -154,11 +155,6 @@ hasuitDoThisPlayer_Target_Changed = {}
 
 
 
--- local asd
--- tinsert(hasuitDoThisAddon_Loaded, function()
-	-- asd = hasuitAsd
-	-- hasuitAsd = nil
--- end)
 
 
 
@@ -170,15 +166,10 @@ hasuitDoThisPlayer_Target_Changed = {}
 
 
 
+local GetInstanceInfo = GetInstanceInfo
 
-
-
-
-
-
+local mainLoadOnFunctionSpammable
 local tinsert = table.insert
--- local lastInstanceId
-local loadConditionsChangedUnsafe
 do
 	local danDoThisAddonLoaded = hasuitDoThisAddon_Loaded
 	local danDoThisPlayerLogin = hasuitDoThisPlayer_Login
@@ -206,19 +197,16 @@ do
 			for i=1,#danDoThisEnteringFirst do
 				danDoThisEnteringFirst[i]()
 			end
+			mainLoadOnFunctionSpammable() --not really necessary since every groupsize influenced loadon will also call this initially, not clean but not sure how to improve that significantly, even if bored. just going to leave this here in case all groupsize stuff gets abandoned later or something else changes, who knows
 			local danDoThisEnteringWorld = hasuitDoThisPlayer_Entering_WorldSkipsFirst
 			hasuitDoThisPlayer_Entering_WorldSkipsFirst = nil
 			danFrame:SetScript("OnEvent", function() -- danPrint(danGreen(loadedCount).." loaded", danYellow(totalCount-loadedCount), "unloaded")
-				local _, instanceType = IsInInstance()
-				-- local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
+				local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
+				hasuitInstanceId = instanceId
 				if instanceType~=hasuitInstanceType then
 					hasuitInstanceType = instanceType
-					loadConditionsChangedUnsafe("instanceType", instanceType)
+					mainLoadOnFunctionSpammable()
 				end
-				-- if instanceId~=lastInstanceId then
-					-- lastInstanceId = instanceId
-					-- loadConditionsChangedUnsafe("instanceId", instanceId)
-				-- end
 				for i=1,#danDoThisEnteringWorld do
 					danDoThisEnteringWorld[i]()
 				end
@@ -227,51 +215,6 @@ do
 		end
 	end)
 end
-
-
-
--- do --hasuitDoThisOnUpdate, hasuitDoThisOnUpdatePosition1
-	-- local danDoThis
-	-- local danFrame = CreateFrame("Frame")
-	-- local function onUpdateFunction()
-		-- local startingLength = #danDoThis
-		-- for i=1,startingLength do
-			-- danDoThis[i]()
-		-- end
-		-- if #danDoThis>startingLength then --for group roster/arena update swapping units around and adding to this mid-onupdate. could be nice for other things in the future to just send stuff to the next onupdate from current onupdate? not sure what those things would be
-			-- local temp = danDoThis
-			-- danDoThis = {}
-			-- local count = 1
-			-- for i=startingLength+1, #temp do
-				-- danDoThis[count] = temp[i]
-				-- count = count+1
-			-- end
-		-- else
-			-- danDoThis = nil
-			-- danFrame:SetScript("OnUpdate", nil)
-		-- end
-	-- end
-	-- function hasuitDoThisOnUpdate(func)
-		-- if danDoThis then
-			-- tinsert(danDoThis, func)
-		-- else
-			-- danDoThis = {func}
-			-- danFrame:SetScript("OnUpdate", onUpdateFunction)
-		-- end
-	-- end
-	-- function hasuitDoThisOnUpdatePosition1(func) --just make sure to not use this while onUpdateFunction is going through the array, can safely use the other one for that and it'll do those things on the next onupdate
-		-- if danDoThis then
-			-- tinsert(danDoThis, 1, func)
-		-- else
-			-- danDoThis = {func}
-			-- danFrame:SetScript("OnUpdate", onUpdateFunction)
-		-- end
-	-- end
--- end
-
-
-
-
 
 
 
@@ -351,11 +294,10 @@ do --hasuitDoThisAfterCombat
 	end)
 end
 
-local loadOnGroupSizes
-local lastLoadOnGroupSize
 local GetNumGroupMembers = GetNumGroupMembers
 do
 	local danDoThisRelevantSizes = {}
+	hasuitDoThisRelevantSizes = danDoThisRelevantSizes
 	do
 		local function getDoThisSizeTable(danSizeTable)
 			local relevantGroupSizes = {functions={}}
@@ -373,7 +315,8 @@ do
 		hasuitDoThisGroup_Roster_UpdateWidthChanged =		getDoThisSizeTable({5,8,15,20,24,28,32,36,40})
 		hasuitDoThisGroup_Roster_UpdateHeightChanged =		getDoThisSizeTable({8,10,15,40})
 		hasuitDoThisGroup_Roster_UpdateColumnsChanged =		getDoThisSizeTable({5,8,20,24,28,32,36,40})
-		hasuitDoThisGroup_Roster_UpdateGroupSize_5_8_40 =	getDoThisSizeTable({5,8,40})
+		hasuitDoThisGroup_Roster_UpdateGroupSize_5 =		getDoThisSizeTable({5,40})
+		hasuitDoThisGroup_Roster_UpdateGroupSize_5_8 =		getDoThisSizeTable({5,8,40})
 	end
 	
 	local danDoThisOnUpdate = hasuitDoThisOnUpdate
@@ -419,12 +362,6 @@ do
 		if groupSize~=hasuitGroupSize then
 			hasuitGroupSize = groupSize
 			
-			local loadOnGroupSize = loadOnGroupSizes[groupSize]
-			if loadOnGroupSize~=lastLoadOnGroupSize then
-				lastLoadOnGroupSize = loadOnGroupSize
-				loadConditionsChangedUnsafe("groupSize", loadOnGroupSize) --track or untrack spells and run loaded/unloaded functions(might change), certain loaded and unloaded functions should get a hasuitDoThisOnUpdate. The main group roster update/arena update functions get tinserted to position 1 of that onupdate table
-			end
-			
 			for i=1,#danDoThisGroupSizeChanged do
 				danDoThisGroupSizeChanged[i]()
 			end
@@ -450,12 +387,6 @@ do
 	
 end
 
--- local danFrame = CreateFrame("Frame")
--- danFrame:RegisterEvent("FIRST_FRAME_RENDERED")
--- danFrame:SetScript("OnEvent", function()
-	-- hasuitUpdateGroupRosterUnsafeTest()
-	-- print("FIRST_FRAME_RENDERED", "combat:", InCombatLockdown(), "playerexists:", UnitExists("player"), "party1exists:", UnitExists("party1"))
--- end)
 
 hasuitRaidFrameWidthForGroupSize = { --hasuitDoThisGroup_Roster_UpdateWidthChanged
 	[0]=114,
@@ -606,50 +537,6 @@ hasuitRaidFrameColumnsForGroupSize = { --hasuitDoThisGroup_Roster_UpdateColumnsC
 }
 
 
-loadOnGroupSizes = {
-	[0]=5,--0
-	5,--1
-	5,--2
-	5,--3
-	5,--4
-	5,--5
-	5,--6
-	5,--7
-	5,--8
-	
-	40,--9
-	40,--10
-	40,--11
-	40,--12
-	40,--13
-	40,--14
-	40,--15
-	40,--16
-	40,--17
-	40,--18
-	40,--19
-	40,--20
-	40,--21
-	40,--22
-	40,--23
-	40,--24
-	40,--25
-	40,--26
-	40,--27
-	40,--28
-	40,--29
-	40,--30
-	40,--31
-	40,--32
-	40,--33
-	40,--34
-	40,--35
-	40,--36
-	40,--37
-	40,--38
-	40,--39
-	40,--40
-}
 
 
 
@@ -681,68 +568,13 @@ local type = type
 local pairs = pairs
 local tremove = tremove
 
-local IsInInstance = IsInInstance
--- local GetInstanceInfo = GetInstanceInfo
-
 local allTable = {}
-local allLoadingProfiles = {}
-
-local currentCheckValues
-local check
-local fullCheck
-
-
 
 -- local loadedCount = 0
 -- local totalCount = 0
 
 
-function hasuitFramesCenterAddLoadingProfile(loadOn)
-	tinsert(allLoadingProfiles, loadOn)
-	-- local index = #allLoadingProfiles
-	-- loadOn.index = index
-	loadOn.shouldLoad = not fullCheck(loadOn, true)
-	return loadOn
-end
-
-check = {
-	-- ["minGroupSize"]=function(currentCheck, newValue) --needs to be redone so that every loadon just gets its own check function or can share one, this will scale badly and can't even do everything needed
-		-- return not currentCheck or currentCheck<newValue
-	-- end,
-	["groupSize"]=function(currentCheck, newValue) --0 to 40, only checks if loadOnGroupSizes changes
-		return not currentCheck or currentCheck>=newValue
-	end,
-	["instanceType"]=function(currentCheck, newValue) --none, arena, pvp, party, scenario, raid
-		return not currentCheck or currentCheck[newValue]
-	end,
-	-- ["instanceId"]=function(currentCheck, newValue) --2177 for comp stomp, todo need some way to check or instead of and. probably give each loadon one check function and get rid of current setup
-		-- return not currentCheck or currentCheck[newValue]
-	-- end,
-}
-function fullCheck(loadOn, initial)
-	for k, v in pairs(currentCheckValues) do
-		if not check[k](loadOn[k], v) then
-			if initial then
-				if loadOn["unloadedFunction"] then
-					loadOn["unloadedFunction"]()
-				end
-				-- danPrint("index", loadOn.index, danYellow("unload"))
-			-- else
-				-- danPrint("index", loadOn.index, "stay unloaded", k, v)
-			end
-			return true
-		end
-	end
-	if loadOn["loadedFunction"] then
-		loadOn["loadedFunction"]()
-	end
-	-- danPrint("index", loadOn.index, danGreen("load"))
-end
-
-
-
-
-local function updateAllSpellTablesUnsafe() --just unsafe in the sense that there's no point doing this multiple times per gettime, should probably come up with a different word compared to things that will actually break something if used during an onupdate or something like the remove from unit_health control function
+local function mainLoadOnFunction()
 	-- local loadedTablesRemoved = 0
 	-- local previousLoadedCount = loadedCount
 	for dan=1, #allTable do
@@ -759,7 +591,7 @@ local function updateAllSpellTablesUnsafe() --just unsafe in the sense that ther
 						loadedTable[spellId] = {}
 						loadedStuff = loadedTable[spellId]
 					end
-					-- local loadFunction = unloadedStuff[i]["loadFunction"]
+					-- local loadFunction = unloadedStuff[i]["loadFunction"] --could do specific load/unload functions per spell like maybe clear an aura? probably won't ever have an actual use for these
 						-- if loadFunction then
 						-- loadFunction()
 					-- end
@@ -808,42 +640,14 @@ end
 local GetTime = GetTime
 local lastTime
 local danPriorityOnUpdate = hasuitDoThisOnUpdatePosition1
-function hasuitUpdateAllSpellTablesSafe()
+function mainLoadOnFunctionSpammable()
 	local currentTime = GetTime()
 	if lastTime~=currentTime then
 		lastTime = currentTime
-		danPriorityOnUpdate(updateAllSpellTablesUnsafe)
+		danPriorityOnUpdate(mainLoadOnFunction)
 	end
 end
-
-
-function loadConditionsChangedUnsafe(whatChanged, newValue) --don't do this during onupdate
-	-- local reportString = whatChanged..": "..currentCheckValues[whatChanged].." to "..newValue
-	currentCheckValues[whatChanged] = newValue
-	
-	for i=1, #allLoadingProfiles do
-		local loadOn = allLoadingProfiles[i] --should have done it where each loadon gets its own unloaded table instead of one big one for everything? maybe not actually. new system (not beside this comment) for changing loadon.shouldload with no limits on what/when/why one can get changed will go well with scanning through all tracked spells with a limit of once per gettime
-		if not loadOn.shouldLoad then
-			loadOn.shouldLoad = not fullCheck(loadOn)
-		else
-			if not check[whatChanged](loadOn[whatChanged], newValue) then 
-				loadOn.shouldLoad = false
-				if loadOn["unloadedFunction"] then
-					loadOn["unloadedFunction"]()
-				end
-				-- danPrint("index", i, danYellow("unload"))
-			-- else
-				-- danPrint("index", i, "stay loaded")
-			end
-		end
-	end
-	
-	local currentTime = GetTime()
-	if lastTime~=currentTime then
-		lastTime = currentTime
-		danPriorityOnUpdate(updateAllSpellTablesUnsafe)
-	end
-end
+hasuitMainLoadOnFunctionSpammable = mainLoadOnFunctionSpammable
 
 -- local temporaryEventTypeTrackingTable = {}
 
@@ -878,10 +682,9 @@ function hasuitFramesCenterAddMultiFunction(func)
 end
 
 
-local _, instanceType = IsInInstance()
--- local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
+local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
 hasuitInstanceType = instanceType
--- lastInstanceId = instanceId
+hasuitInstanceId = instanceId
 
 local groupSize = GetNumGroupMembers()
 if groupSize == 0 then
@@ -891,13 +694,7 @@ hasuitGroupSize = groupSize
 hasuitRaidFrameWidth = hasuitRaidFrameWidthForGroupSize[groupSize]
 hasuitRaidFrameHeight = hasuitRaidFrameHeightForGroupSize[groupSize]
 hasuitRaidFrameColumns = hasuitRaidFrameColumnsForGroupSize[groupSize]
-lastLoadOnGroupSize = loadOnGroupSizes[groupSize]
 
-currentCheckValues = {
-	["groupSize"] = lastLoadOnGroupSize,
-	["instanceType"] = instanceType,
-	-- ["instanceId"] = instanceId,
-}
 
 -- local danTestingCollectionTable = {
 	-- ["normalInitialize"]={},
@@ -1316,10 +1113,13 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
 		hasuitDoThisGroup_Roster_UpdateWidthChanged = nil
 		hasuitDoThisGroup_Roster_UpdateHeightChanged = nil
 		hasuitDoThisGroup_Roster_UpdateColumnsChanged = nil
-		hasuitDoThisGroup_Roster_UpdateGroupSize_5_8_40 = nil
+		hasuitDoThisGroup_Roster_UpdateGroupSize_5 = nil
+		hasuitDoThisGroup_Roster_UpdateGroupSize_5_8 = nil
 		
 		hasuitDoThisOnUpdate = nil
 		hasuitDoThisOnUpdatePosition1 = nil
+		-- hasuitDoThisOnUpdateSpecificPosition = nil
+		-- hasuitGetCurrentOnUpdateTable = nil
 		hasuitDoThisPlayerTargetChanged = nil
 		hasuitDoThisAfterCombat = nil
 		

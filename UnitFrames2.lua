@@ -177,7 +177,7 @@ local updateFrameUnit
 
 local unitsToAddToTable = {}
 
-local danUpdateAurasForFrame = hasuitUpdateAurasForFrame
+local danUnitAuraIsFullUpdate = hasuitUnitAuraIsFullUpdate
 
 local danInitializeArenaSpecialIcons
 
@@ -1890,6 +1890,12 @@ end)
 
 local playerRaidUnit
 do
+	
+	local danDoThis = hasuitDoThisGroup_Roster_UpdateAlways
+	local danDoThisGroupSizeChanged = hasuitDoThisGroup_Roster_UpdateGroupSizeChanged
+	local danDoThisRelevantSizes = hasuitDoThisRelevantSizes
+	
+	
 	local targetFrame
 	local lastFrames = {}
 	function hasuitMakeTestGroupFrames(number)
@@ -1905,24 +1911,40 @@ do
 		danCurrentUnitTable = groupUnitFrames
 		
 		playerRaidUnit = playerRaidUnit or "raid1"
-		local preTestGroupSize = danCurrentGroupSize
+		local actualGroupSize = GetNumGroupMembers()
+		if actualGroupSize == 0 then
+			actualGroupSize = 1
+		end
 		
-		hasuitGroupSize = number
-		danCurrentGroupSize = number
 		
-		danCurrentUnitFrameWidth = hasuitRaidFrameWidthForGroupSize[danCurrentGroupSize]
-		danCurrentUnitFrameWidthPlus2 = danCurrentUnitFrameWidth+2
-		danCurrentUnitFrameWidthPlus3 = danCurrentUnitFrameWidth+3
-		hasuitRaidFrameWidth = danCurrentUnitFrameWidth
 		
-		danCurrentUnitFrameHeight = hasuitRaidFrameHeightForGroupSize[danCurrentGroupSize]
-		danCurrentUnitFrameHeightPlus2 = danCurrentUnitFrameHeight+2
-		danCurrentUnitFrameHeightPlus3 = danCurrentUnitFrameHeight+3
-		hasuitRaidFrameHeight = danCurrentUnitFrameHeight
+		if number~=hasuitGroupSize then
+			hasuitGroupSize = number
+			
+			for i=1,#danDoThisGroupSizeChanged do
+				danDoThisGroupSizeChanged[i]()
+			end
+			
+			for i=1,#danDoThisRelevantSizes do
+				local sizeTable = danDoThisRelevantSizes[i]
+				local relevantSize = sizeTable[number]
+				if sizeTable.activeRelevantSize~=relevantSize then
+					sizeTable.activeRelevantSize = relevantSize
+					local sizeFunctions = sizeTable.functions
+					for j=1,#sizeFunctions do
+						sizeFunctions[j]()
+					end
+				end
+			end
+		end
+		for i=1,#danDoThis do
+			danDoThis[i]()
+		end
 		
-		hasuitRaidFrameColumns = numColumnsForGroupSize[danCurrentGroupSize]
 		
-		changeUnitTypeColorBackgrounds(colorBackgroundsGroupSizeMinimum>0 and danCurrentGroupSize>=colorBackgroundsGroupSizeMinimum)
+		
+		
+		-- changeUnitTypeColorBackgrounds(colorBackgroundsGroupSizeMinimum>0 and danCurrentGroupSize>=colorBackgroundsGroupSizeMinimum)
 		
 		hasuitFrameTypeUpdateCount["group"] = hasuitFrameTypeUpdateCount["group"]+1
 		danPlayerFrame.updated = hasuitFrameTypeUpdateCount["group"]
@@ -1954,7 +1976,7 @@ do
 		targetGUID = nil
 		
 		lastFrames = {}
-		for i=preTestGroupSize+1,number do
+		for i=actualGroupSize+1,number do
 			
 			local unit
 			if targetGUID then
@@ -1980,22 +2002,7 @@ do
 			end)
 			tinsert(lastFrames, frame)
 		end
-		hasuitUpdateGroupRosterUnsafe()
-		
-		danCurrentGroupSize = preTestGroupSize
-		hasuitGroupSize = danCurrentGroupSize
-		
-		danCurrentUnitFrameWidth = hasuitRaidFrameWidthForGroupSize[danCurrentGroupSize]
-		danCurrentUnitFrameWidthPlus2 = danCurrentUnitFrameWidth+2
-		danCurrentUnitFrameWidthPlus3 = danCurrentUnitFrameWidth+3
-		hasuitRaidFrameWidth = danCurrentUnitFrameWidth
-		
-		danCurrentUnitFrameHeight = hasuitRaidFrameHeightForGroupSize[danCurrentGroupSize]
-		danCurrentUnitFrameHeightPlus2 = danCurrentUnitFrameHeight+2
-		danCurrentUnitFrameHeightPlus3 = danCurrentUnitFrameHeight+3
-		hasuitRaidFrameHeight = danCurrentUnitFrameHeight
-		
-		hasuitRaidFrameColumns = numColumnsForGroupSize[danCurrentGroupSize]
+		-- hasuitUpdateAllUnitsForUnitType["group"]()
 	end
 end
 
@@ -2591,7 +2598,7 @@ danUpdateUnitSpecial["group"] = function()
 	else
 		danCurrentFrame:SetAlpha(outOfRangeAlpha)
 	end
-	danUpdateAurasForFrame(danCurrentFrame)
+	danUnitAuraIsFullUpdate(danCurrentFrame)
 	
 end
 
@@ -2601,7 +2608,27 @@ local danCleuDiminish = danCleuDiminish
 local trackedDiminishSpells = hasuitTrackedDiminishSpells
 tinsert(hasuitDoThisAddon_Loaded, function()
 	hasuitFramesCenterSetEventType("cleu")
-	local drLoadOn = hasuitFramesCenterAddLoadingProfile({["instanceType"]={["arena"]=true,["pvp"]=true,["none"]=true}})
+	local drLoadOn
+	do --dr loadon
+		local loadOn = {}
+		local function loadOnCondition()
+			local instanceType = hasuitInstanceType
+			if instanceType=="none" or instanceType=="arena" or instanceType=="pvp" then --should load
+				if not loadOn.shouldLoad then
+					print(hasuitGreen, "drLoadOn")
+					loadOn.shouldLoad = true
+				end
+			else --should NOT load
+				if loadOn.shouldLoad~=false then
+					print(hasuitRed, "drLoadOn")
+					loadOn.shouldLoad = false
+				end
+			end
+		end
+		tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+		loadOnCondition()
+		drLoadOn = loadOn
+	end
 	for drType, options in pairs(hasuitDiminishOptions) do
 		arenaDiminishTextures[options["arena"]] = options["texture"]
 		options[1] = danCleuDiminish
@@ -2770,7 +2797,7 @@ danUpdateUnitSpecial["arena"] = function()
 		danUpdateFrameRole2()
 	end
 	arenaInRange()
-	danUpdateAurasForFrame(danCurrentFrame)
+	danUnitAuraIsFullUpdate(danCurrentFrame)
 end
 
 do
@@ -3442,6 +3469,7 @@ function hasuitUpdateGroupRosterUnsafe()
 		danCurrentFrame = danPlayerFrame
 		danCurrentUnit = "player"
 		danUpdateFrameRole2()
+		-- danUnitAuraIsFullUpdate(danPlayerFrame)
 	end
 	
 	if not raid1Exists or hasuitInstanceType=="arena" then

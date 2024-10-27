@@ -2,7 +2,6 @@
 
 
 biggest things right now:
-finish new loadon system so that old ones with both groupsize and instancetype don't bug out. new bug is from the half-made new system i think. one bad thing i've seen was cooldown icons not unloading when group was size 6/7/8 outdoors and stayed broken even after a reload in that range, making frames almost unusable
 better useroptions setup. settings saved now will get overwritten after this is better, and when actually released that should never happen
 
 other important:
@@ -38,6 +37,12 @@ Seasoned Winds
 unit_in_range onevents now that it's registered to each unitframe anyway
 remove delay on unit update event like rosterupdate and make more unit events instead of registering them for all units. or something, not 100% sure how the game expects things to be handled if like a maxhealth event happens for a unit and rosterupdate happens at the same time. like what order does that happen in? have to assume if i remove the delay on rosterupdate those will always match correctly. that delay was probably the source of some problems
 get rid of extra max health/color check on roster update if the delay was the reason it was needed. not sure. think that might have been a problem even when there was no delay
+
+might want to do a pretty big rework of unit events, maybe make most of them similar to unit_health system and do an extra check for everything any time a unitguid's (main as in the one addon registers unit events for) unit token gets changed. that way could keep the useful delay and never have to worry about it causing problems. i'll test exactly how the order for things work but i think this might end up being the best way to do unit events/roster updates. (i think unit events can happen on the same gettime as roster update but roster update always happens toward the end of events for current gettime, making me wonder if events can happen for a unit and then that unit changes to something else on the same gettime. i know it's capped to one per gettime like a unit's unit_health). currently the addon gets carried by unit_aura fullupdates and a check in the addon's function for that whether unitguid matches
+dr system should be remade to be less awful to work with and made more similar to other icons, probably not given their own dedicated spots for an entire arena but not sure
+could improve drs to be more accurate too and not give incorrect border color sometimes if cc hits right on the edge of dr timer like at 18.6 sec, drs are rng for a small window there (i think) and current system doesn't consider that. should also test how that works in tww, might not even be rng anymore who knows
+whole loading sequence should be looked at. initialize should just put stuff into unloaded table, then run all loadon checks/class specific checks and decide whether to load or even just remove completely during playerlogin, also decide whether options[1] function should care about ignoring player or not here. can save a little bit of performance skipping the is or is not player checks for spells that player can't cast anyway
+
 
 make color check function more specific and not based on 5 different functions like unit_flags assuming anything can indicate d/c or reconnect? although that might just be the best way to do it
 
@@ -82,7 +87,9 @@ make cds smaller the fewer charges they have?
 
 always show minimum 1 dot debuff on a target if there are any? even if weak
 
-alt-ctrl-shift-right click to put a green 2nd border around arena frame or something and hide buff missing, like the red icon idea for debuff missing topleft of frame, if strat is to not dot that target or something after aura missing system gets made?
+alt-ctrl-shift-right click to put a green 2nd border around arena frame or something and hide buff missing, like the red icon idea for debuff missing topleft of frame, if strat is to not dot that target or something after aura missing system gets made? could be actually useful for shuffle/nocomms games if that makes it that way for other people using the addon although would probably never get used by more than 1% or fewer of players
+the better idea with alt-ctrl-shift-right clicking a frame is to give a frame/frames higher priority so for example you know it's you and 2 other dps going to mines at the start of ab, make both of those frames higher priority so it shows you, important dps1, important dps2 all together at the top and way more easy for people to target them with binds if they only have target 1-3 bound instead of full target raid1-10 or raid1-20
+this was really good in av classic when i had that set up in vuhdo, me claudio and gum first 3 raidframes and then the 37 others like normal, this will 100% get added as a feature eventually, not sure about the one for arena frames
 
 bigger lines if unit has offensive cds up? or a border or something, maybe not
 

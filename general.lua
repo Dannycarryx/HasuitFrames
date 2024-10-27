@@ -10,21 +10,101 @@ local hasuitFramesCenterSetEventType = hasuitFramesCenterSetEventType
 -- danLoadOnPvpTalentsInstance = hasuitFramesCenterAddLoadingProfile({
 	-- ["instanceType"]={["none"]=true,["arena"]=true,["pvp"]=true},
 -- })
-danLoadOnBgOnly = hasuitFramesCenterAddLoadingProfile({
-	["instanceType"]={["pvp"]=true},
-})
-danLoadOnInstanceTypeNone = hasuitFramesCenterAddLoadingProfile({
-	["instanceType"]={["none"]=true},
-})
-danLoadOnPartySize = hasuitFramesCenterAddLoadingProfile({
-	["groupSize"]=5,
-})
-danLoadOnArenaOnly = hasuitFramesCenterAddLoadingProfile({
-	["instanceType"]={["arena"]=true},
-})
-danLoadOnNotArenaOnly = hasuitFramesCenterAddLoadingProfile({
-	["instanceType"]={["none"]=true,["pvp"]=true,["party"]=true,["scenario"]=true,["raid"]=true,},
-})
+
+
+
+
+do --instanceType none
+	local loadOn = {}
+	local function loadOnCondition()
+		if hasuitInstanceType=="none" then --should load
+			if not loadOn.shouldLoad then --can remove these from ones where the check doesn't do anything useful after confident things work right
+				print(hasuitGreen, "hasuitLoadOnInstanceTypeNone")
+				loadOn.shouldLoad = true
+			end
+		else --should NOT load
+			if loadOn.shouldLoad~=false then
+				print(hasuitRed, "hasuitLoadOnInstanceTypeNone")
+				loadOn.shouldLoad = false
+			end
+		end
+	end
+	tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+	loadOnCondition()
+	hasuitLoadOnInstanceTypeNone = loadOn
+end
+do --instanceType pvp, (bg only)
+	local loadOn = {}
+	local function loadOnCondition()
+		if hasuitInstanceType=="pvp" then --should load
+			if not loadOn.shouldLoad then
+				print(hasuitGreen, "hasuitLoadOnBgOnly")
+				loadOn.shouldLoad = true
+			end
+		else --should NOT load
+			if loadOn.shouldLoad~=false then
+				print(hasuitRed, "hasuitLoadOnBgOnly")
+				loadOn.shouldLoad = false
+			end
+		end
+	end
+	tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+	loadOnCondition()
+	hasuitLoadOnBgOnly = loadOn
+end
+
+do --arena or not arena loadons
+	local loadOn = {}
+	local loadOn2 = {}
+	local function loadOnCondition()
+		if hasuitInstanceType~="arena" then --should load
+			if not loadOn.shouldLoad then
+				print(hasuitGreen, "hasuitLoadOnNotArenaOnly")
+				print(hasuitRed, "hasuitLoadOnArenaOnly")
+				loadOn.shouldLoad = true
+				loadOn2.shouldLoad = false
+			end
+		else --should NOT load
+			if loadOn.shouldLoad~=false then
+				print(hasuitGreen, "hasuitLoadOnArenaOnly")
+				print(hasuitRed, "hasuitLoadOnNotArenaOnly")
+				loadOn.shouldLoad = false
+				loadOn2.shouldLoad = true
+			end
+		end
+	end
+	tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+	loadOnCondition()
+	hasuitLoadOnNotArenaOnly = loadOn
+	hasuitLoadOnArenaOnly = loadOn2
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -92,8 +172,8 @@ do
 		[40] =	{22, 21, 20, 17, 15, 13, 10 }, --todo system for changing sizes of things based on frame size, and system for changing scale of everything while keeping every number an integer
 	}
 	local lastGroupSize = 0
-	local sizeTable = hasuitDoThisGroup_Roster_UpdateGroupSize_5_8_40
-	local updateAllSpellTablesSafe = hasuitUpdateAllSpellTablesSafe
+	local sizeTable = hasuitDoThisGroup_Roster_UpdateGroupSize_5_8
+	local mainLoadOnFunctionSpammable = hasuitMainLoadOnFunctionSpammable
 	local function danRbgFunction()
 		local bigGroupDebuffsRaidForSize = bigGroupDebuffsRaid[sizeTable.activeRelevantSize]
 		if lastGroupSize<6 then
@@ -106,13 +186,14 @@ do
 				options["size"]=bigGroupDebuffsRaidForSize[i]
 				options["controller"]=danTopRight_TopRight
 			end
-			if rootOptionsBreakableCleuPartLoadon.shouldLoad then --check doesn't do anything yet
+			if rootOptionsBreakableCleuPartLoadon.shouldLoad~=false then --check doesn't do anything yet
 				rootOptionsBreakable1["specialIconType"] = nil
 				rootOptionsBreakable1["specialAuraFunction"] = nil
 				rootOptionsBreakable175["specialIconType"] = nil
 				rootOptionsBreakable175["specialAuraFunction"] = nil
+				print(hasuitRed, "rootOptionsBreakableCleuPartLoadon")
 				rootOptionsBreakableCleuPartLoadon.shouldLoad = false
-				updateAllSpellTablesSafe()
+				mainLoadOnFunctionSpammable()
 			end
 		else
 			for i=1,#commonBigGroupDebuffs do
@@ -141,8 +222,9 @@ do
 				rootOptionsBreakable1["specialAuraFunction"] = hasuitSpecialAuraCcBreakThreshold
 				rootOptionsBreakable175["specialIconType"] = "ccBreak"
 				rootOptionsBreakable175["specialAuraFunction"] = hasuitSpecialAuraCcBreakThreshold
+				print(hasuitGreen, "rootOptionsBreakableCleuPartLoadon")
 				rootOptionsBreakableCleuPartLoadon.shouldLoad = true
-				updateAllSpellTablesSafe()
+				mainLoadOnFunctionSpammable()
 			end
 		end
 	end)
@@ -189,9 +271,9 @@ initialize(GetSpellName(216338)) --Food
 initialize(GetSpellName(308433)) --Food & Drink
 
 
-hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-69,	["loadOn"]=danLoadOnArenaOnly,		["group"]=commonBigGroupDebuffs[1],	["arena"]=commonBigBottomLeftArena[1], ["specialAuraFunction"]=hasuitShadowyDuelFunction} --rogue
+hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-69,	["loadOn"]=hasuitLoadOnArenaOnly,		["group"]=commonBigGroupDebuffs[1],	["arena"]=commonBigBottomLeftArena[1], ["specialAuraFunction"]=hasuitShadowyDuelFunction} --rogue
 initialize(207736) --Shadowy Duel --todo make something so that duel aura doesn't hide, maybe prevent other auras from hiding too
-hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-69,	["loadOn"]=danLoadOnNotArenaOnly,		["group"]=commonBigGroupDebuffs[1],	["arena"]=commonBigBottomLeftArena[1]} --rogue
+hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-69,	["loadOn"]=hasuitLoadOnNotArenaOnly,		["group"]=commonBigGroupDebuffs[1],	["arena"]=commonBigBottomLeftArena[1]} --rogue
 initialize(207736) --Shadowy Duel
 
 
@@ -445,11 +527,11 @@ initialize(81210) --Net, from ashran?
 
 
 
-hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-27,		["loadOn"]=danLoadOnNotArenaOnly,		["group"]=commonBigGroupDebuffs[6],	["arena"]=commonBigBottomLeftArena[6]}
+hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-27,		["loadOn"]=hasuitLoadOnNotArenaOnly,		["group"]=commonBigGroupDebuffs[6],	["arena"]=commonBigBottomLeftArena[6]}
 initialize(212183) --Smoke Bomb, moved down in priority because range opacity works well enough now + small bug with it being higher than other stuff like cheap shot when there isn't enough room on the frame, ends up weirdly merging/cd text from cheap shot/garrote shows on top of smoke bomb like it belongs to it. It probably belongs down here ideally anyway now --although i think i don't like it in rbgs now, maybe change border or something in rbgs to show it idk
-hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-27,		["loadOn"]=danLoadOnArenaOnly,			["group"]=commonBigGroupDebuffs[6], 										["specialAuraFunction"]=danSmokeBombSpecialFunctionForPlayer} --bomb on friendly
+hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-27,		["loadOn"]=hasuitLoadOnArenaOnly,			["group"]=commonBigGroupDebuffs[6], 										["specialAuraFunction"]=danSmokeBombSpecialFunctionForPlayer} --bomb on friendly
 initialize(212183) --Smoke Bomb
-hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-27,		["loadOn"]=danLoadOnArenaOnly,												["arena"]=commonBigBottomLeftArena[6], 	["specialAuraFunction"]=danSmokeBombSpecialFunctionForArenaFrames} --bomb on arena, game's range events are broken so this tries to work around it
+hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=-27,		["loadOn"]=hasuitLoadOnArenaOnly,												["arena"]=commonBigBottomLeftArena[6], 	["specialAuraFunction"]=danSmokeBombSpecialFunctionForArenaFrames} --bomb on arena, game's range events are broken so this tries to work around it
 initialize(212183) --Smoke Bomb
 
 
@@ -890,17 +972,17 @@ initialize(24450) --pet Prowl
 
 local middleGroupImportantMisc	=	{["controller"]=danMiddleMiddle,				["size"]=21,	["frameLevel"]=21,	["hideCooldownText"]=true,	["alpha"]=1,	}
 
-hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=150,		["loadOn"]=danLoadOnBgOnly,					["group"]=middleGroupImportantMisc, ["specialAuraFunction"]=danAuraFlagDebuffSpecialFunctionBg, ["textKey"]="danFontOrbOfPower", ["actualText"]=""} --textkey stuff to prevent it from getting stack text normally --this doesn't prevent anything? but oh well
+hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=150,		["loadOn"]=hasuitLoadOnBgOnly,					["group"]=middleGroupImportantMisc, ["specialAuraFunction"]=danAuraFlagDebuffSpecialFunctionBg, ["textKey"]="danFontOrbOfPower", ["actualText"]=""} --textkey stuff to prevent it from getting stack text normally --this doesn't prevent anything? but oh well
 initialize(46392)--Focused Assault
 initialize(46393) --Brutal Assault
 
-hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=153,		["loadOn"]=danLoadOnBgOnly,					["group"]=middleGroupImportantMisc, ["specialAuraFunction"]=danAuraOrbOfPowerSpecialFunction} --debuff doesn't have stacks so can do it differently than wsg/twin peaks debuffs
+hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=153,		["loadOn"]=hasuitLoadOnBgOnly,					["group"]=middleGroupImportantMisc, ["specialAuraFunction"]=danAuraOrbOfPowerSpecialFunction} --debuff doesn't have stacks so can do it differently than wsg/twin peaks debuffs
 initialize(121177) --Orb of Power
 initialize(121176) --Orb of Power
 initialize(121175) --Orb of Power
 initialize(121164) --Orb of Power
 
-hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=155,		["loadOn"]=danLoadOnBgOnly,					["group"]=middleGroupImportantMisc} --BG DEBUFFS ___
+hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=155,		["loadOn"]=hasuitLoadOnBgOnly,					["group"]=middleGroupImportantMisc} --BG DEBUFFS ___
 initialize(34976) --Netherstorm Flag
 initialize(156621) --Alliance Flag
 initialize(156618) --Horde Flag
@@ -913,11 +995,11 @@ initialize(231814) --Orange Dunkball
 
 
 
-hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=-100,		["loadOn"]=danLoadOnBgOnly,					["group"]=danCommonTopLeftGroup} --leaf, above other buffs top left	
+hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=-100,		["loadOn"]=hasuitLoadOnBgOnly,					["group"]=danCommonTopLeftGroup} --leaf, above other buffs top left	
 initialize(GetSpellName(23493)) --Restoration, leaf on flag maps
 initialize(422968) --Rune of Frequency, 50% cd reduction for 30 sec
 
-hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=160,		["loadOn"]=danLoadOnBgOnly,					["group"]=danCommonTopLeftGroup} --BG BUFFS ___
+hasuitSetupFrameOptions = {danMainAuraFunction,					["priority"]=160,		["loadOn"]=hasuitLoadOnBgOnly,					["group"]=danCommonTopLeftGroup} --BG BUFFS ___
 initialize(24378)	--rbg berserking?
 initialize(240466)	--rbg berserking?
 initialize(314058)	--rbg berserking?
@@ -998,23 +1080,36 @@ for i=1,5 do
 end
 
 
-danLoadOnGroupSize5_OrLess = hasuitFramesCenterAddLoadingProfile({
-	["groupSize"]=5,
-	
-	
-	["loadedFunction"]=function()
-		for i=1,5 do
-			danCommonTopRightGroupDebuffs[i]["size"] = dotDebuffsArena[i]
-			danCommonTopLeftArenaDebuffs[i]["size"] = dotDebuffsArena[i] --todo maybe get rid of these for arena, might do something with making frames in bgs later might not. --actually ya what does this line even do atm? nothing exists for arena units outside of arena not going to mess with it because it's what sets the size initially but ya
+do --groupSize 5 or less
+	local loadOn = {}
+	local mainLoadOnFunctionSpammable = hasuitMainLoadOnFunctionSpammable
+	local function loadOnCondition()
+		if hasuitGroupSize<=5 then --should load
+			if not loadOn.shouldLoad then
+				print(hasuitGreen, "hasuitLoadOnPartySize")
+				loadOn.shouldLoad = true
+				mainLoadOnFunctionSpammable()
+				for i=1,5 do
+					danCommonTopRightGroupDebuffs[i]["size"] = dotDebuffsArena[i]
+					danCommonTopLeftArenaDebuffs[i]["size"] = dotDebuffsArena[i] --todo maybe get rid of these for arena, might do something with making frames in bgs later might not. --actually ya what does this line even do atm? nothing exists for arena units outside of arena not going to mess with it because it's what sets the size initially but ya
+				end
+			end
+		else --should NOT load
+			if loadOn.shouldLoad~=false then
+				print(hasuitRed, "hasuitLoadOnPartySize")
+				loadOn.shouldLoad = false
+				mainLoadOnFunctionSpammable()
+				for i=1,5 do
+					danCommonTopRightGroupDebuffs[i]["size"] = dotDebuffsRbg[i] --todo turn this kind of setup into an easier to use function
+					danCommonTopLeftArenaDebuffs[i]["size"] = dotDebuffsRbg[i]
+				end
+			end
 		end
-	end,
-	["unloadedFunction"]=function()
-		for i=1,5 do
-			danCommonTopRightGroupDebuffs[i]["size"] = dotDebuffsRbg[i] --todo turn this kind of setup into an easier to use function
-			danCommonTopLeftArenaDebuffs[i]["size"] = dotDebuffsRbg[i]
-		end
-	end,
-})
+	end
+	tinsert(hasuitDoThisGroup_Roster_UpdateGroupSize_5.functions, loadOnCondition)
+	loadOnCondition()
+	hasuitLoadOnPartySize = loadOn
+end
 
 
 hasuitFramesCenterSetEventType("cleu")
@@ -1410,8 +1505,8 @@ initialize(198688) --Dagger in the Dark
 hasuitSetupFrameOptions = {danMainAuraFunction,						["priority"]=280,					["group"]=danCommonTopRightGroupDebuffs[5],	["arena"]=danCommonTopLeftArenaDebuffs[5],}
 initialize(GetSpellName(8326)) --Ghost, todo bigger/15 sec timer in rbgs?
 
--- hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=3,["loadOn"]=danLoadOnInstanceTypeNone,	["group"]=danCommonTopRightGroupDebuffs[5]} --deserter
--- initialize(GetSpellName(26013)) --Deserter --todo these need to get removed when entering instance since they're so long, then can uncomment
+-- hasuitSetupFrameOptions = {danMainAuraFunction,			["priority"]=3,["loadOn"]=hasuitLoadOnInstanceTypeNone,	["group"]=danCommonTopRightGroupDebuffs[5]} --deserter
+-- initialize(GetSpellName(26013)) --Deserter --todo these need to get removed when entering instance since they're so long, then can uncomment, surprised it's needed, seems like it'll work itself out after getting the order of loadons/everything else right?
 -- initialize(GetSpellName(71041)) --Dungeon Deserter
 -- initialize(158263) --Craven (arena deserter)
 
@@ -1441,7 +1536,7 @@ hasuitFramesCenterSetEventType("aura")
 
 danBottomLeft_BottomLeft	=	{["xDirection"]=1,	["yDirection"]=	1,	["xMinimum"]=2,	["yMinimum"]=3,	["xLimit"]=0,	["yLimit"]=0,	["ownPoint"]="BOTTOMLEFT",["targetPoint"]="BOTTOMLEFT",["xOffset"]=0,["yOffset"]=0,["grow"]=normalGrow,["sort"]=danSortPriorityExpirationTime}
 local commonHarmful = {["controller"]=danBottomLeft_BottomLeft,["size"]=15,	["frameLevel"]=20,	["hideCooldownText"]=true,	["alpha"]=1}
-hasuitFramesOptionsClassSpecificHarmful = {auraSourceIsPlayer,	["priority"]=1,	["arena"]=commonHarmful, ["loadOn"]=danLoadOnArenaOnly} --for github, i'm thinking about not showing debuffs bottom left at all and doing something different/using that space to show another dr like typhoon, so this is subject to change
+hasuitFramesOptionsClassSpecificHarmful = {auraSourceIsPlayer,	["priority"]=1,	["arena"]=commonHarmful, ["loadOn"]=hasuitLoadOnArenaOnly} --for github, i'm thinking about not showing debuffs bottom left at all and doing something different/using that space to show another dr like typhoon, so this is subject to change
 
 
 danBottomRight_BottomRight	=	{["xDirection"]=-1,	["yDirection"]=	1,	["xMinimum"]=1,	["yMinimum"]=1,	["xLimit"]=1,	["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT",["targetPoint"]="BOTTOMRIGHT",["xOffset"]=0,["yOffset"]=0,["grow"]=normalGrow,["sort"]=danSortPriorityExpirationTime}

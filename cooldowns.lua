@@ -41,13 +41,18 @@ hasuitBlessingOfAutumnIgnoreList = { --how would this interact with time stop? o
 local tinsert = tinsert
 
 local danCooldownDisplayLoadOn
-do
+do --cooldowns loadon
+	local danDoThisOnUpdate = hasuitDoThisOnUpdate
+	local arenaCrowdControlSpellUpdateFrame = hasuitArenaCrowdControlSpellUpdateFrame
+	hasuitArenaCrowdControlSpellUpdateFrame = nil
+	
 	local danRestoreCooldowns1
 	tinsert(hasuitDoThisAddon_Loaded, function()
 		danRestoreCooldowns1 = hasuitRestoreCooldowns
 		hasuitRestoreCooldowns = nil
 	end)
 	
+	local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
 	local function danRestoreCooldowns2()
 		for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do
 			for i=#unitTable,1,-1 do
@@ -56,45 +61,52 @@ do
 		end
 	end
 	
-	local danDoThisOnUpdate = hasuitDoThisOnUpdate
-	local arenaCrowdControlSpellUpdateFrame = hasuitArenaCrowdControlSpellUpdateFrame
-	hasuitArenaCrowdControlSpellUpdateFrame = nil
-
-	danCooldownDisplayLoadOn = hasuitFramesCenterAddLoadingProfile({
-		["instanceType"]={["none"]=true,["arena"]=true,["party"]=true,["scenario"]=true},
-		["groupSize"]=5,
-		
-		
-		["loadedFunction"]=function()
-			arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
-			arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
-			if hasuitCooldownDisplayActiveGroup==false then
-				danDoThisOnUpdate(danRestoreCooldowns2)
-				-- C_Timer.After(0, danRestoreCooldowns2)
+	
+	local loadOn = {}
+	local function loadOnCondition()
+		local instanceType = hasuitInstanceType
+		if hasuitGroupSize<=5 and (instanceType=="none" or instanceType=="arena" or instanceType=="party" or instanceType=="scenario") then --should load
+			if not loadOn.shouldLoad then
+				print(hasuitGreen, "hasuitCooldownDisplayLoadOn")
+				loadOn.shouldLoad = true
+				arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
+				arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
+				if hasuitCooldownDisplayActiveGroup==false then
+					danDoThisOnUpdate(danRestoreCooldowns2)
+					-- C_Timer.After(0, danRestoreCooldowns2)
+				end
+				hasuitCooldownDisplayActiveGroup = true
 			end
-			hasuitCooldownDisplayActiveGroup = true
-		end,
-		["unloadedFunction"]=function()
-			if hasuitCooldownDisplayActiveGroup then
-				arenaCrowdControlSpellUpdateFrame:UnregisterAllEvents()
-				for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do --bored todo make hasuitUnitFramesForUnitType an array? with a pairs table as well
-					for i=#unitTable,1,-1 do
-						local frame = unitTable[i]
-						if frame.cooldownPriorities then
-							for _, icon in pairs(frame.cooldownPriorities) do
-								hasuitRecycleCooldownIcon(icon)
+		else --should NOT load
+			if loadOn.shouldLoad~=false then
+				print(hasuitRed, "hasuitCooldownDisplayLoadOn")
+				loadOn.shouldLoad = false
+				if hasuitCooldownDisplayActiveGroup then
+					arenaCrowdControlSpellUpdateFrame:UnregisterAllEvents()
+					for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do --bored todo make hasuitUnitFramesForUnitType an array? with a pairs table as well
+						for i=#unitTable,1,-1 do
+							local frame = unitTable[i]
+							if frame.cooldownPriorities then
+								for _, icon in pairs(frame.cooldownPriorities) do
+									hasuitRecycleCooldownIcon(icon)
+								end
+								frame.cooldowns = {}
+								frame.cooldownOptions = {}
+								frame.cooldownPriorities = {}
+								frame.cooldownsDisabled = true
 							end
-							frame.cooldowns = {}
-							frame.cooldownOptions = {}
-							frame.cooldownPriorities = {}
-							frame.cooldownsDisabled = true
 						end
 					end
 				end
+				hasuitCooldownDisplayActiveGroup = false
 			end
-			hasuitCooldownDisplayActiveGroup = false
-		end,
-	})
+		end
+	end
+	tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+	tinsert(hasuitDoThisGroup_Roster_UpdateGroupSize_5.functions, loadOnCondition)
+	loadOnCondition()
+	danCooldownDisplayLoadOn = loadOn
+	hasuitCooldownDisplayLoadOn = loadOn
 end
 
 
