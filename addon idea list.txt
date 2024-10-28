@@ -1,13 +1,12 @@
 
 
 
---test
 
 other important:
 player buffs/debuffs showing for specs that haven't been set up like spriest dots on arena frames, buffs on allies from player, more important for friendly buffs
 middle cast bars
 display for spellcasts and who they're from for people with ranged kicks like shaman
-improve cd display in m+ or 4/5 man groups so they don't overlap chat and friendly interrupt cds show better, need to go through and separate interrupts from other cc and then put interrupt cds together in a combined table above unitframes or something like that, have option for where to put it. also figure out how it should be sorted, try to get it to sync with whatever people normally use for interrupts in pve so there's no disadvantage to using it. i think that's a thing anyway where they have an addon that shows who next interrupt is?
+make party interrupt display for m+
 display for purgable buffs for people that have purge
 pet frames
 make click through frames good to use like probably needs to have both left and right click target a unit so that either can be used depending on whether player wants camera move or player move, also option to disable both and only use mouseover, and option to just have normal frames. i think click through could be cool in raids for more mobility/less flinging cursor above raid frames to control movement but never got it to work before this so no experience. need to keep right click as focus on arena frames. small bonus to the click through stuff is can't accidentally click a frame and get prevented from turning. ages ago i tried to set things up so that everything that didn't have a reason to be clicked would ignore mouse clicks for this reason, although not sure if i've accidentally clicked anything but some stupid nameplate icons or the new popup saying the instance name or whatever. also todo make sure those are propagated through as much as possible. those are actually important to make less annoying
@@ -42,6 +41,7 @@ dr system should be remade to be less awful to work with and made more similar t
 could improve drs to be more accurate too and not give incorrect border color sometimes if cc hits right on the edge of dr timer like at 18.6 sec, drs are rng for a small window there (i think) and current system doesn't consider that. should also test how that works in tww, might not even be rng anymore who knows
 whole loading sequence should be looked at. initialize should just put stuff into unloaded table, then run all loadon checks/class specific checks and decide whether to load or even just remove completely during playerlogin, also decide whether options[1] function should care about ignoring player or not here. can save a little bit of performance skipping the is or is not player checks for spells that player can't cast anyway
 
+get rid of the gap that can happen if arena1/3 are targeting something but not arena2, maybe do something to make lines more distinct if a class is targeting their same class
 
 make color check function more specific and not based on 5 different functions like unit_flags assuming anything can indicate d/c or reconnect? although that might just be the best way to do it
 

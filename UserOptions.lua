@@ -71,11 +71,11 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
 			["partyX"]=-381,
 			["partyY"]=127, --old comment: number-hasuitRaidFrameHeightForGroupSize[5]-3?
 			
-			["raidX"]=0,
-			["raidY"]=-215,
-			
 			["arenaX"]=381,
 			["arenaY"]=127,
+			
+			["raidX"]=0,
+			["raidY"]=-215,
 			
 			
 			["groupColoredBackgroundMinimum"]=4, --todo option for pve only?
@@ -114,7 +114,7 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
 	userOptionsOnChanged["scale"] = function()
 		local scale = savedUserOptions["scale"]
 		if lastScale==1 and scale~=1 then
-			print("changing the scale from 1 will make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually")
+			print("changing the scale from 1 could make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually")
 		end
 		lastScale = scale
 		hasuitFrameParent:SetScale(scale*0.71111112833023)
@@ -341,78 +341,77 @@ local function nextPage()
 		end
 	end
 end
+
 local function openMainOptions()
 	if not userOptionsShown then
-		if userOptionsShown~=nil then
-			userOptionsFrame:Show()
-			currentOptionsPageIndex = 1
-			currentOptionsPage = optionsPages[1]
-			currentOptionsPage:Show()
-		else
-			userOptionsFrame:SetIgnoreParentScale(true)
-			userOptionsFrame:SetScale(0.71111112833023)
-			userOptionsFrame:SetBackdrop(danBackdrop)
-			userOptionsFrame:SetSize(710,30)
-			userOptionsFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 200)
-			userOptionsFrame:SetFrameStrata("HIGH")
-			userOptionsFrame:SetBackdropColor(0,0,0,0.8)
-			userOptionsFrame:SetBackdropBorderColor(0,0,0)
-			userOptionsFrame:SetMovable(true)
-			userOptionsFrame:EnableMouse(true)
-			userOptionsFrame:RegisterForDrag("LeftButton", "RightButton")
-			userOptionsFrame:SetScript("OnDragStart", function(optionsFrame)
-				optionsFrame:StartMoving()
-			end)
-			userOptionsFrame:SetScript("OnDragStop", function(optionsFrame)
-				optionsFrame:StopMovingOrSizing()
-			end)
-			userOptionsFrame:SetScript("OnKeyDown", onKeyDown)
-			
-			
-			local closeButton = CreateFrame("Button", "hasuitFramesOptionsCloseButton", userOptionsFrame, "BackdropTemplate")
-			closeButton:SetBackdrop(danBackdrop)
-			closeButton:SetBackdropColor(0.8,0,0)
-			closeButton:SetBackdropBorderColor(0,0,0)
-			closeButton:SetSize(50,50)
-			closeButtonText = closeButton:CreateFontString()
-			closeButtonText:SetFontObject(danFont25)
-			closeButtonText:SetText("x")
-			closeButtonText:SetPoint("CENTER",1,1)
-			closeButton:SetPoint("TOPRIGHT",userOptionsFrame,"TOPRIGHT")
-			closeButton:SetFrameLevel(3)
-			closeButton:EnableMouse(true)
-			closeButton:RegisterForClicks("AnyDown")
-			closeButton:SetScript("OnClick", hideUserOptionsFrame)
-			
-			local nextButton = CreateFrame("Button", "hasuitFramesOptionsNextButton", userOptionsFrame, "BackdropTemplate") --i don't like this being top right but kind of want different pages to be able to be different heights and not have to click in different spots to hit next page button, not sure
-			nextButton:SetBackdrop(danBackdrop)
-			nextButton:SetBackdropColor(0,0.2,0.4)
-			nextButton:SetBackdropBorderColor(0,0,0)
-			nextButton:SetSize(50,40)
-			nextButtonText = nextButton:CreateFontString()
-			nextButtonText:SetFontObject(danFont16)
-			nextButtonText:SetText("->")
-			nextButtonText:SetPoint("CENTER",1,1)
-			nextButtonText:SetJustifyH("CENTER")
-			nextButton:SetPoint("TOPRIGHT",closeButton,"TOPLEFT")
-			nextButton:SetFrameLevel(3)
-			nextButton:EnableMouse(true)
-			nextButton:RegisterForClicks("AnyDown")
-			nextButton:SetScript("OnClick", nextPage)
-			
-			nextPage()
-			
-		end
+		userOptionsFrame:Show()
+		currentOptionsPageIndex = 1
+		currentOptionsPage = optionsPages[1]
+		currentOptionsPage:Show()
 		userOptionsShown = true
 	else
 		hideUserOptionsFrame()
 	end
 end
-
+local function openMainOptionsFirst()
+	userOptionsFrame:SetIgnoreParentScale(true)
+	userOptionsFrame:SetScale(0.71111112833023)
+	userOptionsFrame:SetBackdrop(danBackdrop)
+	userOptionsFrame:SetSize(710,30)
+	userOptionsFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 200)
+	userOptionsFrame:SetFrameStrata("HIGH")
+	userOptionsFrame:SetBackdropColor(0,0,0,0.8)
+	userOptionsFrame:SetBackdropBorderColor(0,0,0)
+	userOptionsFrame:SetMovable(true)
+	userOptionsFrame:EnableMouse(true)
+	userOptionsFrame:RegisterForDrag("LeftButton", "RightButton")
+	userOptionsFrame:SetScript("OnDragStart", function(optionsFrame)
+		optionsFrame:StartMoving()
+	end)
+	userOptionsFrame:SetScript("OnDragStop", function(optionsFrame)
+		optionsFrame:StopMovingOrSizing()
+	end)
+	userOptionsFrame:SetScript("OnKeyDown", onKeyDown)
+	
+	local closeButton = CreateFrame("Button", "hasuitFramesOptionsCloseButton", userOptionsFrame, "BackdropTemplate")
+	closeButton:SetBackdrop(danBackdrop)
+	closeButton:SetBackdropColor(0.8,0,0)
+	closeButton:SetBackdropBorderColor(0,0,0)
+	closeButton:SetSize(50,50)
+	closeButtonText = closeButton:CreateFontString()
+	closeButtonText:SetFontObject(danFont25)
+	closeButtonText:SetText("x")
+	closeButtonText:SetPoint("CENTER",1,1)
+	closeButton:SetPoint("TOPRIGHT",userOptionsFrame,"TOPRIGHT")
+	closeButton:SetFrameLevel(3)
+	closeButton:EnableMouse(true)
+	closeButton:RegisterForClicks("AnyDown")
+	closeButton:SetScript("OnClick", hideUserOptionsFrame)
+	
+	local nextButton = CreateFrame("Button", "hasuitFramesOptionsNextButton", userOptionsFrame, "BackdropTemplate") --i don't like this being top right but kind of want different pages to be able to be different heights and not have to click in different spots to hit next page button, not sure
+	nextButton:SetBackdrop(danBackdrop)
+	nextButton:SetBackdropColor(0,0.2,0.4)
+	nextButton:SetBackdropBorderColor(0,0,0)
+	nextButton:SetSize(50,40)
+	nextButtonText = nextButton:CreateFontString()
+	nextButtonText:SetFontObject(danFont16)
+	nextButtonText:SetText("->")
+	nextButtonText:SetPoint("CENTER",1,1)
+	nextButtonText:SetJustifyH("CENTER")
+	nextButton:SetPoint("TOPRIGHT",closeButton,"TOPLEFT")
+	nextButton:SetFrameLevel(3)
+	nextButton:EnableMouse(true)
+	nextButton:RegisterForClicks("AnyDown")
+	nextButton:SetScript("OnClick", nextPage)
+	
+	nextPage()
+	
+	SlashCmdList.HasuitFrames = openMainOptions
+end
 
 SLASH_HasuitFrames1 = "/hf" --capitalization doesn't matter
 SLASH_HasuitFrames2 = "/hasuitframes"
 SLASH_HasuitFrames3 = "/hasuit"
 SLASH_HasuitFrames4 = "/hasuit frames"
-SlashCmdList.HasuitFrames = openMainOptions
+SlashCmdList.HasuitFrames = openMainOptionsFirst
 

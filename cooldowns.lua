@@ -49,7 +49,7 @@ do --cooldowns loadon
 	local danRestoreCooldowns1
 	tinsert(hasuitDoThisAddon_Loaded, function()
 		danRestoreCooldowns1 = hasuitRestoreCooldowns
-		hasuitRestoreCooldowns = nil
+		-- hasuitRestoreCooldowns = nil
 	end)
 	
 	local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
@@ -60,6 +60,8 @@ do --cooldowns loadon
 			end
 		end
 	end
+	
+	
 	
 	
 	local loadOn = {}
@@ -88,7 +90,9 @@ do --cooldowns loadon
 							local frame = unitTable[i]
 							if frame.cooldownPriorities then
 								for _, icon in pairs(frame.cooldownPriorities) do
-									hasuitRecycleCooldownIcon(icon)
+									if icon.recycle then
+										hasuitRecycleCooldownIcon(icon)
+									end
 								end
 								frame.cooldowns = {}
 								frame.cooldownOptions = {}
@@ -218,18 +222,19 @@ do
 	local yOffsets = (defaultCdSize-hasuitRaidFrameHeightForGroupSize[3])/2-1 --doing it like this with TOPRIGHT/TOPLEFT instead of RIGHT/LEFT because it'll be better if i make some cooldowns different sizes? will need to change something if frame size stuff for under groupsize 6 is ever different --which should be possible in useroptions, todo
 	
 	hasuitTrinketCooldowns={}
-	hasuitInterruptCooldowns={}
 	hasuitDefensiveCooldowns={}
+	hasuitInterruptCooldowns={}
+	hasuitCrowdControlCooldowns={}
 	hasuitCooldownsControllers = {
-		{
+		{ --trinket
 			["grow"]=cooldownGrowLimited,
 			["sort"]=danSortCooldowns,
 			["setPointOnBorder"]=true,
 			["group"]={["specCooldowns"]=hasuitTrinketCooldowns,	["size"]=defaultCdSize,["xDirection"]=-1,["ownPoint"]="TOPRIGHT",["targetPoint"]="TOPLEFT",["xOffset"]=-44,["yOffset"]=yOffsets,["limit"]=1}, --could have like a half grow upward when trinket is about to come up and go back to limit 1 when it's off cd, some way of showing trinket is about to come up would be nice?
-			["arena"]={["specCooldowns"]=hasuitTrinketCooldowns,	["size"]=defaultCdSize,["xDirection"]=1, ["ownPoint"]="TOPLEFT",["targetPoint"]="TOPRIGHT",["xOffset"]=44,["yOffset"]=yOffsets,["limit"]=1},
+			["arena"]={["specCooldowns"]=hasuitTrinketCooldowns,	["size"]=defaultCdSize,["xDirection"]=1, ["ownPoint"]="TOPLEFT",["targetPoint"]="TOPRIGHT",["xOffset"]=44,["yOffset"]=yOffsets,["limit"]=1}, --offsets/limits change below too from 4 or 5 people in group
 		},
 		
-		{
+		{ --defensive
 			["grow"]=cooldownGrowLimited,
 			["sort"]=danSortCooldowns,
 			["setPointOnBorder"]=true,
@@ -237,14 +242,110 @@ do
 			["arena"]={["specCooldowns"]=hasuitDefensiveCooldowns,	["size"]=defaultCdSize,["xDirection"]=1, ["ownPoint"]="TOPLEFT", ["targetPoint"]="TOPRIGHT",["xOffset"]=73,["yOffset"]=yOffsets,["limit"]=7},
 		},
 		
-		{
+		{ --interrupt
+			["grow"]=cooldownGrowLimited,
+			["sort"]=danSortCooldowns,
+			["setPointOnBorder"]=true,
+			["group"]={["specCooldowns"]=hasuitInterruptCooldowns,	["size"]=defaultCdSize,["xDirection"]=-1,["ownPoint"]="TOPRIGHT",["targetPoint"]="TOPLEFT",["xOffset"]=-305,["yOffset"]=yOffsets,["limit"]=1},
+			["arena"]={["specCooldowns"]=hasuitInterruptCooldowns,	["size"]=defaultCdSize,["xDirection"]=1, ["ownPoint"]="TOPLEFT", ["targetPoint"]="TOPRIGHT",["xOffset"]=305,["yOffset"]=yOffsets,["limit"]=1},
+		},
+		
+		{ --crowdcontrol
 			["grow"]=cooldownGrow,
 			["sort"]=danSortCooldownsStationaryish,
 			["setPointOnBorder"]=true,
-			["group"]={["specCooldowns"]=hasuitInterruptCooldowns,	["size"]=defaultCdSize,["xDirection"]=-1,["ownPoint"]="TOPRIGHT",["targetPoint"]="TOPLEFT",["xOffset"]=-305,["yOffset"]=yOffsets},
-			["arena"]={["specCooldowns"]=hasuitInterruptCooldowns,	["size"]=defaultCdSize,["xDirection"]=1, ["ownPoint"]="TOPLEFT", ["targetPoint"]="TOPRIGHT",["xOffset"]=305,["yOffset"]=yOffsets},
+			["group"]={["specCooldowns"]=hasuitCrowdControlCooldowns,	["size"]=defaultCdSize,["xDirection"]=-1,["ownPoint"]="TOPRIGHT",["targetPoint"]="TOPLEFT",["xOffset"]=-334,["yOffset"]=yOffsets},
+			["arena"]={["specCooldowns"]=hasuitCrowdControlCooldowns,	["size"]=defaultCdSize,["xDirection"]=1, ["ownPoint"]="TOPLEFT", ["targetPoint"]="TOPRIGHT",["xOffset"]=334,["yOffset"]=yOffsets},
 		},
 	}
+	
+	do
+		local recycleCooldownIcon
+		function hasuitDoThisRandomFunctionAsd(func)
+			recycleCooldownIcon = func
+		end
+		local danCooldownDoneRecycle = hasuitCooldownDoneRecycle
+		local function cleanController(controller)
+			if controller then
+				local frames = controller.frames
+				for i=1,#frames do
+					local icon = frames[i]
+					if icon.recycle then
+						recycleCooldownIcon(icon)
+					end
+				end
+			end
+		end
+		local danRestoreCooldowns
+		tinsert(hasuitDoThisAddon_Loaded, function()
+			danRestoreCooldowns = hasuitRestoreCooldowns
+			hasuitRestoreCooldowns = nil
+		end)
+		local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
+		local lastSize
+		local trinketControllerOptions = hasuitCooldownsControllers[1]
+		local defensiveControllerOptions = hasuitCooldownsControllers[2]
+		local interruptControllerOptions = hasuitCooldownsControllers[3]
+		local crowdControlControllerOptions = hasuitCooldownsControllers[4]
+		local trinketControllerOptionsGroupUnitTypeStuff = trinketControllerOptions["group"]
+		local defensiveControllerOptionsGroupUnitTypeStuff = defensiveControllerOptions["group"]
+		local interruptControllerOptionsGroupUnitTypeStuff = interruptControllerOptions["group"]
+		local crowdControlControllerOptionsGroupUnitTypeStuff = crowdControlControllerOptions["group"]
+		tinsert(hasuitDoThisGroup_Roster_UpdateGroupSizeChanged, function() --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size forgot about that
+			local groupSize = hasuitGroupSize
+			if groupSize==4 or groupSize==5 then
+				if lastSize~=4 and lastSize~=5 then
+					trinketControllerOptionsGroupUnitTypeStuff["xOffset"] = -5
+					defensiveControllerOptionsGroupUnitTypeStuff["xOffset"] = -34
+					defensiveControllerOptionsGroupUnitTypeStuff["limit"] = 5
+					interruptControllerOptions["group"] = nil
+					crowdControlControllerOptions["group"] = nil
+					for i=1,#groupUnitFrames do
+						local frame = groupUnitFrames[i]
+						if not frame.cooldownsDisabled then
+							local controller1 = frame.controllersPairs[trinketControllerOptions]
+							if controller1 then
+								hasuitSortController(controller1)
+							end
+							local controller2 = frame.controllersPairs[defensiveControllerOptions]
+							if controller2 then
+								hasuitSortController(controller2)
+							end
+							cleanController(frame.controllersPairs[interruptControllerOptions])
+							cleanController(frame.controllersPairs[crowdControlControllerOptions])
+						end
+					end
+				end
+			else
+				if lastSize==4 or lastSize==5 then
+					trinketControllerOptionsGroupUnitTypeStuff["xOffset"] = -44
+					defensiveControllerOptionsGroupUnitTypeStuff["xOffset"] = -73
+					defensiveControllerOptionsGroupUnitTypeStuff["limit"] = 7
+					interruptControllerOptions["group"] = interruptControllerOptionsGroupUnitTypeStuff
+					crowdControlControllerOptions["group"] = crowdControlControllerOptionsGroupUnitTypeStuff
+					for i=1,#groupUnitFrames do
+						local frame = groupUnitFrames[i]
+						if not frame.cooldownsDisabled then
+							if frame.cooldownPriorities then
+								for _, icon in pairs(frame.cooldownPriorities) do
+									if icon.recycle then --idk, this got way dumber than i wanted. i guess there's a conflict between this and cooldowns loadon/controller delaying actually removing the icons? should be able to cheese it by checking icon.recycle like this?
+										recycleCooldownIcon(icon)
+									end
+								end
+								frame.cooldowns = {}
+								frame.cooldownOptions = {}
+								frame.cooldownPriorities = {}
+								frame.cooldownsDisabled = true
+								danRestoreCooldowns(frame)
+							end
+						end
+					end
+				end
+			end
+			lastSize = groupSize
+		end)
+	end
+	
 end
 
 hasuitFramesCenterSetEventType("cleu")
@@ -321,372 +422,44 @@ do
 	end
 	
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	do
-		local interruptCooldowns = hasuitInterruptCooldowns
-		
-		
-		hasuitTrackedRaceCooldowns["Pandaren"] = true
-		interruptCooldowns["Pandaren"]={
-			{cdCle2,["spellId"]=107079,	["priority"]=40,["duration"]=120},--Quaking Palm
-		}
-		
-		
-		-- interruptCooldowns["general"]={
-		-- }
-		
-		
-		
-		do
-			local cdCleSB=danCleuSuccessCooldownStartSolarBeam
-			
-			local skullBashTableHidden=
-				{cdCle2,["spellId"]=106839,	["priority"]=2,["duration"]=15,  --Skull Bash hidden
-					["startAlpha"]=0}
-			local skullBashTable=
-				{cdCle2,["spellId"]=106839,	["priority"]=2,["duration"]=15}  --Skull Bash normal
-			local maimTable=
-				{cdCle2,["spellId"]=22570,	["priority"]=4,["duration"]=20,  --Maim hidden
-					["startAlpha"]=0}
-			local typhoonTable=
-				{cdCle2,["spellId"]=61391,	["priority"]=5,["duration"]=30,  --Typhoon hidden
-					["startAlpha"]=0}
-			
-			interruptCooldowns["DRUID"]={
-				{cdCle2,["spellId"]=5211,	["priority"]=3,	["duration"]=60},--Mighty Bash
-				{cdCle2,["spellId"]=99,		["priority"]=3,	["duration"]=30},--Incapacitating Roar
-			}
-			interruptCooldowns[102]={--Balance
-				{cdCleSB,["spellId"]=78675,	["priority"]=1,	["duration"]=60},--Solar Beam
-				skullBashTableHidden,
-				{cdCle2,["spellId"]=61391,	["priority"]=5,	["duration"]=30, --Typhoon low opacity
-					["startAlpha"]=lowStartAlpha},
-			}
-			interruptCooldowns[103]={--Feral
-				skullBashTable,
-				{cdCle2,["spellId"]=22570,	["priority"]=4,	["duration"]=20},--Maim
-				typhoonTable,
-			}
-			interruptCooldowns[104]={--Guardian
-				skullBashTable,
-				maimTable,
-				typhoonTable,
-			}
-			interruptCooldowns[105]={--Restoration
-				skullBashTableHidden,
-				maimTable,
-				typhoonTable,
-			}
-			
-			
-			hasuitSetupFrameOptions = {danCleuInterruptCooldownReductionSolarBeam,["CDr"]=15,["affectedSpells"]={78675},["loadOn"]=danCooldownDisplayLoadOn}--Solar Beam
-			initialize(97547) --Solar Beam interrupt
-			
-		end
-
-
-		interruptCooldowns["DEATHKNIGHT"]={ --todo pet stuff
-			{cdCle2,["spellId"]=47528,	["priority"]=1,	["duration"]=15},--Mind Freeze
-			{cdCle2,["spellId"]=77606,	["priority"]=2,	["duration"]=20, --Dark Simulacrum hidden
-				["startAlpha"]=0},
-			{cdCle2,["spellId"]=47476,	["priority"]=3,	["duration"]=45},--Strangulate
-			{cdCle2,["spellId"]=221562,	["priority"]=3,	["duration"]=45},--Asphyxiate
-			{cdCle2,["spellId"]=108194,	["priority"]=3,	["duration"]=45},--Asphyxiate?
-			{cdCle2,["spellId"]=207167,	["priority"]=5,	["duration"]=60},--Blinding Sleet
-		}
-		-- interruptCooldowns[250]={--Blood
-		-- }
-		interruptCooldowns[251]={--Frost --todo remorseless winter?
-			{cleAurP,["spellId"]=377048,	["priority"]=4,	["duration"]=90,--Absolute Zero (from Frostwyrm's Fury), should maybe be 89 or something? probably not worth making a whole thing to make the cd based on actual spellcast and then only show once they're confirmed playing the stun. --todo hide if not playing the stun? or change icon to the dragon?
-				["startAlpha"]=lowStartAlpha},
-		}
-		-- interruptCooldowns[252]={--Unholy
-		-- }
-		hasuitSetupFrameOptions = {danCleuEnergizeCooldownReduction,["CDr"]=3,["affectedSpells"]={47528},["loadOn"]=danCooldownDisplayLoadOn}--Mind Freeze
-		initialize(378849) --Coldthirst
-		
-		
-
-
-		interruptCooldowns["DEMONHUNTER"]={
-			{cdCle2,["spellId"]=183752,	["priority"]=1,	["duration"]=15},--Disrupt
-			{cdCle2,["spellId"]=179057,	["priority"]=2,	["duration"]=45},--Chaos Nova, there'sa tongues talent [Wave of Debilitation] new duration was 60
-			{cdCle2,["spellId"]=217832,	["priority"]=4,	["duration"]=45},--Imprison
-			{cdCle2,["spellId"]=221527,	["priority"]=4,	["duration"]=45},--Imprison immune
-			{cdCle2,["spellId"]=207684,	["priority"]=5,	["duration"]=90},--Sigil of Misery base 120, not sure if they take -25% honor talent
-		}
-		-- interruptCooldowns[577]={--Havoc
-			-- {cdCle2,["spellId"]=211881,	["priority"]=3,	["duration"]=30},--Fel Eruption
-		-- }
-		-- interruptCooldowns[581]={--Vengeance
-		-- }
-
-
-		do
-			local quell20=
-				{cdCle2,["spellId"]=351338,	["priority"]=1,	["duration"]=20}--Quell 20
-			
-			interruptCooldowns["EVOKER"]={ --todo wing buffet, tail swipe?
-				{cdCleE,["spellId"]=382266,	["priority"]=5,	["duration"]=30}, --Fire Breath
-				{cdCleE,["spellId"]=357208,	["priority"]=5,	["duration"]=30}, --Fire Breath
-			}
-			interruptCooldowns[1467]={--Devastation
-				quell20,
-				{cdCle2,["spellId"]=357210,	["priority"]=3,	["duration"]=60},--Deep Breath 60, base 120
-				{cdCle2,["spellId"]=433874,	["priority"]=3,	["duration"]=60},--Deep Breath 60, base 120
-			}
-			interruptCooldowns[1468]={--Preservation
-				{cdCle2,["spellId"]=351338,	["priority"]=1,	["duration"]=40},--Quell 40
-				{cdCle2,["spellId"]=357210,	["priority"]=3,	["duration"]=120},--Deep Breath, todo [Wingleader] and [Onyx Legacy]
-				{cdCle2,["spellId"]=433874,	["priority"]=3,	["duration"]=120},--Deep Breath 120, this one is 3.75 sec duration and more common, other one is 6 sec, can't tell where the difference comes from but maybe one is devastation and the other is pres, or maybe one is the one that can fly around and be controlled but idk where the extra duration is coming from if that's the case. the 3.75 second one is an entirely different spellid but also adds like 5 random points and moves some around from the old spellid. none of the points ever change so like what? what's the point of points in an aura that look like this ["0, 0, -200, 0, 0, -100"]/["0, 0, 0, -200, -200, 200, 0, 100, 70, 70, -100, 0"] and not a single one ever changes? maybe just supposed to be used internally by blizzard and a way to tune stuff easily like how fast you can turn while it's active? speed and stuff. not actually inefficient probably i guess maybe, just weird because there are definitely ways to do that without it showing up in an aura's points. also why does the first -200 change from [3] to [4]? what's the extra 0 lol, or maybe it moved to [5]
-				{cdCle2,["spellId"]=359816,	["priority"]=4,	["duration"]=120, --Dream Flight
-					["startAlpha"]=0},
-			}
-			interruptCooldowns[1473]={--Augmentation
-				quell20,
-				{cdCle2,["spellId"]=403631,	["priority"]=3,	["duration"]=120},--Breath of Eons, same thing as deep breath? spellid must be based on whether talent is taken that makes you able to steer but too low lvl to test
-				{cdCle2,["spellId"]=442204,	["priority"]=3,	["duration"]=120},--Breath of Eons
-				{cdCle2,["spellId"]=404977,	["priority"]=2,	["duration"]=180},--Time Skip
-			}
-			
-			tinsert(timeSkipAffectedSpells, 382266) --Fire Breath
-			tinsert(timeSkipAffectedSpells, 357208) --Fire Breath
-			tinsert(timeSkipAffectedSpells, 351338) --Quell
-			tinsert(timeSkipAffectedSpells, 403631) --Breath of Eons
-			tinsert(timeSkipAffectedSpells, 442204) --Breath of Eons
-			
-			hasuitSetupFrameOptions = {danCleuSpellEmpowerInterruptCooldownReduction,["CDr"]="reset",["affectedSpells"]={382266, 357208},["loadOn"]=danCooldownDisplayLoadOn} --Fire Breath, could have just done like 10000 for cdr instead of having "reset" be a thing?
-			initialize(382266) --Fire Breath
-			initialize(357208) --Fire Breath
-			hasuitSetupFrameOptions = {danCleuAppliedCooldownReduction,["CDr"]=3,["affectedSpells"]={357210, 433874, 442204},["loadOn"]=danCooldownDisplayLoadOn} --Deep Breath, bored todo 3 sec cap? might not get reached every time, assuming i understand how this works from reading the tooltip
-			initialize(434473) --Bombardments
-		end
-
-		interruptCooldowns["MONK"]={
-			{cdCle2,["spellId"]=116705,	["priority"]=1,	["duration"]=15},--Spear Hand Strike
-			{cdCle2,["spellId"]=119381,	["priority"]=2,	["duration"]=50},--Leg Sweep base 60
-			{cdCle2,["spellId"]=115078,	["priority"]=3,	["duration"]=30},--Paralysis base 45
-			{cdCle2,["spellId"]=116844,	["priority"]=4,	["duration"]=40},--Ring of Peace base 45, do people take the -5 sec?
-		}
-		-- interruptCooldowns[268]={--Brewmaster
-		-- }
-		-- interruptCooldowns[269]={--Windwalker
-		-- }
-		-- interruptCooldowns[270]={--Mistweaver
-		-- }
-		hasuitSetupFrameOptions = {danCleuInterruptCooldownReduction,["CDr"]=5,["affectedSpells"]={115078},["loadOn"]=danCooldownDisplayLoadOn} --paralysis, do people take [Energy Transfer]?
-		initialize(116705) --spear hand strike
-		
-		
-
-
-		interruptCooldowns["WARRIOR"]={
-			{cdCle2,["spellId"]=6552,	["priority"]=1,	["duration"]=13.3},--Pummel --base 15, 382461 1 sec off pummel, 5% from another
-			{cdCle2,["spellId"]=107570,	["priority"]=2,	["duration"]=28.5},--Storm Bolt
-			{cdCle2,["spellId"]=46968,	["priority"]=3,	["duration"]=25, --Shockwave --todo 15 sec reduction if it hit 3 targets,40 baseline, todo -5 sec from [Earthquaker] probably has an event
-				["startAlpha"]=lowStartAlpha},
-			{cdCle2,["spellId"]=5246,	["priority"]=4,	["duration"]=90},--Intimidating Shout
-		}
-		interruptCooldowns[71]={--Arms
-			{cdCle2,["spellId"]=236320,	["priority"]=6,	["duration"]=90, --War Banner
-				["startAlpha"]=lowStartAlpha},
-		
-		}
-		-- interruptCooldowns[72]={--Fury
-		-- }
-		-- interruptCooldowns[73]={--Protection
-			-- {cdCle2,["spellId"]="Disrupting Shout",	["priority"]=1,	["duration"]=75},--Disrupting Shout todo?
-		-- }
-
-
-		interruptCooldowns["HUNTER"]={
-			{cdCle2,["spellId"]=19577,	["priority"]=2,	["duration"]=55},--Intimidation base 60, do people take -5?
-			{cdCle2,["spellId"]=187650,	["priority"]=3,	["duration"]=25},--Freezing Trap, 30 base, do people take -5?
-			{cdCle2,["spellId"]=213691,	["priority"]=4,	["duration"]=30},--Scatter Shot, doesn't share with binding anymore, shares with bursting now todo
-			{cdCle2,["spellId"]=109248,	["priority"]=5,	["duration"]=45},--Binding Shot
-			{cdCle2,["spellId"]=236776,	["priority"]=6,	["duration"]=35},--High Explosive Trap, 40 base, do people take -5? doesn't replace intim anymore, worth to track?
-		}
-		interruptCooldowns[253]={--Beast Mastery
-			{cdCle2,["spellId"]=147362,	["priority"]=1,	["duration"]=22},--Counter Shot base 24, people prob take this talent
-		}
-		interruptCooldowns[254]={--Marksmanship
-			{cdCle2,["spellId"]=147362,	["priority"]=1,	["duration"]=22},--Counter Shot base 24
-		}
-		interruptCooldowns[255]={--Survival
-			{cdCle2,["spellId"]=187707,	["priority"]=1,	["duration"]=13},--Muzzle base 15
-		}
-		
-		hasuitSetupFrameOptions = {danCleuSuccessCooldownReduction,["CDr"]=0.5,["affectedSpells"]={19577, 109248},["loadOn"]=danCooldownDisplayLoadOn} --intimidation and binding shot
-		initialize(259495) --wildfire bomb
-		initialize(19434) --Aimed Shot
-		initialize(34026) --bm kill command
-		
-		hasuitSetupFrameOptions = {danCleuAppliedCooldownReductionSourceIsDest,["CDr"]="reset",["affectedSpells"]={213691},["loadOn"]=danCooldownDisplayLoadOn} --Scatter Shot
-		initialize(385646) --Quick Load from health 40%
-		
-		
-		
-		
-
-		interruptCooldowns["WARLOCK"]={
-			{cdCle2,["spellId"]=132409,	["priority"]=1,	["duration"]=24},--Spell Lock?
-			
-			{cdCast,["spellId"]=119910,	["priority"]=1,	["duration"]=24},--Spell Lock (command demon) --seems 100% impossible to track these properly if they press command demon while out of range
-			{cdCast,["spellId"]=119905,	["priority"]=1,	["duration"]=15},--Singe Magic (command demon)
-			{cdCast,["spellId"]=119907,	["priority"]=1,	["duration"]=120},--Shadow Bulwark (command demon)
-			{cdCast,["spellId"]=119909,	["priority"]=1,	["duration"]=0.5},--Seduction (command demon)
-			{cdPet,	["spellId"]=19647,	["priority"]=1,	["duration"]=24},--Spell Lock (pet)
-			{cdPet,	["spellId"]=89808,	["priority"]=1,	["duration"]=15},--Singe Magic (pet)
-			{cdPet,	["spellId"]=17767,	["priority"]=1,	["duration"]=120},--Shadow Bulwark (pet)
-			{cdPet,	["spellId"]=6358,	["priority"]=1,	["duration"]=0.5},--Seduction (pet)
-			{cdCle2,["spellId"]=6789,	["priority"]=3,	["duration"]=45},--Mortal Coil
-			{cdCle2,["spellId"]=5484,	["priority"]=3,	["duration"]=40},--Howl of Terror
-		}
-		-- interruptCooldowns[265]={--Affliction
-		-- }
-		interruptCooldowns[266]={--Demonology
-			{cdCast,["spellId"]=119914,	["priority"]=1,	["duration"]=30},--Axe Toss (command demon)
-			{cdPet,	["spellId"]=89766,	["priority"]=1,	["duration"]=30},--Axe Toss (pet)
-			
-			{cdCle2,["spellId"]=111898,	["priority"]=2,	["duration"]=120},--Grimoire: Felguard
-		}
-		interruptCooldowns[267]={--Destruction
-			{cdCle2,["spellId"]=1122,	["priority"]=4,	["duration"]=120},--Summon Infernal --todo check for buff after infernal cast to determine whether they took -60 sec cd talent, sometimes they take it sometimes they don't. 180 base
-		}
-
-		interruptCooldowns["MAGE"]={
-			{cdCle2,["spellId"]=2139,	["priority"]=1,	["duration"]=24},--Counterspell
-			{cdCle2,["spellId"]=382440,	["priority"]=2,	["duration"]=60},--Shifting Power
-			{cdCle2,["spellId"]=31661,	["priority"]=3,	["duration"]=45},--Dragon's Breath --todo all specs 387807 Casting Ice Lance on Frozen targets reduces the cooldown of your loss of control abilities by 2 sec.
-		}
-		-- interruptCooldowns[62]={--Arcane
-		-- }
-		-- interruptCooldowns[63]={--Fire
-		-- }
-		-- interruptCooldowns[64]={--Frost
-		-- }
-		
-		-- if hasuitPlayerClass=="DRUID" then
-			-- tinsert(interruptCooldowns["MAGE"], --actually just re-enable this after making the ice lance cd reduction
-				-- {cdCle2,["spellId"]=113724,	["priority"]=4,	["duration"]=45}--Ring of Frost, nice to call out "only ring" sometimes if in form, could add this only for resto when that gets made, maybe this should be tracked for any dps spec if they have a resto druid or just always tracked
-				-- tinsert(shiftingPowerAffectedSpells, 113724) --Ring of Frost
-				-- tinsert(coldSnapAffectedSpells, 113724) --Ring of Frost
-			-- ) 
-		-- end
-		
-		tinsert(shiftingPowerAffectedSpells, 2139) --counterspell
-		tinsert(shiftingPowerAffectedSpells, 31661) --dragon's breath
-		
-		hasuitSetupFrameOptions = {danCleuInterruptCooldownReduction,["CDr"]=4,["affectedSpells"]={2139},["loadOn"]=danCooldownDisplayLoadOn}
-		initialize(2139) --counterspell 4 sec reduction
-
-
-		interruptCooldowns["SHAMAN"]={ --todo track earth ele stun, maybe like earth ele cd that gets replaced by the stun when earth ele is out, todo static field?
-			{cdCle2,["spellId"]=57994,	["priority"]=1,	["duration"]=12},--Wind Shear
-			{cdCle2,["spellId"]=204336,	["priority"]=3,	["duration"]=24},--Grounding Totem
-			{cdCle2,["spellId"]=51490,	["priority"]=4,	["duration"]=30, --Thunderstorm, todo can be -5 sec if talented with knockup
-				["startAlpha"]=lowStartAlpha},
-		}
-		-- interruptCooldowns[262]={--Elemental
-		-- }
-		interruptCooldowns[263]={--Enhancement
-			{cdCle2,["spellId"]=197214,	["priority"]=2,	["duration"]=40},--Sundering todo -12 sec from [Whirling Elements]
-		}
-		-- interruptCooldowns[264]={--Restoration
-		-- }
-		
-		
-		do
-			local blind120 = 
-				{cdCle2,["spellId"]=2094,	["priority"]=4,	["duration"]=120} --Blind 120
-			
-			
-			interruptCooldowns["ROGUE"]={
-				{cdCle2,["spellId"]=1766,	["priority"]=1,	["duration"]=15},--Kick
-				{cdCle2,["spellId"]=408,	["priority"]=2,	["duration"]=30},--Kidney Shot
-				{cdCle2,["spellId"]=1776,	["priority"]=3,	["duration"]=25},--Gouge new duration was 20
-			}
-			interruptCooldowns[259]={--Assassination
-				blind120,
-			}
-			interruptCooldowns[260]={--Outlaw
-				{cdCle2,["spellId"]=2094,	["priority"]=4,	["duration"]=81}, --Blind 90 base 120, -30 outlaw and -10% outlaw hero talent, not sure if 10% taken
-			}
-			interruptCooldowns[261]={--Subtlety
-				blind120,
-			}
-			tinsert(vanishAffectedSpells, 1766) --Kick
-			tinsert(vanishAffectedSpells, 408) --Kidney Shot
-			tinsert(vanishAffectedSpells, 1776) --Gouge
-			tinsert(vanishAffectedSpells, 2094) --Blind
-		end
-
-
-
-		interruptCooldowns["PRIEST"]={
-			{cdCle2,["spellId"]=8122,	["priority"]=3,	["duration"]=30},--Psychic Scream, 45 base
-		}
-		-- interruptCooldowns[256]={--Discipline
-		-- }
-		interruptCooldowns[257]={--Holy
-			{cdCle2,["spellId"]=88625,	["priority"]=1,	["duration"]=30},--Holy Word: Chastise, base 60 --todo accurate cd, smite + divine word? + talent reductions etc
-		}
-		interruptCooldowns[258]={--Shadow
-			{cdCle2,["spellId"]=15487,	["priority"]=1,	["duration"]=30},--Silence base 45
-			{cdCle2,["spellId"]=64044,	["priority"]=2,	["duration"]=45},--Psychic Horror
-		}
-
-
-		interruptCooldowns["PALADIN"]={
-			{cdCle2,["spellId"]=96231,	["priority"]=1,	["duration"]=15},--Rebuke
-			{cdCle2,["spellId"]=853,	["priority"]=3,	["duration"]=60},--Hammer of Justice
-			{cdCle2,["spellId"]=115750,	["priority"]=4,	["duration"]=90},--Blinding Light
-			{cdCle2,["spellId"]=20066,	["priority"]=4,	["duration"]=15},--Repentance
-		}
-		-- interruptCooldowns[65]={--Holy
-		-- }
-		interruptCooldowns[66]={--Protection
-			{cdCle2,["spellId"]=215652,	["priority"]=2,	["duration"]=45},--Shield of Virtue pvp talent
-		}
-		-- interruptCooldowns[70]={--Retribution
-		-- }
-		
-		local hoj = {853}
-		hasuitSetupFrameOptions = {danCleuSuccessCooldownReduction,["CDr"]=6,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
-		initialize(53600) --Shield of the Righteous
-		initialize(415091) --Shield of the Righteous?
-		initialize(2812) --Denounce
-		initialize(53385) --Divine Storm
-		initialize(383328) --Final Verdict
-		initialize(215661) --Justicar's Vengeance
-		initialize(85222) --Light of Dawn
-		initialize(85673) --Word of Glory --tested and free procs still give the -2 per holy power spent, Divine Purpose and Shining Light, same with divine storm proc
-		initialize(156322) --Eternal Flame
-		initialize(85256) --Templar's Verdict
-		
-		hasuitSetupFrameOptions = {danCleuSuccessCooldownReduction,["CDr"]=10,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
-		initialize(427453) --Hammer of Light, untested, seemed like maybe this was breaking vs a ret paladin?
-		initialize(429826) --Hammer of Light ^
-		
-		hasuitSetupFrameOptions = {danCleuSuccessCooldownReduction,["CDr"]=16,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
-		initialize(198034) --Divine Hammer, todo 1 Holy Power per sec
-		initialize(198137) --Divine Hammer ^
-		
-	end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	do 
 		local defensiveCooldowns = hasuitDefensiveCooldowns
 		
 		
@@ -1069,6 +842,631 @@ do
 	end
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	do
+		local interruptCooldowns = hasuitInterruptCooldowns
+		
+		
+		
+		-- interruptCooldowns["general"]={
+		-- }
+		
+		
+		
+		do
+			local cdCleSB=danCleuSuccessCooldownStartSolarBeam
+			
+			local skullBashTableHidden=
+				{cdCle2,["spellId"]=106839,	["priority"]=2,["duration"]=15,  --Skull Bash hidden
+					["startAlpha"]=0}
+			local skullBashTable=
+				{cdCle2,["spellId"]=106839,	["priority"]=2,["duration"]=15}  --Skull Bash normal
+			
+			-- interruptCooldowns["DRUID"]={
+			-- }
+			interruptCooldowns[102]={--Balance
+				{cdCleSB,["spellId"]=78675,	["priority"]=1,	["duration"]=60},--Solar Beam
+				skullBashTableHidden,
+			}
+			interruptCooldowns[103]={--Feral
+				skullBashTable,
+			}
+			interruptCooldowns[104]={--Guardian
+				skullBashTable,
+			}
+			interruptCooldowns[105]={--Restoration
+				skullBashTableHidden,
+			}
+			
+			
+			hasuitSetupFrameOptions = {danCleuInterruptCooldownReductionSolarBeam,["CDr"]=15,["affectedSpells"]={78675},["loadOn"]=danCooldownDisplayLoadOn}--Solar Beam
+			initialize(97547) --Solar Beam interrupt
+			
+		end
+
+
+
+		interruptCooldowns["DEATHKNIGHT"]={ --todo pet stuff
+			{cdCle2,["spellId"]=47528,	["priority"]=1,	["duration"]=15},--Mind Freeze
+		}
+		-- interruptCooldowns[250]={--Blood
+		-- }
+		-- interruptCooldowns[251]={--Frost --todo remorseless winter?
+		-- }
+		-- interruptCooldowns[252]={--Unholy
+		-- }
+		hasuitSetupFrameOptions = {danCleuEnergizeCooldownReduction,["CDr"]=3,["affectedSpells"]={47528},["loadOn"]=danCooldownDisplayLoadOn}--Mind Freeze
+		initialize(378849) --Coldthirst
+		
+		
+
+
+		interruptCooldowns["DEMONHUNTER"]={
+			{cdCle2,["spellId"]=183752,	["priority"]=1,	["duration"]=15},--Disrupt
+		}
+		-- interruptCooldowns[577]={--Havoc
+			-- {cdCle2,["spellId"]=211881,	["priority"]=3,	["duration"]=30},--Fel Eruption
+		-- }
+		-- interruptCooldowns[581]={--Vengeance
+		-- }
+
+
+
+		do
+			local quell20=
+				{cdCle2,["spellId"]=351338,	["priority"]=1,	["duration"]=20}--Quell 20
+			
+			-- interruptCooldowns["EVOKER"]={ --todo wing buffet, tail swipe?
+			-- }
+			interruptCooldowns[1467]={--Devastation
+				quell20,
+			}
+			interruptCooldowns[1468]={--Preservation
+				{cdCle2,["spellId"]=351338,	["priority"]=1,	["duration"]=40},--Quell 40
+			}
+			interruptCooldowns[1473]={--Augmentation
+				quell20,
+			}
+			
+			tinsert(timeSkipAffectedSpells, 351338) --Quell
+		end
+
+
+
+		interruptCooldowns["MONK"]={
+			{cdCle2,["spellId"]=116705,	["priority"]=1,	["duration"]=15},--Spear Hand Strike
+		}
+		-- interruptCooldowns[268]={--Brewmaster
+		-- }
+		-- interruptCooldowns[269]={--Windwalker
+		-- }
+		-- interruptCooldowns[270]={--Mistweaver
+		-- }
+		
+		
+		
+
+
+		interruptCooldowns["WARRIOR"]={
+			{cdCle2,["spellId"]=6552,	["priority"]=1,	["duration"]=13.3},--Pummel --base 15, 382461 1 sec off pummel, 5% from another
+		}
+		-- interruptCooldowns[71]={--Arms
+		-- }
+		-- interruptCooldowns[72]={--Fury
+		-- }
+		-- interruptCooldowns[73]={--Protection
+			-- {cdCle2,["spellId"]="Disrupting Shout",	["priority"]=1,	["duration"]=75},--Disrupting Shout todo?
+		-- }
+
+
+
+
+		-- interruptCooldowns["HUNTER"]={
+		-- }
+		interruptCooldowns[253]={--Beast Mastery
+			{cdCle2,["spellId"]=147362,	["priority"]=1,	["duration"]=22},--Counter Shot base 24, people prob take this talent
+		}
+		interruptCooldowns[254]={--Marksmanship
+			{cdCle2,["spellId"]=147362,	["priority"]=1,	["duration"]=22},--Counter Shot base 24
+		}
+		interruptCooldowns[255]={--Survival
+			{cdCle2,["spellId"]=187707,	["priority"]=1,	["duration"]=13},--Muzzle base 15
+		}
+		
+		
+		
+		
+
+		interruptCooldowns["WARLOCK"]={
+			{cdCle2,["spellId"]=132409,	["priority"]=1,	["duration"]=24},--Spell Lock?
+			
+			{cdCast,["spellId"]=119910,	["priority"]=1,	["duration"]=24},--Spell Lock (command demon) --seems 100% impossible to track these properly if they press command demon while out of range
+			{cdCast,["spellId"]=119905,	["priority"]=1,	["duration"]=15},--Singe Magic (command demon)
+			{cdCast,["spellId"]=119907,	["priority"]=1,	["duration"]=120},--Shadow Bulwark (command demon)
+			{cdCast,["spellId"]=119909,	["priority"]=1,	["duration"]=0.5},--Seduction (command demon)
+			{cdPet,	["spellId"]=19647,	["priority"]=1,	["duration"]=24},--Spell Lock (pet)
+			{cdPet,	["spellId"]=89808,	["priority"]=1,	["duration"]=15},--Singe Magic (pet)
+			{cdPet,	["spellId"]=17767,	["priority"]=1,	["duration"]=120},--Shadow Bulwark (pet)
+			{cdPet,	["spellId"]=6358,	["priority"]=1,	["duration"]=0.5},--Seduction (pet)
+		}
+		-- interruptCooldowns[265]={--Affliction
+		-- }
+		interruptCooldowns[266]={--Demonology
+			{cdCast,["spellId"]=119914,	["priority"]=1,	["duration"]=30},--Axe Toss (command demon)
+			{cdPet,	["spellId"]=89766,	["priority"]=1,	["duration"]=30},--Axe Toss (pet)
+		}
+		-- interruptCooldowns[267]={--Destruction
+		-- }
+		
+		
+		
+
+		interruptCooldowns["MAGE"]={
+			{cdCle2,["spellId"]=2139,	["priority"]=1,	["duration"]=24},--Counterspell
+		}
+		-- interruptCooldowns[62]={--Arcane
+		-- }
+		-- interruptCooldowns[63]={--Fire
+		-- }
+		-- interruptCooldowns[64]={--Frost
+		-- }
+		
+		tinsert(shiftingPowerAffectedSpells, 2139) --counterspell
+		
+		hasuitSetupFrameOptions = {danCleuInterruptCooldownReduction,["CDr"]=4,["affectedSpells"]={2139},["loadOn"]=danCooldownDisplayLoadOn}
+		initialize(2139) --counterspell 4 sec reduction
+
+
+		interruptCooldowns["SHAMAN"]={ --todo track earth ele stun, maybe like earth ele cd that gets replaced by the stun when earth ele is out, todo static field?
+			{cdCle2,["spellId"]=57994,	["priority"]=1,	["duration"]=12},--Wind Shear
+		}
+		-- interruptCooldowns[262]={--Elemental
+		-- }
+		-- interruptCooldowns[263]={--Enhancement
+		-- }
+		-- interruptCooldowns[264]={--Restoration
+		-- }
+		
+		
+		
+		
+		interruptCooldowns["ROGUE"]={
+			{cdCle2,["spellId"]=1766,	["priority"]=1,	["duration"]=15},--Kick
+		}
+		-- interruptCooldowns[259]={--Assassination
+		-- }
+		-- interruptCooldowns[260]={--Outlaw
+		-- }
+		-- interruptCooldowns[261]={--Subtlety
+		-- }
+		tinsert(vanishAffectedSpells, 1766) --Kick
+
+
+
+
+		-- interruptCooldowns["PRIEST"]={
+		-- }
+		-- interruptCooldowns[256]={--Discipline
+		-- }
+		-- interruptCooldowns[257]={--Holy
+		-- }
+		interruptCooldowns[258]={--Shadow
+			{cdCle2,["spellId"]=15487,	["priority"]=1,	["duration"]=30},--Silence base 45
+		}
+
+
+
+		interruptCooldowns["PALADIN"]={
+			{cdCle2,["spellId"]=96231,	["priority"]=1,	["duration"]=15},--Rebuke
+		}
+		-- interruptCooldowns[65]={--Holy
+		-- }
+		-- interruptCooldowns[66]={--Protection
+			-- {cdCle2,["spellId"]=215652,	["priority"]=2,	["duration"]=45},--Shield of Virtue pvp talent, todo
+		-- }
+		-- interruptCooldowns[70]={--Retribution
+		-- }
+		
+	end
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	do
+		local crowdControlCooldowns = hasuitCrowdControlCooldowns
+		
+		
+		hasuitTrackedRaceCooldowns["Pandaren"] = true
+		crowdControlCooldowns["Pandaren"]={
+			{cdCle2,["spellId"]=107079,	["priority"]=40,["duration"]=120},--Quaking Palm
+		}
+		
+		
+		-- crowdControlCooldowns["general"]={
+		-- }
+		
+		
+		
+		do
+			local maimTable=
+				{cdCle2,["spellId"]=22570,	["priority"]=4,["duration"]=20,  --Maim hidden
+					["startAlpha"]=0}
+			local typhoonTable=
+				{cdCle2,["spellId"]=61391,	["priority"]=5,["duration"]=30,  --Typhoon hidden
+					["startAlpha"]=0}
+			
+			crowdControlCooldowns["DRUID"]={
+				{cdCle2,["spellId"]=5211,	["priority"]=3,	["duration"]=60},--Mighty Bash
+				{cdCle2,["spellId"]=99,		["priority"]=3,	["duration"]=30},--Incapacitating Roar
+			}
+			crowdControlCooldowns[102]={--Balance
+				{cdCle2,["spellId"]=61391,	["priority"]=5,	["duration"]=30, --Typhoon low opacity
+					["startAlpha"]=lowStartAlpha},
+			}
+			crowdControlCooldowns[103]={--Feral
+				{cdCle2,["spellId"]=22570,	["priority"]=4,	["duration"]=20},--Maim
+				typhoonTable,
+			}
+			crowdControlCooldowns[104]={--Guardian
+				maimTable,
+				typhoonTable,
+			}
+			crowdControlCooldowns[105]={--Restoration
+				maimTable,
+				typhoonTable,
+			}
+		end
+
+
+		crowdControlCooldowns["DEATHKNIGHT"]={ --todo pet stuff
+			{cdCle2,["spellId"]=77606,	["priority"]=2,	["duration"]=20, --Dark Simulacrum hidden
+				["startAlpha"]=0},
+			{cdCle2,["spellId"]=47476,	["priority"]=3,	["duration"]=45},--Strangulate --can this be an interrupt in pve?
+			{cdCle2,["spellId"]=221562,	["priority"]=3,	["duration"]=45},--Asphyxiate
+			{cdCle2,["spellId"]=108194,	["priority"]=3,	["duration"]=45},--Asphyxiate?
+			{cdCle2,["spellId"]=207167,	["priority"]=5,	["duration"]=60},--Blinding Sleet
+		}
+		-- crowdControlCooldowns[250]={--Blood
+		-- }
+		crowdControlCooldowns[251]={--Frost --todo remorseless winter?
+			{cleAurP,["spellId"]=377048,	["priority"]=4,	["duration"]=90,--Absolute Zero (from Frostwyrm's Fury), should maybe be 89 or something? probably not worth making a whole thing to make the cd based on actual spellcast and then only show once they're confirmed playing the stun. --todo hide if not playing the stun? or change icon to the dragon?
+				["startAlpha"]=lowStartAlpha},
+		}
+		-- crowdControlCooldowns[252]={--Unholy
+		-- }
+		
+		
+
+
+		crowdControlCooldowns["DEMONHUNTER"]={
+			{cdCle2,["spellId"]=179057,	["priority"]=2,	["duration"]=45},--Chaos Nova, there'sa tongues talent [Wave of Debilitation] new duration was 60
+			{cdCle2,["spellId"]=217832,	["priority"]=4,	["duration"]=45},--Imprison
+			{cdCle2,["spellId"]=221527,	["priority"]=4,	["duration"]=45},--Imprison immune
+			{cdCle2,["spellId"]=207684,	["priority"]=5,	["duration"]=90},--Sigil of Misery base 120, not sure if they take -25% honor talent
+		}
+		-- crowdControlCooldowns[577]={--Havoc
+			-- {cdCle2,["spellId"]=211881,	["priority"]=3,	["duration"]=30},--Fel Eruption
+		-- }
+		-- crowdControlCooldowns[581]={--Vengeance
+		-- }
+
+
+		do
+			crowdControlCooldowns["EVOKER"]={ --todo wing buffet, tail swipe?
+				{cdCleE,["spellId"]=382266,	["priority"]=5,	["duration"]=30}, --Fire Breath
+				{cdCleE,["spellId"]=357208,	["priority"]=5,	["duration"]=30}, --Fire Breath
+			}
+			crowdControlCooldowns[1467]={--Devastation
+				{cdCle2,["spellId"]=357210,	["priority"]=3,	["duration"]=60},--Deep Breath 60, base 120
+				{cdCle2,["spellId"]=433874,	["priority"]=3,	["duration"]=60},--Deep Breath 60, base 120
+			}
+			crowdControlCooldowns[1468]={--Preservation
+				{cdCle2,["spellId"]=357210,	["priority"]=3,	["duration"]=120},--Deep Breath, todo [Wingleader] and [Onyx Legacy]
+				{cdCle2,["spellId"]=433874,	["priority"]=3,	["duration"]=120},--Deep Breath 120, this one is 3.75 sec duration and more common, other one is 6 sec, can't tell where the difference comes from but maybe one is devastation and the other is pres, or maybe one is the one that can fly around and be controlled but idk where the extra duration is coming from if that's the case. the 3.75 second one is an entirely different spellid but also adds like 5 random points and moves some around from the old spellid. none of the points ever change so like what? what's the point of points in an aura that look like this ["0, 0, -200, 0, 0, -100"]/["0, 0, 0, -200, -200, 200, 0, 100, 70, 70, -100, 0"] and not a single one ever changes? maybe just supposed to be used internally by blizzard and a way to tune stuff easily like how fast you can turn while it's active? speed and stuff. not actually inefficient probably i guess maybe, just weird because there are definitely ways to do that without it showing up in an aura's points. also why does the first -200 change from [3] to [4]? what's the extra 0 lol, or maybe it moved to [5]
+				{cdCle2,["spellId"]=359816,	["priority"]=4,	["duration"]=120, --Dream Flight
+					["startAlpha"]=0},
+			}
+			crowdControlCooldowns[1473]={--Augmentation
+				{cdCle2,["spellId"]=403631,	["priority"]=3,	["duration"]=120},--Breath of Eons, same thing as deep breath? spellid must be based on whether talent is taken that makes you able to steer but too low lvl to test
+				{cdCle2,["spellId"]=442204,	["priority"]=3,	["duration"]=120},--Breath of Eons
+				{cdCle2,["spellId"]=404977,	["priority"]=2,	["duration"]=180},--Time Skip
+			}
+			
+			tinsert(timeSkipAffectedSpells, 382266) --Fire Breath
+			tinsert(timeSkipAffectedSpells, 357208) --Fire Breath
+			tinsert(timeSkipAffectedSpells, 403631) --Breath of Eons
+			tinsert(timeSkipAffectedSpells, 442204) --Breath of Eons
+			
+			hasuitSetupFrameOptions = {danCleuSpellEmpowerInterruptCooldownReduction,["CDr"]="reset",["affectedSpells"]={382266, 357208},["loadOn"]=danCooldownDisplayLoadOn} --Fire Breath, could have just done like 10000 for cdr instead of having "reset" be a thing?
+			initialize(382266) --Fire Breath
+			initialize(357208) --Fire Breath
+			hasuitSetupFrameOptions = {danCleuAppliedCooldownReduction,["CDr"]=3,["affectedSpells"]={357210, 433874, 442204},["loadOn"]=danCooldownDisplayLoadOn} --Deep Breath, bored todo 3 sec cap? might not get reached every time, assuming i understand how this works from reading the tooltip
+			initialize(434473) --Bombardments
+		end
+
+		crowdControlCooldowns["MONK"]={
+			{cdCle2,["spellId"]=119381,	["priority"]=2,	["duration"]=50},--Leg Sweep base 60
+			{cdCle2,["spellId"]=115078,	["priority"]=3,	["duration"]=30},--Paralysis base 45
+			{cdCle2,["spellId"]=116844,	["priority"]=4,	["duration"]=40},--Ring of Peace base 45, do people take the -5 sec?
+		}
+		-- crowdControlCooldowns[268]={--Brewmaster
+		-- }
+		-- crowdControlCooldowns[269]={--Windwalker
+		-- }
+		-- crowdControlCooldowns[270]={--Mistweaver
+		-- }
+		hasuitSetupFrameOptions = {danCleuInterruptCooldownReduction,["CDr"]=5,["affectedSpells"]={115078},["loadOn"]=danCooldownDisplayLoadOn} --paralysis, do people take [Energy Transfer]?
+		initialize(116705) --spear hand strike
+		
+		
+
+
+		crowdControlCooldowns["WARRIOR"]={
+			{cdCle2,["spellId"]=107570,	["priority"]=2,	["duration"]=28.5},--Storm Bolt
+			{cdCle2,["spellId"]=46968,	["priority"]=3,	["duration"]=25, --Shockwave --todo 15 sec reduction if it hit 3 targets,40 baseline, todo -5 sec from [Earthquaker] probably has an event
+				["startAlpha"]=lowStartAlpha},
+			{cdCle2,["spellId"]=5246,	["priority"]=4,	["duration"]=90},--Intimidating Shout
+		}
+		crowdControlCooldowns[71]={--Arms
+			{cdCle2,["spellId"]=236320,	["priority"]=6,	["duration"]=90, --War Banner
+				["startAlpha"]=lowStartAlpha},
+		
+		}
+		-- crowdControlCooldowns[72]={--Fury
+		-- }
+		-- crowdControlCooldowns[73]={--Protection
+			-- {cdCle2,["spellId"]="Disrupting Shout",	["priority"]=1,	["duration"]=75},--Disrupting Shout todo?
+		-- }
+
+
+		crowdControlCooldowns["HUNTER"]={
+			{cdCle2,["spellId"]=19577,	["priority"]=2,	["duration"]=55},--Intimidation base 60, do people take -5?
+			{cdCle2,["spellId"]=187650,	["priority"]=3,	["duration"]=25},--Freezing Trap, 30 base, do people take -5?
+			{cdCle2,["spellId"]=213691,	["priority"]=4,	["duration"]=30},--Scatter Shot, doesn't share with binding anymore, shares with bursting now todo
+			{cdCle2,["spellId"]=109248,	["priority"]=5,	["duration"]=45},--Binding Shot
+			{cdCle2,["spellId"]=236776,	["priority"]=6,	["duration"]=35},--High Explosive Trap, 40 base, do people take -5? doesn't replace intim anymore, worth to track?
+		}
+		-- crowdControlCooldowns[253]={--Beast Mastery
+		-- }
+		-- crowdControlCooldowns[254]={--Marksmanship
+		-- }
+		-- crowdControlCooldowns[255]={--Survival
+		-- }
+		
+		hasuitSetupFrameOptions = {danCleuSuccessCooldownReduction,["CDr"]=0.5,["affectedSpells"]={19577, 109248},["loadOn"]=danCooldownDisplayLoadOn} --intimidation and binding shot
+		initialize(259495) --wildfire bomb
+		initialize(19434) --Aimed Shot
+		initialize(34026) --bm kill command
+		
+		hasuitSetupFrameOptions = {danCleuAppliedCooldownReductionSourceIsDest,["CDr"]="reset",["affectedSpells"]={213691},["loadOn"]=danCooldownDisplayLoadOn} --Scatter Shot
+		initialize(385646) --Quick Load from health 40%
+		
+		
+		
+		
+
+		crowdControlCooldowns["WARLOCK"]={
+			{cdCle2,["spellId"]=6789,	["priority"]=3,	["duration"]=45},--Mortal Coil
+			{cdCle2,["spellId"]=5484,	["priority"]=3,	["duration"]=40},--Howl of Terror
+		}
+		-- crowdControlCooldowns[265]={--Affliction
+		-- }
+		crowdControlCooldowns[266]={--Demonology
+			{cdCle2,["spellId"]=111898,	["priority"]=2,	["duration"]=120},--Grimoire: Felguard
+		}
+		crowdControlCooldowns[267]={--Destruction
+			{cdCle2,["spellId"]=1122,	["priority"]=4,	["duration"]=120},--Summon Infernal --todo check for buff after infernal cast to determine whether they took -60 sec cd talent, sometimes they take it sometimes they don't. 180 base
+		}
+
+
+
+		crowdControlCooldowns["MAGE"]={
+			{cdCle2,["spellId"]=382440,	["priority"]=2,	["duration"]=60},--Shifting Power
+			{cdCle2,["spellId"]=31661,	["priority"]=3,	["duration"]=45},--Dragon's Breath --todo all specs 387807 Casting Ice Lance on Frozen targets reduces the cooldown of your loss of control abilities by 2 sec.
+		}
+		-- crowdControlCooldowns[62]={--Arcane
+		-- }
+		-- crowdControlCooldowns[63]={--Fire
+		-- }
+		-- crowdControlCooldowns[64]={--Frost
+		-- }
+		
+		-- if hasuitPlayerClass=="DRUID" then
+			-- tinsert(crowdControlCooldowns["MAGE"], --actually just re-enable this after making the ice lance cd reduction
+				-- {cdCle2,["spellId"]=113724,	["priority"]=4,	["duration"]=45}--Ring of Frost, nice to call out "only ring" sometimes if in form, could add this only for resto when that gets made, maybe this should be tracked for any dps spec if they have a resto druid or just always tracked
+				-- tinsert(shiftingPowerAffectedSpells, 113724) --Ring of Frost
+				-- tinsert(coldSnapAffectedSpells, 113724) --Ring of Frost
+			-- ) 
+		-- end
+		
+		tinsert(shiftingPowerAffectedSpells, 31661) --dragon's breath
+
+
+
+
+		crowdControlCooldowns["SHAMAN"]={ --todo track earth ele stun, maybe like earth ele cd that gets replaced by the stun when earth ele is out, todo static field?
+			{cdCle2,["spellId"]=204336,	["priority"]=3,	["duration"]=24},--Grounding Totem
+			{cdCle2,["spellId"]=51490,	["priority"]=4,	["duration"]=30, --Thunderstorm, todo can be -5 sec if talented with knockup
+				["startAlpha"]=lowStartAlpha},
+		}
+		-- crowdControlCooldowns[262]={--Elemental
+		-- }
+		crowdControlCooldowns[263]={--Enhancement
+			{cdCle2,["spellId"]=197214,	["priority"]=2,	["duration"]=40},--Sundering todo -12 sec from [Whirling Elements]
+		}
+		-- crowdControlCooldowns[264]={--Restoration
+		-- }
+		
+		
+		do
+			local blind120 = 
+				{cdCle2,["spellId"]=2094,	["priority"]=4,	["duration"]=120} --Blind 120
+			
+			
+			crowdControlCooldowns["ROGUE"]={
+				{cdCle2,["spellId"]=408,	["priority"]=2,	["duration"]=30},--Kidney Shot
+				{cdCle2,["spellId"]=1776,	["priority"]=3,	["duration"]=25},--Gouge new duration was 20
+			}
+			crowdControlCooldowns[259]={--Assassination
+				blind120,
+			}
+			crowdControlCooldowns[260]={--Outlaw
+				{cdCle2,["spellId"]=2094,	["priority"]=4,	["duration"]=81}, --Blind 90 base 120, -30 outlaw and -10% outlaw hero talent, not sure if 10% taken
+			}
+			crowdControlCooldowns[261]={--Subtlety
+				blind120,
+			}
+			tinsert(vanishAffectedSpells, 408) --Kidney Shot
+			tinsert(vanishAffectedSpells, 1776) --Gouge
+			tinsert(vanishAffectedSpells, 2094) --Blind
+		end
+
+
+
+		crowdControlCooldowns["PRIEST"]={
+			{cdCle2,["spellId"]=8122,	["priority"]=3,	["duration"]=30},--Psychic Scream, 45 base
+		}
+		-- crowdControlCooldowns[256]={--Discipline
+		-- }
+		crowdControlCooldowns[257]={--Holy
+			{cdCle2,["spellId"]=88625,	["priority"]=1,	["duration"]=30},--Holy Word: Chastise, base 60 --todo accurate cd, smite + divine word? + talent reductions etc
+		}
+		crowdControlCooldowns[258]={--Shadow
+			{cdCle2,["spellId"]=64044,	["priority"]=2,	["duration"]=45},--Psychic Horror
+		}
+
+
+
+		crowdControlCooldowns["PALADIN"]={
+			{cdCle2,["spellId"]=853,	["priority"]=3,	["duration"]=60},--Hammer of Justice
+			{cdCle2,["spellId"]=115750,	["priority"]=4,	["duration"]=90},--Blinding Light
+			{cdCle2,["spellId"]=20066,	["priority"]=4,	["duration"]=15},--Repentance
+		}
+		-- crowdControlCooldowns[65]={--Holy
+		-- }
+		-- crowdControlCooldowns[66]={--Protection
+		-- }
+		-- crowdControlCooldowns[70]={--Retribution
+		-- }
+		
+		local hoj = {853}
+		hasuitSetupFrameOptions = {danCleuSuccessCooldownReduction,["CDr"]=6,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
+		initialize(53600) --Shield of the Righteous
+		initialize(415091) --Shield of the Righteous?
+		initialize(2812) --Denounce
+		initialize(53385) --Divine Storm
+		initialize(383328) --Final Verdict
+		initialize(215661) --Justicar's Vengeance
+		initialize(85222) --Light of Dawn
+		initialize(85673) --Word of Glory --tested and free procs still give the -2 per holy power spent, Divine Purpose and Shining Light, same with divine storm proc
+		initialize(156322) --Eternal Flame
+		initialize(85256) --Templar's Verdict
+		
+		hasuitSetupFrameOptions = {danCleuSuccessCooldownReduction,["CDr"]=10,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
+		initialize(427453) --Hammer of Light, untested, seemed like maybe this was breaking vs a ret paladin?
+		initialize(429826) --Hammer of Light ^
+		
+		hasuitSetupFrameOptions = {danCleuSuccessCooldownReduction,["CDr"]=16,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
+		initialize(198034) --Divine Hammer, todo 1 Holy Power per sec
+		initialize(198137) --Divine Hammer ^
+		
+	end
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	hasuitFramesCenterSetEventType("cleu")
 	
 	if #shiftingPowerAffectedSpells>0 then
@@ -1121,8 +1519,9 @@ end
 do
 	local allCooldownsTable = {
 		hasuitTrinketCooldowns,
-		hasuitInterruptCooldowns,
 		hasuitDefensiveCooldowns,
+		hasuitInterruptCooldowns,
+		hasuitCrowdControlCooldowns,
 	}
 	local lastFunction
 	for i=1,#allCooldownsTable do

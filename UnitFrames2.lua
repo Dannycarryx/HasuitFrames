@@ -145,7 +145,6 @@ end)
 
 
 
---x3
 
 local frameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize
 local numColumnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
@@ -2906,6 +2905,8 @@ do
 		hasuitCleanController(icon.controller)
 	end
 	hasuitRecycleCooldownIcon = danRecycleCooldownIcon
+	hasuitDoThisRandomFunctionAsd(danRecycleCooldownIcon)
+	hasuitDoThisRandomFunctionAsd = nil
 	local function cooldownOnCooldownDone(cooldown)
 		-- danPrint("cooldownOnCooldownDone")
 		local icon = cooldown.parentIcon
@@ -2972,11 +2973,11 @@ do
 		end
 	end
 	hasuitCooldownOnCooldownDone = cooldownOnCooldownDone
-	local cooldownsControllers = hasuitCooldownsControllers
+	-- local cooldownsControllers = hasuitCooldownsControllers --temporary?
 	function danAddSpecializationCooldowns(specId, isClassUpdate)
 		-- danPrint("danAddSpecializationCooldowns")
-		for i=1,#cooldownsControllers do
-			local controllerOptions = cooldownsControllers[i]
+		for i=1,#hasuitCooldownsControllers do
+			local controllerOptions = hasuitCooldownsControllers[i]
 			local unitTypeStuff = controllerOptions[danCurrentUnitType]
 			if unitTypeStuff then
 				local specCooldowns = unitTypeStuff["specCooldowns"][specId]
@@ -3163,7 +3164,6 @@ function hasuitRestoreCooldowns(frame)
 		end
 	end
 end
-
 
 
 
