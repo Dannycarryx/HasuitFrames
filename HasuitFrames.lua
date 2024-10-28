@@ -29,7 +29,7 @@ local danCurrentFrameOptionsCommon
 local removedAuraSharedFunction
 local updatedAuraSharedFunction
 
-local danUpdateAurasForFrame
+local danUnitAuraIsFullUpdate
 -- danSort
 -- danSortExpirationTime
 -- normalGrow
@@ -255,29 +255,50 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
 	end
 	
 	
-	danLoadOnEnablePve = hasuitFramesCenterAddLoadingProfile({ --todo fully delete all saved pve stuff on unload? shouldn't make much of a difference but will lower memory after pveing/being out of instance, and make the main load/unload function faster
-		["instanceType"]={["none"]=true,["party"]=true,["raid"]=true,["scenario"]=true},
-		
-		
-		["loadedFunction"]=function()
-			danGeneralCleuFrameSetScriptOnEvent(pveCleuFunc)
-		end,
-		["unloadedFunction"]=danGeneralCleuFrameSetScriptOnEvent,
-	})
-	local danLoadOnEnablePve = danLoadOnEnablePve
+	
+	
+	
+	do --loadon for pve, todo fully delete all saved pve stuff on unload? 
+		local loadOn = {}
+		local function loadOnCondition()
+			local instanceId = hasuitInstanceId
+			local instanceType = hasuitInstanceType
+			if instanceType=="none" or instanceType=="party" or instanceType=="raid" or instanceType=="scenario" or instanceId==2177 then --should load, --2177 is comp stomp, untested, pve mobs spellids in comp stomp are all different than pvp so nothing will show up without considering it to be pve
+				if not loadOn.shouldLoad then
+					print(hasuitGreen, "hasuitLoadOnEnablePve")
+					danGeneralCleuFrameSetScriptOnEvent(pveCleuFunc)
+					loadOn.shouldLoad = true
+					if instanceId==2177 then --assuming instanceid will almost never be used for anything, also assuming i got this part right, atm any instance type change will prompt a main loadon function but instanceid change won't. so if going from instancetype pvp directly into a comp stomp the pve loadon needs this to properly run the main function. maybe impossible and group size would probably take care of it anyway, but this should be solid.. should probably make this setup less complicated. it's kind of simple in that every other load condition except instancetype changing needs to call the main loadon function when a .shouldLoad changes but ya we'll see in the future i guess, or if someone else tries to make a loadon and hates it
+						hasuitMainLoadOnFunctionSpammable()
+					end
+				end
+			else --should NOT load
+				if loadOn.shouldLoad~=false then
+					print(hasuitRed, "hasuitLoadOnEnablePve")
+					danGeneralCleuFrameSetScriptOnEvent()
+					loadOn.shouldLoad = false
+				end
+			end
+		end
+		tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+		loadOnCondition()
+		hasuitLoadOnEnablePve = loadOn
+	end
+	local hasuitLoadOnEnablePve = hasuitLoadOnEnablePve
+	
 	
 	
 	local auraOptionsCommon =			{["size"]=16,	["frameLevel"]=20,	["hideCooldownText"]=true,	["alpha"]=1}
 	local auraOptionsIsBossAuraCommon =	{["size"]=22,	["frameLevel"]=20,	["hideCooldownText"]=true,	["alpha"]=1}
-	pveAuraOptions =					{["priority"]=480,	["group"]=auraOptionsCommon, ["loadOn"]=danLoadOnEnablePve}
-	pveAuraOptionsIsBossAura =			{["priority"]=470,	["group"]=auraOptionsIsBossAuraCommon, ["loadOn"]=danLoadOnEnablePve} --todo should pve debuffs be guaranteed to show up? could make something to make them smaller to fit on frames if they go over a limit, in instance not in open world
+	pveAuraOptions =					{["priority"]=480,	["group"]=auraOptionsCommon, ["loadOn"]=hasuitLoadOnEnablePve}
+	pveAuraOptionsIsBossAura =			{["priority"]=470,	["group"]=auraOptionsIsBossAuraCommon, ["loadOn"]=hasuitLoadOnEnablePve} --todo should pve debuffs be guaranteed to show up? could make something to make them smaller to fit on frames if they go over a limit, in instance not in open world
 	pveAuraOptionsUnknownType =			{}
 	
 	local cleuINCOptionsCommon =		{["size"]=14,	["frameLevel"]=20,	["hideCooldownText"]=true,	["alpha"]=1}
-	cleuINCOptions =					{["priority"]=490,["group"]=cleuINCOptionsCommon,["duration"]=2.5,["isPve"]=true, ["loadOn"]=danLoadOnEnablePve} --todo fix
+	cleuINCOptions =					{["priority"]=490,["group"]=cleuINCOptionsCommon,["duration"]=2.5,["isPve"]=true, ["loadOn"]=hasuitLoadOnEnablePve} --todo fix
 	
 	local unitCastOptionsCommon =		{["size"]=12,	["frameLevel"]=20,	["hideCooldownText"]=true,	["alpha"]=1}
-	unitCastOptions =					{["priority"]=495,["group"]=unitCastOptionsCommon, ["loadOn"]=danLoadOnEnablePve}
+	unitCastOptions =					{["priority"]=495,["group"]=unitCastOptionsCommon, ["loadOn"]=hasuitLoadOnEnablePve}
 	
 	tinsert(hasuitDoThisAddon_Loaded, function()
 		auraOptionsCommon["controller"] = danTopRight_TopRight
@@ -719,7 +740,7 @@ hasuitUnitAuraFrame:SetScript("OnEvent", function(_, _, unit, auraTable) --auraI
 	danAuraEventActive = false --any better/worse than nil?
 	
 	if auraTable.isFullUpdate then --could maybe just put this at the top and return if true? not sure if anything else ever happens if it's a full update, or if there's any reason to care even if stuff does happen, although some stuff cares whether it's a real event or a fullupdate and those can happen in the same unitaura event i'm pretty sure, so maybe don't do this
-		danUpdateAurasForFrame()
+		danUnitAuraIsFullUpdate()
 	end
 end)
 
@@ -765,7 +786,7 @@ end)
 
 
 
-function danUpdateAurasForFrame()
+function danUnitAuraIsFullUpdate()
 	local unit = danCurrentFrame.unit
 	local unitGUID = UnitGUID(unit)
 	if unitGUID ~= danCurrentFrame.unitGUID then
@@ -828,9 +849,9 @@ function danUpdateAurasForFrame()
 		frameAuraInstanceIDs[auraInstanceID] = nil
 	end
 end
-function hasuitUpdateAurasForFrame(frame)
+function hasuitUnitAuraIsFullUpdate(frame)
 	danCurrentFrame = frame
-	danUpdateAurasForFrame()
+	danUnitAuraIsFullUpdate()
 end
 
 
@@ -3865,7 +3886,7 @@ do
 	
 	local lastEventId
 	local GetArenaCrowdControlInfo = C_PvP.GetArenaCrowdControlInfo
-	local arenaCrowdControlSpellUpdateFrame = CreateFrame("Frame") --events registered in danCooldownDisplayLoadOn
+	local arenaCrowdControlSpellUpdateFrame = CreateFrame("Frame") --events registered in hasuitCooldownDisplayLoadOn
 	hasuitArenaCrowdControlSpellUpdateFrame = arenaCrowdControlSpellUpdateFrame
 	arenaCrowdControlSpellUpdateFrame:SetScript("OnEvent", function(_, event, unit, spellId) --bored todo: register and unregister selectively, game fires these a lot for no reason. real todo: arena3 (mage) got their first ARENA_CROWD_CONTROL_SPELL_UPDATE like 10 seconds after coming out of stealth. it didn't show trinket icon on blizzard arena frames until then either. and the mage definitely pressed trinket later in the match. was also already in combat for a while at the time so it wasn't some weird thing where they equipped it after skirmish started. also seems like GetArenaCrowdControlInfo doesn't work outside of reacting to an event even if the relevant event has already happened and trinket has already been shown so maybe change this to assume they have trinket until game says spellid==0. is it possible it didn't show because it was on cd from them equipping it and having the 30s timer? if so could do something with that
 		-- danPrint("arenaCrowdControlSpellUpdateFrame", unit..event)

@@ -149,14 +149,14 @@ initialize(290754) --Lifebloom from Full Bloom (early spring)
 
 
 local common = {["controller"]=danBottomRightHots4,	["size"]=13,	["frameLevel"]=21,	["hideCooldownText"]=true,	["alpha"]=1,	}
-hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=5,["loadOn"]=danLoadOnPartySize,["group"]=common,	}
+hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=5,["loadOn"]=hasuitLoadOnPartySize,["group"]=common,	}
 initialize("Grove Tending")
-hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=6,["loadOn"]=danLoadOnPartySize,["group"]=common,	}
+hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=6,["loadOn"]=hasuitLoadOnPartySize,["group"]=common,	}
 local common = {["controller"]=danBottomRightHots4,	["size"]=13,	["frameLevel"]=21,	["hideCooldownText"]=true,	["alpha"]=1,	}
 -- initialize("Cultivation")
 -- initialize("Spring Blossoms")
 local common = {["controller"]=danBottomRightHots4,	["size"]=12,		["frameLevel"]=21,	["hideCooldownText"]=true,	["alpha"]=1,	}
-hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=7,["loadOn"]=danLoadOnPartySize,["group"]=common,	}
+hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=7,["loadOn"]=hasuitLoadOnPartySize,["group"]=common,	}
 initialize("Tranquility")
 
 -- local common = {["controller"]=danBottomRightHots4,	["size"]=12,	["frameLevel"]=21,	["hideCooldownText"]=true,	["alpha"]=1,}
@@ -167,7 +167,7 @@ initialize("Tranquility")
 
 
 local common = {["controller"]=danBottomRightHots5,	["size"]=14,	["frameLevel"]=21,	["hideCooldownText"]=true,	["alpha"]=1,	}
-hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=0,["loadOn"]=danLoadOnPartySize,["group"]=common,			}
+hasuitSetupFrameOptions = {auraSourceIsPlayer,			["priority"]=0,["loadOn"]=hasuitLoadOnPartySize,["group"]=common,			}
 -- initialize(391891	) --adaptive swarm
 initialize(429222) --"Minor Cenarion Ward"
 

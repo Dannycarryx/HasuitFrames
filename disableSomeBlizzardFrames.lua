@@ -5,11 +5,26 @@
 
 
 
--- hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {}
 tinsert(hasuitDoThisPlayer_Login, function()
-	local savedSavedUserOptions = hasuitSavedUserOptions
-	local hasuitDisableDefaultPartyFrames, hasuitDisableDefaultArenaFrames, hasuitDisableDefaultRaidFrames = savedSavedUserOptions["party"]["Hide Default"], savedSavedUserOptions["arena"]["Hide Default"], savedSavedUserOptions["raid"]["Hide Default"]
-	if hasuitDisableDefaultPartyFrames or hasuitDisableDefaultArenaFrames or hasuitDisableDefaultRaidFrames then
+	local savedUserOptions = hasuitSavedUserOptions
+	local userOptionsOnChanged = hasuitUserOptionsOnChanged
+	
+	
+	local function printAboutReloading()
+		print("hiding blizzard frames requires reload")
+	end
+	
+	local hideBlizzardParty = savedUserOptions["hideBlizzardParty"]
+	userOptionsOnChanged["hideBlizzardParty"] = printAboutReloading
+	
+	local hideBlizzardArena = savedUserOptions["hideBlizzardArena"]
+	userOptionsOnChanged["hideBlizzardArena"] = printAboutReloading
+	
+	local hideBlizzardRaid = savedUserOptions["hideBlizzardRaid"]
+	userOptionsOnChanged["hideBlizzardRaid"] = printAboutReloading
+	
+	
+	if hideBlizzardParty or hideBlizzardArena or hideBlizzardRaid then
 		
 		if EditModeSystemSettingsDialog then
 			EditModeSystemSettingsDialog:SetPropagateKeyboardInput(true)
@@ -43,7 +58,7 @@ tinsert(hasuitDoThisPlayer_Login, function()
 			end
 		end
 		
-		if hasuitDisableDefaultPartyFrames then
+		if hideBlizzardParty then
 			local PartyFrame = PartyFrame
 			if type(PartyFrame)=="table" then
 				danDisableBlizzardUnitFrame2(CompactPartyFrameMember1) --raid-style party frames turned on
@@ -59,7 +74,7 @@ tinsert(hasuitDoThisPlayer_Login, function()
 			end
 		end
 		
-		if hasuitDisableDefaultArenaFrames then
+		if hideBlizzardArena then
 			local CompactArenaFrame = CompactArenaFrame
 			if type(CompactArenaFrame)=="table" then
 				danDisableBlizzardUnitFrame2(CompactArenaFrameMember1)
@@ -77,7 +92,7 @@ tinsert(hasuitDoThisPlayer_Login, function()
 			end
 		end
 		
-		if hasuitDisableDefaultRaidFrames then
+		if hideBlizzardRaid then
 			UIParent:UnregisterEvent("GROUP_ROSTER_UPDATE")
 			local CompactRaidFrameContainer = CompactRaidFrameContainer
 			if type(CompactRaidFrameContainer)=="table" then

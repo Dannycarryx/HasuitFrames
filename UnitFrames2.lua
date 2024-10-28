@@ -4,34 +4,26 @@ local hasuitPlayerGUID = hasuitPlayerGUID
 
 
 
--- local colorBackgroundsGroupSizeMinimum = 4 --todo option for pve only?
-local colorBackgroundsGroupSizeMinimum
--- local colorBackgroundsArenaSizeMinimum = 5 --worked in a skirmish with a little bit of green background showing through sometimes
-local colorBackgroundsArenaSizeMinimum
 
 local manaBarHeight = 4
-
-local partyStartX
-local partyStartY
-
-local arenaStartX
-local arenaStartY
-
-local raidStartX
-local raidStartY
-local raidStartYForPlayerRaidUnit
-
--- local partyStartX = -381
--- local partyStartY = 127 -- number-hasuitRaidFrameHeightForGroupSize[5]-3?
-
--- local arenaStartX = 381
--- local arenaStartY = 127
-
--- local raidStartX = 0
--- local raidStartY = -215
-
 local arenaWidth = hasuitRaidFrameWidthForGroupSize[3]
 local arenaHeight = hasuitRaidFrameHeightForGroupSize[3]
+
+
+
+local partyX
+local partyY
+
+local raidX
+local raidY
+local raidYForPlayerRaidUnit
+
+local arenaX
+local arenaY
+
+local groupColoredBackgroundMinimum
+local arenaColoredBackgroundMinimum
+
 
 
 local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
@@ -41,62 +33,114 @@ local danCurrentUnitTable
 local danCurrentGroupSize = hasuitGroupSize
 local danCurrentPartySize = GetNumSubgroupMembers()
 
-tinsert(hasuitDoThisAddon_Loaded, 1, function()
+local InCombatLockdown = InCombatLockdown
+local updateArenaPositions
+local updatingGroupPositions
+local danUpdateGroupPositionsButtons
+
+tinsert(hasuitDoThisUserOptionsLoaded, function()
 	local savedUserOptions = hasuitSavedUserOptions
+	local userOptionsOnChanged = hasuitUserOptionsOnChanged
+	local danRunAfterCombat = hasuitDoThisAfterCombat
 	
 	
-	local savedUserOptionsGroup = savedUserOptions["group"]
-	local savedUserOptionsParty = savedUserOptions["party"]
-	local function updatePartyVariables()
-		partyStartX = savedUserOptionsParty["X"]
-		partyStartY = savedUserOptionsParty["Y"]
+	
+	local function updateGroupPositions()
+		if not InCombatLockdown() then
+			danUpdateGroupPositionsButtons()
+		elseif not updatingGroupPositions then
+			updatingGroupPositions = true
+			danRunAfterCombat(danUpdateGroupPositionsButtons)
+		end
 	end
 	
-	local savedUserOptionsArena = savedUserOptions["arena"]
-	local function updateArenaVariables()
-		arenaStartX = savedUserOptionsArena["X"]
-		arenaStartY = savedUserOptionsArena["Y"]
-		colorBackgroundsArenaSizeMinimum = savedUserOptionsArena["Colored Background Minimum Size"]
+	
+	
+	partyX = savedUserOptions["partyX"]
+	userOptionsOnChanged["partyX"] = function()
+		partyX = savedUserOptions["partyX"]
+		updateGroupPositions()
+	end
+	partyY = savedUserOptions["partyY"]
+	userOptionsOnChanged["partyY"] = function()
+		partyY = savedUserOptions["partyY"]
+		updateGroupPositions()
 	end
 	
-	local savedUserOptionsRaid = savedUserOptions["raid"]
-	local function updateRaidVariables()
-		raidStartX = savedUserOptionsRaid["X"]
-		raidStartY = savedUserOptionsRaid["Y"]
-		raidStartYForPlayerRaidUnit = raidStartY-12
+	raidX = savedUserOptions["raidX"]
+	userOptionsOnChanged["raidX"] = function()
+		raidX = savedUserOptions["raidX"]
+		updateGroupPositions()
+	end
+	raidY = savedUserOptions["raidY"]
+	raidYForPlayerRaidUnit = raidY-12
+	userOptionsOnChanged["raidY"] = function()
+		raidY = savedUserOptions["raidY"]
+		raidYForPlayerRaidUnit = raidY-12
+		updateGroupPositions()
 	end
 	
-	local function updateGroupVariables()
-		colorBackgroundsGroupSizeMinimum = savedUserOptionsGroup["Colored Background Minimum Size"]
+	
+	local updatingArenaPositions
+	local function arenaPositions2()
+		updatingArenaPositions = nil
+		updateArenaPositions()
+	end
+	local function arenaPositionsAsd()
+		arenaX = savedUserOptions["arenaX"]
+		arenaY = savedUserOptions["arenaY"]
+		if not InCombatLockdown() then
+			updateArenaPositions()
+		elseif not updatingArenaPositions then
+			updatingArenaPositions = true
+			danRunAfterCombat(arenaPositions2)
+		end
+	end
+	arenaX = savedUserOptions["arenaX"]
+	userOptionsOnChanged["arenaX"] = arenaPositionsAsd
+	arenaY = savedUserOptions["arenaY"]
+	userOptionsOnChanged["arenaY"] = arenaPositionsAsd
+	
+	
+	
+	groupColoredBackgroundMinimum = savedUserOptions["groupColoredBackgroundMinimum"]
+	userOptionsOnChanged["groupColoredBackgroundMinimum"] = function()
+		groupColoredBackgroundMinimum = savedUserOptions["groupColoredBackgroundMinimum"]
 		danCurrentUnitTable = groupUnitFrames
-		changeUnitTypeColorBackgrounds(colorBackgroundsGroupSizeMinimum>0 and danCurrentGroupSize>=colorBackgroundsGroupSizeMinimum)
+		changeUnitTypeColorBackgrounds(groupColoredBackgroundMinimum>0 and danCurrentGroupSize>=groupColoredBackgroundMinimum)
 	end
-	local updateGroupFrames = hasuitUpdateAllUnitsForUnitType["group"]
-	local updateArenaFrames = hasuitUpdateAllUnitsForUnitType["arena"]
-	hasuitUpdateFramesFromOptions = { --todo easier/cleaner way to add a new useroption, remake some of the current setup
-		["party"]=function()
-			updatePartyVariables()
-			updateGroupFrames()
-		end,
-		["arena"]=function()
-			updateArenaVariables()
-			updateArenaFrames()
-			hasuitUpdateArenaPositions()
-		end,
-		["raid"]=function()
-			updateRaidVariables()
-			updateGroupFrames()
-		end,
-		["group"]=function()
-			updateGroupVariables()
-			-- updateGroupFrames()
-		end,
-	}
 	
-	updatePartyVariables()
-	updateArenaVariables()
-	updateRaidVariables()
-	updateGroupVariables()
+	
+	
+	arenaColoredBackgroundMinimum = savedUserOptions["arenaColoredBackgroundMinimum"]
+	userOptionsOnChanged["arenaColoredBackgroundMinimum"] = function()
+		arenaColoredBackgroundMinimum = savedUserOptions["arenaColoredBackgroundMinimum"]
+		danCurrentUnitTable = arenaUnitFrames
+		changeUnitTypeColorBackgrounds(arenaColoredBackgroundMinimum>0 and #arenaUnitFrames>=arenaColoredBackgroundMinimum)
+	end
+	
+	
+	
+	local makeTestGroupFrames = hasuitMakeTestGroupFrames
+	userOptionsOnChanged["partyTest"] = function()
+		makeTestGroupFrames(savedUserOptions["partyTest"])
+	end
+	local makeTestArenaFrames = hasuitMakeTestArenaFrames
+	userOptionsOnChanged["arenaTest"] = function()
+		makeTestArenaFrames(savedUserOptions["arenaTest"])
+	end
+	userOptionsOnChanged["raidTest"] = function()
+		makeTestGroupFrames(savedUserOptions["raidTest"])
+	end
+	
+	
+	
+	
+	-- CHANGE = savedUserOptions["CHANGE"]
+	-- userOptionsOnChanged["CHANGE"] = function()
+		-- CHANGE = savedUserOptions["CHANGE"]
+		-- updateGroupUnitFrames()
+	-- end
 end)
 
 
@@ -137,7 +181,6 @@ local C_Timer_After = C_Timer.After
 local CreateFrame = CreateFrame
 local IsInInstance = IsInInstance
 local UnitIsUnit = UnitIsUnit
-local InCombatLockdown = InCombatLockdown
 local GetSpellName = C_Spell.GetSpellName
 local GetSpellTexture = C_Spell.GetSpellTexture
 local UnitRace = UnitRace
@@ -177,7 +220,7 @@ local updateFrameUnit
 
 local unitsToAddToTable = {}
 
-local danUpdateAurasForFrame = hasuitUpdateAurasForFrame
+local danUnitAuraIsFullUpdate = hasuitUnitAuraIsFullUpdate
 
 local danInitializeArenaSpecialIcons
 
@@ -1654,7 +1697,7 @@ do
 		
 		-- danCurrentUnitType = "group"
 		danCurrentUnitTable = groupUnitFrames
-		changeUnitTypeColorBackgrounds(colorBackgroundsGroupSizeMinimum>0 and danCurrentGroupSize>=colorBackgroundsGroupSizeMinimum) --bugged during a shuffle transition where group size was 4 and someone was d/ced for 1 frame, dark color stuck on the one that was d/ced, so i moved this out of group roster update unsafe function and changed a few things with updating existing units so should be good now? the problem was probably with updating existing units and probably not this
+		changeUnitTypeColorBackgrounds(groupColoredBackgroundMinimum>0 and danCurrentGroupSize>=groupColoredBackgroundMinimum) --bugged during a shuffle transition where group size was 4 and someone was d/ced for 1 frame, dark color stuck on the one that was d/ced, so i moved this out of group roster update unsafe function and changed a few things with updating existing units so should be good now? the problem was probably with updating existing units and probably not this
 	end)
 end
 
@@ -1804,15 +1847,15 @@ tinsert(hasuitDoThisPlayer_Login, 1, function()
 		local arenaWidthPlusTwo = arenaWidth+2
 		local arenaHeightPlusTwo = arenaHeight+2
 		local arenaHeightasd = arenaHeightPlusTwo+1
-		function hasuitUpdateArenaPositions()
+		function updateArenaPositions()
 			for i=1,5 do
 				local unit = "arena"..i
 				local button = hasuitButtonForUnit[unit]
 				button:SetSize(arenaWidthPlusTwo,arenaHeightPlusTwo)
-				button:SetPoint("TOP", UIParent, "CENTER", arenaStartX, arenaStartY-i*arenaHeightasd)
+				button:SetPoint("TOP", UIParent, "CENTER", arenaX, arenaY-i*arenaHeightasd)
 			end
 		end
-		hasuitUpdateArenaPositions()
+		updateArenaPositions()
 	end
 	
 	
@@ -1824,7 +1867,7 @@ tinsert(hasuitDoThisPlayer_Login, 1, function()
 	danCurrentUnitType = "group"
 	danCurrentUnitTable = groupUnitFrames
 	
-	if colorBackgroundsGroupSizeMinimum>0 and danCurrentGroupSize>=colorBackgroundsGroupSizeMinimum then
+	if groupColoredBackgroundMinimum>0 and danCurrentGroupSize>=groupColoredBackgroundMinimum then
 		changeUnitTypeColorBackgrounds(true)
 	else
 		danSetScriptRangeMaybe()
@@ -1890,7 +1933,13 @@ end)
 
 local playerRaidUnit
 do
-	local targetFrame
+	
+	local danDoThis = hasuitDoThisGroup_Roster_UpdateAlways
+	local danDoThisGroupSizeChanged = hasuitDoThisGroup_Roster_UpdateGroupSizeChanged
+	local danDoThisRelevantSizes = hasuitDoThisRelevantSizes
+	
+	
+	local targetGUID
 	local lastFrames = {}
 	function hasuitMakeTestGroupFrames(number)
 		if hasuitInstanceType=="arena" then
@@ -1905,56 +1954,82 @@ do
 		danCurrentUnitTable = groupUnitFrames
 		
 		playerRaidUnit = playerRaidUnit or "raid1"
-		local preTestGroupSize = danCurrentGroupSize
-		
-		hasuitGroupSize = number
-		danCurrentGroupSize = number
-		
-		danCurrentUnitFrameWidth = hasuitRaidFrameWidthForGroupSize[danCurrentGroupSize]
-		danCurrentUnitFrameWidthPlus2 = danCurrentUnitFrameWidth+2
-		danCurrentUnitFrameWidthPlus3 = danCurrentUnitFrameWidth+3
-		hasuitRaidFrameWidth = danCurrentUnitFrameWidth
-		
-		danCurrentUnitFrameHeight = hasuitRaidFrameHeightForGroupSize[danCurrentGroupSize]
-		danCurrentUnitFrameHeightPlus2 = danCurrentUnitFrameHeight+2
-		danCurrentUnitFrameHeightPlus3 = danCurrentUnitFrameHeight+3
-		hasuitRaidFrameHeight = danCurrentUnitFrameHeight
-		
-		hasuitRaidFrameColumns = numColumnsForGroupSize[danCurrentGroupSize]
-		
-		changeUnitTypeColorBackgrounds(colorBackgroundsGroupSizeMinimum>0 and danCurrentGroupSize>=colorBackgroundsGroupSizeMinimum)
-		
-		hasuitFrameTypeUpdateCount["group"] = hasuitFrameTypeUpdateCount["group"]+1
-		danPlayerFrame.updated = hasuitFrameTypeUpdateCount["group"]
-		
-		
-		hasuitHideInactiveFrames()
-		for i=1,#lastFrames do
-			local frame = lastFrames[i]
-			if not UnitExists(frame.unit) then
-				danHideUnitFrame2(frame)
-				frame.specialAuraInstanceIDsRemove = {}
-			end
+		local actualGroupSize = GetNumGroupMembers()
+		if actualGroupSize == 0 then
+			actualGroupSize = 1
 		end
 		
-		if targetGUID and targetGUID~=true then
+		if number<actualGroupSize then
+			number = actualGroupSize
+		end
+		
+		
+		if number~=hasuitGroupSize then
+			hasuitGroupSize = number
+			
+			for i=1,#danDoThisGroupSizeChanged do
+				danDoThisGroupSizeChanged[i]()
+			end
+			
+			for i=1,#danDoThisRelevantSizes do
+				local sizeTable = danDoThisRelevantSizes[i]
+				local relevantSize = sizeTable[number]
+				if sizeTable.activeRelevantSize~=relevantSize then
+					sizeTable.activeRelevantSize = relevantSize
+					local sizeFunctions = sizeTable.functions
+					for j=1,#sizeFunctions do
+						sizeFunctions[j]()
+					end
+				end
+			end
+		end
+		for i=1,#danDoThis do
+			danDoThis[i]()
+		end
+		
+		
+		
+		
+		local updatedPlus1 = hasuitFrameTypeUpdateCount["group"]+1
+		hasuitFrameTypeUpdateCount["group"] = updatedPlus1
+		
+		
+		if targetGUID and targetGUID~=true then --made first fake frame "target" to be able to test things on a dummy easily like root/root ccbreakbar/loadon switching text around/unloading ccbreakbar on roots only etc. can test a bunch of stuff super easily this way, might be misleading for other people though because some stuff won't get tracked if spell is from player or things like that. not sure if ideal because of that? todo maybe disable for release and only use fake raid units. also probably get rid of the party broken text for tests? that'll probably just be confusing
 			local unitGUID = targetGUID
 			if unitGUID then
 				for i=1,#groupUnitFrames do
-					-- print(i)
 					local frame = groupUnitFrames[i]
-					if frame.unitGUID==unitGUID then
-						-- print(unitGUID, 2)
-						hasuitUnitFrameForUnit[unitGUID] = frame
-						break
+					if frame.unitGUID==unitGUID then 
+						if frame.unit=="target" then
+							frame.unitGUID = nil
+						else
+							hasuitUnitFrameForUnit[unitGUID] = frame
+						end
 					end
 				end
 			end
 		end
 		targetGUID = nil
 		
+		for i=1,#groupUnitFrames do
+			local frame = groupUnitFrames[i]
+			local unitGUID = frame.unitGUID
+			if unitGUID and hasuitUnitFrameForUnit[unitGUID]==frame and UnitExists(frame.unit) then
+				frame.updated = updatedPlus1
+			end
+		end
+		
+		hasuitHideInactiveFrames()
+		for i=1,#lastFrames do --to skip the 10 second hide timer if calling test function multiple times
+			local frame = lastFrames[i]
+			if frame.updated ~= updatedPlus1 then
+				danHideUnitFrame2(frame)
+				frame.specialAuraInstanceIDsRemove = {}
+			end
+		end
+		
 		lastFrames = {}
-		for i=preTestGroupSize+1,number do
+		for i=actualGroupSize+1,number do
 			
 			local unit
 			if targetGUID then
@@ -1974,28 +2049,12 @@ do
 			frame.colorFunction = nil
 			frame.priority = i+10000
 			frame.number = i+10000
-			frame.updated = hasuitFrameTypeUpdateCount["group"]+1
+			frame.updated = updatedPlus1+1
 			C_Timer_After(0, function()
 				frame:SetAlpha(1)
 			end)
 			tinsert(lastFrames, frame)
 		end
-		hasuitUpdateGroupRosterUnsafe()
-		
-		danCurrentGroupSize = preTestGroupSize
-		hasuitGroupSize = danCurrentGroupSize
-		
-		danCurrentUnitFrameWidth = hasuitRaidFrameWidthForGroupSize[danCurrentGroupSize]
-		danCurrentUnitFrameWidthPlus2 = danCurrentUnitFrameWidth+2
-		danCurrentUnitFrameWidthPlus3 = danCurrentUnitFrameWidth+3
-		hasuitRaidFrameWidth = danCurrentUnitFrameWidth
-		
-		danCurrentUnitFrameHeight = hasuitRaidFrameHeightForGroupSize[danCurrentGroupSize]
-		danCurrentUnitFrameHeightPlus2 = danCurrentUnitFrameHeight+2
-		danCurrentUnitFrameHeightPlus3 = danCurrentUnitFrameHeight+3
-		hasuitRaidFrameHeight = danCurrentUnitFrameHeight
-		
-		hasuitRaidFrameColumns = numColumnsForGroupSize[danCurrentGroupSize]
 	end
 end
 
@@ -2591,7 +2650,7 @@ danUpdateUnitSpecial["group"] = function()
 	else
 		danCurrentFrame:SetAlpha(outOfRangeAlpha)
 	end
-	danUpdateAurasForFrame(danCurrentFrame)
+	danUnitAuraIsFullUpdate(danCurrentFrame)
 	
 end
 
@@ -2601,7 +2660,27 @@ local danCleuDiminish = danCleuDiminish
 local trackedDiminishSpells = hasuitTrackedDiminishSpells
 tinsert(hasuitDoThisAddon_Loaded, function()
 	hasuitFramesCenterSetEventType("cleu")
-	local drLoadOn = hasuitFramesCenterAddLoadingProfile({["instanceType"]={["arena"]=true,["pvp"]=true,["none"]=true}})
+	local drLoadOn
+	do --dr loadon
+		local loadOn = {}
+		local function loadOnCondition()
+			local instanceType = hasuitInstanceType
+			if instanceType=="none" or instanceType=="arena" or instanceType=="pvp" then --should load
+				if not loadOn.shouldLoad then
+					print(hasuitGreen, "drLoadOn")
+					loadOn.shouldLoad = true
+				end
+			else --should NOT load
+				if loadOn.shouldLoad~=false then
+					print(hasuitRed, "drLoadOn")
+					loadOn.shouldLoad = false
+				end
+			end
+		end
+		tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+		loadOnCondition() --these are redundant i think, should get rid of them when changing initialize function? or probably already could
+		drLoadOn = loadOn
+	end
 	for drType, options in pairs(hasuitDiminishOptions) do
 		arenaDiminishTextures[options["arena"]] = options["texture"]
 		options[1] = danCleuDiminish
@@ -2770,7 +2849,7 @@ danUpdateUnitSpecial["arena"] = function()
 		danUpdateFrameRole2()
 	end
 	arenaInRange()
-	danUpdateAurasForFrame(danCurrentFrame)
+	danUnitAuraIsFullUpdate(danCurrentFrame)
 end
 
 do
@@ -3305,7 +3384,7 @@ function danUpdateArenaFramesUnsafe()
 		numArenaOpponents = GetNumArenaOpponents()
 	end
 	
-	changeUnitTypeColorBackgrounds(colorBackgroundsArenaSizeMinimum>0 and numArenaOpponents>=colorBackgroundsArenaSizeMinimum)
+	changeUnitTypeColorBackgrounds(arenaColoredBackgroundMinimum>0 and numArenaOpponents>=arenaColoredBackgroundMinimum)
 	
 	for i=1, numArenaOpponents do
 		danCurrentArenaSpec = GetArenaOpponentSpec(i)
@@ -3393,7 +3472,7 @@ end
 		
 		-- local button = hasuitButtonForUnit[frame.unit]
 		-- button:SetSize(danCurrentUnitFrameWidthPlus2,danCurrentUnitFrameHeightPlus2)
-		-- button:SetPoint("TOP", UIParent, "CENTER", arenaStartX, 1+arenaStartY-i*danCurrentUnitFrameHeightPlus3)
+		-- button:SetPoint("TOP", UIParent, "CENTER", arenaX, 1+arenaY-i*danCurrentUnitFrameHeightPlus3)
 	-- end
 -- end
 
@@ -3426,7 +3505,7 @@ function hasuitHideInactiveFrames()
 		end
 	end
 end
-local updatingGroupPositions
+-- local updatingGroupPositions
 local danRunAfterCombat = hasuitDoThisAfterCombat
 function hasuitUpdateGroupRosterUnsafe()
 	-- print("hasuitUpdateGroupRosterUnsafe()", GetNumGroupMembers())
@@ -3435,13 +3514,14 @@ function hasuitUpdateGroupRosterUnsafe()
 	
 	danCurrentUnitType = "group"
 	danCurrentUnitTable = groupUnitFrames
-	-- changeUnitTypeColorBackgrounds(danCurrentGroupSize>=colorBackgroundsGroupSizeMinimum)
+	-- changeUnitTypeColorBackgrounds(danCurrentGroupSize>=groupColoredBackgroundMinimum)
 	
 	local raid1Exists = UnitExists("raid1")
 	if not raid1Exists and danUpdatingRole then
 		danCurrentFrame = danPlayerFrame
 		danCurrentUnit = "player"
 		danUpdateFrameRole2()
+		-- danUnitAuraIsFullUpdate(danPlayerFrame)
 	end
 	
 	if not raid1Exists or hasuitInstanceType=="arena" then
@@ -3550,7 +3630,7 @@ do
 	local partyWasBroken
 	local lastRaidSize2 = 0
 	-- -- local highestPartyBrokenSize = 0
-	-- local raidStartYForPlayerRaidUnit = raidStartY-12
+	-- local raidYForPlayerRaidUnit = raidY-12
 
 	function danUpdateGroupPositionsButtons() --should handle people leaving well? but not joining, todo? can look broken if group size changes size/columns in combat atm but probably rare. should never make game unplayable even when that happens?
 		updatingGroupPositions = false
@@ -3562,7 +3642,7 @@ do
 				
 				local button = hasuitButtonForUnit[danCurrentFrame.unit]
 				button:SetSize(danCurrentUnitFrameWidthPlus2,danCurrentUnitFrameHeightPlus2)
-				button:SetPoint("TOP", UIParent, "CENTER", partyStartX, partyStartY-i*danCurrentUnitFrameHeightPlus3)
+				button:SetPoint("TOP", UIParent, "CENTER", partyX, partyY-i*danCurrentUnitFrameHeightPlus3)
 				
 				local macroTargetFrame = _G["d"..i.."-1"] --danclick
 				if macroTargetFrame then
@@ -3606,7 +3686,7 @@ do
 		else
 			
 			local maxColumnsMinus1 = numColumnsForGroupSize[danCurrentGroupSize]-1
-			local startX = raidStartX+floor(-danCurrentUnitFrameWidthPlus3*maxColumnsMinus1/2)+1
+			local startX = raidX+floor(-danCurrentUnitFrameWidthPlus3*maxColumnsMinus1/2)+1
 
 			
 			local numGroupFrames = #groupUnitFrames --bored todo test whether this makes it faster --don't think it does, i think multiple # checks gets faster after 1. or it seemed that way when i was testing random things like this, although actually i think it might here just from making the local variable instead of using groupUnitFrames from outside? idk
@@ -3619,7 +3699,7 @@ do
 					if danCurrentFrame then
 						i = i + 1
 						danSetSize()
-						local y=raidStartY-danCurrentUnitFrameHeightPlus3*row
+						local y=raidY-danCurrentUnitFrameHeightPlus3*row
 						local x=startX+danCurrentUnitFrameWidthPlus3*column
 						
 						local button = hasuitButtonForUnit[danCurrentFrame.unit]
@@ -3640,7 +3720,7 @@ do
 			
 			local button = hasuitButtonForUnit[playerRaidUnit]
 			button:SetSize(danCurrentUnitFrameWidthPlus2,danCurrentUnitFrameHeightPlus2)
-			button:SetPoint("TOP", UIParent, "CENTER", startX-danCurrentUnitFrameWidthPlus3, raidStartYForPlayerRaidUnit-danCurrentUnitFrameHeightPlus3)
+			button:SetPoint("TOP", UIParent, "CENTER", startX-danCurrentUnitFrameWidthPlus3, raidYForPlayerRaidUnit-danCurrentUnitFrameHeightPlus3)
 			
 			for i=i,lastRaidSize2 do
 				hasuitButtonForUnit["raid"..i]:SetPoint("TOP", UIParent, "CENTER", 0, -10000) --todo, just shoving out of the way for now
