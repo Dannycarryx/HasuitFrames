@@ -9,7 +9,7 @@
 
 local hasuitFrameParent = CreateFrame("Frame", "hasuitFrameParent", UIParent)
 hasuitFrameParent:SetIgnoreParentScale(true)
-hasuitFrameParent:SetScale(0.71111112833023)
+-- hasuitFrameParent:SetScale(0.71111112833023)
 hasuitFrameParent:SetSize(1,1)
 hasuitFrameParent:SetPoint("CENTER")
 hasuitFrameParent:SetFrameStrata("LOW")
@@ -141,6 +141,8 @@ hasuitDoThisGroup_Roster_UpdateGroupSizeChanged = {}
 -- hasuitDoThisGroup_Roster_UpdateGroupSize_5_8
 
 hasuitDoThisPlayer_Target_Changed = {}
+
+hasuitDoThisUserOptionsLoaded = {}
 
 -- hasuitDoThisOnUpdate(func)
 -- hasuitDoThisOnUpdatePosition1(func)
@@ -294,6 +296,7 @@ do --hasuitDoThisAfterCombat
 	end)
 end
 
+-- local savedUserOptions
 local GetNumGroupMembers = GetNumGroupMembers
 do
 	local danDoThisRelevantSizes = {}
@@ -324,8 +327,7 @@ do
 	local danDoThisGroupSizeChanged = hasuitDoThisGroup_Roster_UpdateGroupSizeChanged
 	local danFrame = CreateFrame("Frame")
 	danFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-	tinsert(hasuitDoThisAddon_Loaded, 1, function()
-		hasuitSavedUserOptions = hasuitSavedUserOptions
+	tinsert(hasuitDoThisAddon_Loaded, 1, function() --ends up being #2 (for now?)
 		for i=1,#danDoThisGroupSizeChanged do
 			danDoThisGroupSizeChanged[i]()
 		end
@@ -591,7 +593,7 @@ local function mainLoadOnFunction()
 						loadedTable[spellId] = {}
 						loadedStuff = loadedTable[spellId]
 					end
-					-- local loadFunction = unloadedStuff[i]["loadFunction"] --could do specific load/unload functions per spell like maybe clear an aura? probably won't ever have an actual use for these
+					-- local loadFunction = unloadedStuff[i]["loadFunction"] --could do specific load/unload functions per spell like maybe clear an aura? probably won't ever have a good enough reason to uncomment these
 						-- if loadFunction then
 						-- loadFunction()
 					-- end
@@ -625,6 +627,7 @@ local function mainLoadOnFunction()
 			end
 		end
 	end
+	print("mainLoadOnFunction()")
 	-- reportString = reportString.."\n"..danGreen(loadedCount).." loaded "..danYellow((totalCount-loadedCount)).." unloaded"
 	-- local difference = loadedCount-previousLoadedCount
 	-- if difference>0 then
@@ -1151,7 +1154,10 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
 		hasuitGetD2anCleuSubevent = nil
 		hasuitGetD4anCleuSourceGuid = nil
 		hasuitGetD12anCleuSpellId = nil
+		
+		hasuitDoThisUserOptionsLoaded = nil
+		hasuitUserOptionsOnChanged = nil
+		hasuitMakeTestGroupFrames = nil
+		hasuitMakeTestArenaFrames = nil
 	end)
 end)
-
-

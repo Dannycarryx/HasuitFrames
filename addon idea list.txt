@@ -1,8 +1,6 @@
 
 
 
-biggest things right now:
-better useroptions setup. settings saved now will get overwritten after this is better, and when actually released that should never happen
 
 other important:
 player buffs/debuffs showing for specs that haven't been set up like spriest dots on arena frames, buffs on allies from player, more important for friendly buffs

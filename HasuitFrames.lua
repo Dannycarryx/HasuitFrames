@@ -268,7 +268,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
 					print(hasuitGreen, "hasuitLoadOnEnablePve")
 					danGeneralCleuFrameSetScriptOnEvent(pveCleuFunc)
 					loadOn.shouldLoad = true
-					if instanceId==2177 then --assuming instanceid will almost never be used for anything, also assuming i got this part right, atm any instance type change will prompt a main loadon function but instanceid change won't. so if going from instancetype pvp directly into a comp stomp the pve loadon needs this to properly run the main function. maybe impossible and group size would probably take care of it anyway, but this should be solid
+					if instanceId==2177 then --assuming instanceid will almost never be used for anything, also assuming i got this part right, atm any instance type change will prompt a main loadon function but instanceid change won't. so if going from instancetype pvp directly into a comp stomp the pve loadon needs this to properly run the main function. maybe impossible and group size would probably take care of it anyway, but this should be solid.. should probably make this setup less complicated. it's kind of simple in that every other load condition except instancetype changing needs to call the main loadon function when a .shouldLoad changes but ya we'll see in the future i guess, or if someone else tries to make a loadon and hates it
 						hasuitMainLoadOnFunctionSpammable()
 					end
 				end

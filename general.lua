@@ -1536,7 +1536,7 @@ hasuitFramesCenterSetEventType("aura")
 
 danBottomLeft_BottomLeft	=	{["xDirection"]=1,	["yDirection"]=	1,	["xMinimum"]=2,	["yMinimum"]=3,	["xLimit"]=0,	["yLimit"]=0,	["ownPoint"]="BOTTOMLEFT",["targetPoint"]="BOTTOMLEFT",["xOffset"]=0,["yOffset"]=0,["grow"]=normalGrow,["sort"]=danSortPriorityExpirationTime}
 local commonHarmful = {["controller"]=danBottomLeft_BottomLeft,["size"]=15,	["frameLevel"]=20,	["hideCooldownText"]=true,	["alpha"]=1}
-hasuitFramesOptionsClassSpecificHarmful = {auraSourceIsPlayer,	["priority"]=1,	["arena"]=commonHarmful, ["loadOn"]=hasuitLoadOnArenaOnly} --for github, i'm thinking about not showing debuffs bottom left at all and doing something different/using that space to show another dr like typhoon, so this is subject to change
+hasuitFramesOptionsClassSpecificHarmful = {auraSourceIsPlayer,	["priority"]=1,	["arena"]=commonHarmful, ["loadOn"]=hasuitLoadOnArenaOnly} --i'm thinking about not showing debuffs bottom left at all and doing something different/using that space to show another dr like typhoon, so this is subject to change
 
 
 danBottomRight_BottomRight	=	{["xDirection"]=-1,	["yDirection"]=	1,	["xMinimum"]=1,	["yMinimum"]=1,	["xLimit"]=1,	["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT",["targetPoint"]="BOTTOMRIGHT",["xOffset"]=0,["yOffset"]=0,["grow"]=normalGrow,["sort"]=danSortPriorityExpirationTime}

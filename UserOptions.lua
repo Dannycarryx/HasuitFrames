@@ -7,55 +7,125 @@
 
 
 
-hasuitSavedUserOptions = { --todo change and get rid of the party/arena/raid etc, text on options frame will need to be changed too
-	["party"]={
-		["X"]=-381,
-		["Y"]=127,
-		["Hide Default"]=true,
-	},
-	["arena"]={
-		["X"]=381,
-		["Y"]=127,
-		["Colored Background Minimum Size"]=0,
-		["Hide Default"]=true,
-	},
-	["raid"]={
-		["X"]=0,
-		["Y"]=-215,
-		["Hide Default"]=true,
-	},
-	["group"]={
-		["Colored Background Minimum Size"]=4,
-	},
-	["scale"]=1,
-	
+local danCreateCheckButton
+local danCreateEditBox
+local danCreateNewHeader
+local danSetPointAndDirection
+local createPageBackground
+local createOptionsPages = {
+	function() --1
+		createPageBackground(150)
+		
+		danSetPointAndDirection("TOP", "TOPLEFT", 160, 19, -25)
+		danCreateNewHeader("party")
+		danCreateEditBox("partyX", "X")
+		danCreateEditBox("partyY", "Y")
+		danCreateEditBox("partyTest", "Test Size")
+		
+		danSetPointAndDirection("TOP", "TOPLEFT", 360, 19, -25)
+		danCreateNewHeader("arena")
+		danCreateEditBox("arenaX", "X")
+		danCreateEditBox("arenaY", "Y")
+		danCreateEditBox("arenaTest", "Test Size")
+		
+		danSetPointAndDirection("TOP", "TOPLEFT", 560, 19, -25)
+		danCreateNewHeader("raid")
+		danCreateEditBox("raidX", "X")
+		danCreateEditBox("raidY", "Y")
+		danCreateEditBox("raidTest", "Test Size")
+	end,
+	function() --2
+		createPageBackground(150)
+		
+		danSetPointAndDirection("TOP", "TOPLEFT", 390, 19, -25)
+		danCreateNewHeader("group")
+		danCreateEditBox("groupColoredBackgroundMinimum", "Colored Background Minimum Size")
+		danCreateNewHeader("party")
+		danCreateCheckButton("hideBlizzardParty", "Hide Default")
+		
+		danSetPointAndDirection("TOP", "TOPLEFT", 170, -61, -25)
+		danCreateEditBox("scale", "scale")
+		
+		danSetPointAndDirection("TOP", "TOPLEFT", 480, 19, -25)
+		danCreateNewHeader("arena")
+		danCreateEditBox("arenaColoredBackgroundMinimum")
+		danCreateNewHeader("arena")
+		danCreateCheckButton("hideBlizzardArena")
+		
+		danSetPointAndDirection("TOP", "TOPLEFT", 570, -34, -25)
+		danCreateNewHeader("raid")
+		danCreateCheckButton("hideBlizzardRaid")
+	end,
 }
 
 
 
 
-
-
-
 local savedUserOptions
-local updateFramesFromOptions
-tinsert(hasuitDoThisAddon_Loaded, function()
+local userOptionsOnChanged = {} --or just clicked/pressed enter, value doesn't have to actually change
+hasuitUserOptionsOnChanged = userOptionsOnChanged
+tinsert(hasuitDoThisAddon_Loaded, 1, function()
 	savedUserOptions = hasuitSavedUserOptions
-	updateFramesFromOptions = hasuitUpdateFramesFromOptions
+	if not savedUserOptions then --will need to have checks for any new options added after release
+		savedUserOptions = { --defaults ___
+			["partyX"]=-381,
+			["partyY"]=127, --old comment: number-hasuitRaidFrameHeightForGroupSize[5]-3?
+			
+			["raidX"]=0,
+			["raidY"]=-215,
+			
+			["arenaX"]=381,
+			["arenaY"]=127,
+			
+			
+			["groupColoredBackgroundMinimum"]=4, --todo option for pve only?
+			["arenaColoredBackgroundMinimum"]=0, --worked in a skirmish with a little bit of green background showing through sometimes
+			
+			["hideBlizzardParty"]=true,
+			["hideBlizzardArena"]=true,
+			["hideBlizzardRaid"]=true,
+			
+			["scale"]=1,
+		}
+		hasuitSavedUserOptions = savedUserOptions
+	end
+	savedUserOptions["partyTest"] = 3 --need to fix cds for party of 5, todo would also be nice to show them in test mode
+	savedUserOptions["arenaTest"] = 3
+	savedUserOptions["raidTest"] = 8
 	
-	if savedUserOptions["scale"]~=1 then
-		hasuitFrameParent:SetScale(savedUserOptions["scale"]*0.71111112833023)
+	
+	
+	
+	
+	
+	
+	local danDoThisUserOptionsLoaded = hasuitDoThisUserOptionsLoaded
+	for i=1,#danDoThisUserOptionsLoaded do
+		danDoThisUserOptionsLoaded[i]()
 	end
 	
+	
+	
+	
+	
+	-- local pixelPerfectMult = 768/1080 --GxFullscreenResolution, GxWindowedResolution, todo
 	local lastScale = savedUserOptions["scale"]
-	updateFramesFromOptions["scale"] = function(value)
-		if lastScale==1 and value~=1 then
+	hasuitFrameParent:SetScale(lastScale*0.71111112833023)
+	userOptionsOnChanged["scale"] = function()
+		local scale = savedUserOptions["scale"]
+		if lastScale==1 and scale~=1 then
 			print("changing the scale from 1 will make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually")
 		end
-		lastScale = value
-		hasuitFrameParent:SetScale(value*0.71111112833023)
+		lastScale = scale
+		hasuitFrameParent:SetScale(scale*0.71111112833023)
 	end
 end)
+
+
+
+
+
+
 
 
 local danBackdrop = {
@@ -76,12 +146,10 @@ local currentOptionsPage
 local currentOptionsPageIndex = 0
 local changesMade
 local danCreateNewRow
-local danCreateEditBox
-local danCreateCheckButton
 local currentCheckButton
 do
 	function editBoxEscape(editBox) --OnEscapePressed
-		editBox:SetText(editBox.optionsTable[editBox.optionsKey])
+		editBox:SetText(savedUserOptions[editBox.optionsKey])
 		currentEditBox = nil
 		editBox:ClearFocus()
 	end
@@ -90,29 +158,29 @@ do
 		local currentText = editBox:GetText()
 		local number = tonumber(currentText)
 		if number then
-			local previousValue = editBox.optionsTable[editBox.optionsKey]
-			editBox.optionsTable[editBox.optionsKey] = number
+			local previousValue = savedUserOptions[editBox.optionsKey]
+			savedUserOptions[editBox.optionsKey] = number
 			changesMade = changesMade or previousValue~=number
-			editBox.optionsUpdateTable()
+			editBox.optionsOnChangedFunction()
 		else
-			editBox:SetText(editBox.optionsTable[editBox.optionsKey])
+			editBox:SetText(savedUserOptions[editBox.optionsKey])
 		end
 		currentEditBox = nil
 		editBox:ClearFocus()
 	end
 	local function checkButtonMouseDown(checkButton) --checkButton OnMouseDown
-		local isChecked = checkButton.optionsTable[checkButton.optionsKey]
+		local isChecked = savedUserOptions[checkButton.optionsKey]
 		if isChecked then
 			checkButton.onOffText:SetText("off")
 			checkButton:SetBackdropColor(0.8,0,0)
-			checkButton.optionsTable[checkButton.optionsKey] = false
+			savedUserOptions[checkButton.optionsKey] = false
 		else
 			checkButton.onOffText:SetText("on")
 			checkButton:SetBackdropColor(0,0.8,0)
-			checkButton.optionsTable[checkButton.optionsKey] = true
+			savedUserOptions[checkButton.optionsKey] = true
 		end
 		changesMade = true
-		checkButton.optionsUpdateTable()
+		checkButton.optionsOnChangedFunction()
 	end
 	local function editBoxMouseDown(editBox) --OnMouseDown
 		currentEditBox = editBox
@@ -123,9 +191,7 @@ do
 	local y
 	local ownPoint
 	local targetPoint
-	local name
-	local currentUserOptionsTable
-	function danCreateEditBox(optionsKey, hideText, unsavedTable, specialFunction)
+	function danCreateEditBox(optionsKey, leftText)
 		local editBox = CreateFrame("EditBox", nil, currentOptionsPage, "BackdropTemplate")
 		editBox:SetBackdrop(danBackdrop)
 		editBox:SetBackdropColor(0,0,0)
@@ -139,26 +205,18 @@ do
 		editBox:SetScript("OnEscapePressed", editBoxEscape)
 		editBox:SetScript("OnEnterPressed", editBoxEnter)
 		editBox:SetScript("OnMouseDown", editBoxMouseDown)
-		if unsavedTable then
-			editBox.optionsUpdateTable = function()
-				specialFunction(editBox.optionsTable[optionsKey])
-			end
-			editBox.optionsTable = unsavedTable
-		else
-			editBox.optionsUpdateTable = updateFramesFromOptions[name]
-			editBox.optionsTable = currentUserOptionsTable
-		end
+		editBox.optionsOnChangedFunction = userOptionsOnChanged[optionsKey]
 		editBox.optionsKey = optionsKey
-		editBox:SetText(editBox.optionsTable[optionsKey])
-		if not hideText then
+		editBox:SetText(savedUserOptions[optionsKey])
+		if leftText then
 			local nameText = editBox:CreateFontString()
 			nameText:SetFontObject(danFont16)
-			nameText:SetText(optionsKey)
+			nameText:SetText(leftText)
 			nameText:SetPoint("RIGHT", editBox, "LEFT", -1,1)
 		end
 		return editBox
 	end
-	function danCreateCheckButton(optionsKey, hideText)
+	function danCreateCheckButton(optionsKey, leftText)
 		local checkButton = CreateFrame("Button", nil, currentOptionsPage, "BackdropTemplate")
 		checkButton:SetBackdrop(danBackdrop)
 		checkButton:SetBackdropBorderColor(0,0,0)
@@ -166,40 +224,40 @@ do
 		checkButton:SetPoint(ownPoint, currentOptionsPage, targetPoint, x, y)
 		checkButton:SetSize(80,20)
 		checkButton:SetScript("OnMouseDown", checkButtonMouseDown)
-		checkButton.optionsUpdateTable = updateFramesFromOptions[name]
-		checkButton.optionsTable = currentUserOptionsTable
+		checkButton.optionsOnChangedFunction = userOptionsOnChanged[optionsKey]
 		checkButton.optionsKey = optionsKey
 		local onOffText = checkButton:CreateFontString()
 		checkButton.onOffText = onOffText
 		onOffText:SetFontObject(danFont14)
 		onOffText:SetPoint("CENTER")
-		if checkButton.optionsTable[checkButton.optionsKey] then
+		if savedUserOptions[checkButton.optionsKey] then
 			onOffText:SetText("on")
 			checkButton:SetBackdropColor(0,0.8,0)
 		else
 			onOffText:SetText("off")
 			checkButton:SetBackdropColor(0.8,0,0)
 		end
-		if not hideText then
+		if leftText then
 			local nameText = checkButton:CreateFontString()
 			nameText:SetFontObject(danFont16)
-			nameText:SetText(optionsKey)
+			nameText:SetText(leftText)
 			nameText:SetPoint("RIGHT", checkButton, "LEFT", -1,1)
 		end
 		return checkButton
 	end
-	function danCreateNewColumn(setName, setOwnPoint, setTargetPoint, setX, setY, setYChange)
-		currentUserOptionsTable = savedUserOptions[setName]
-		name = setName
-		ownPoint = setOwnPoint
-		targetPoint = setTargetPoint
-		x = setX+1
-		y = setY-1
-		yChange = setYChange
+	function danCreateNewHeader(headerText)
 		local header = currentOptionsPage:CreateFontString()
 		header:SetFontObject(danFont25)
-		header:SetText(setName)
-		header:SetPoint(setOwnPoint,currentOptionsPage,setTargetPoint,setX,setY)
+		header:SetText(headerText)
+		y = y+yChange-3
+		header:SetPoint(ownPoint,currentOptionsPage,targetPoint,x,y)
+	end
+	function danSetPointAndDirection(setOwnPoint, setTargetPoint, setX, setY, setYChange)
+		ownPoint = setOwnPoint
+		targetPoint = setTargetPoint
+		x = setX
+		y = setY
+		yChange = setYChange
 	end
 end
 
@@ -217,7 +275,7 @@ local function hideUserOptionsFrame()
 		if InCombatLockdown() then
 			print("saved changes, applying after combat")
 		else
-			print("saved changes") --the messages should be improved
+			print("saved changes") --the messages could be improved
 		end
 	end
 	changesMade = nil
@@ -245,7 +303,7 @@ local function onKeyDown(optionsFrame, key)
 		end
 	end
 end
-local function createPageBackground(height)
+function createPageBackground(height)
 	currentOptionsPage = CreateFrame("Frame", nil, userOptionsFrame, "BackdropTemplate")
 	currentOptionsPage:SetBackdrop(danBackdrop)
 	currentOptionsPage:SetHeight(height)
@@ -257,41 +315,9 @@ local function createPageBackground(height)
 end
 
 
-local createOptionsPages = {
-	function() --1
-		createPageBackground(150)
-		danCreateNewColumn("party", "TOP", "TOPLEFT", 160, -5, -25)
-		danCreateEditBox("X")
-		danCreateEditBox("Y")
-		danCreateEditBox("test group", false, {["test group"]=10}, hasuitMakeTestGroupFrames)
-		
-		danCreateNewColumn("arena", "TOP", "TOPLEFT", 360, -5, -25)
-		danCreateEditBox("X")
-		danCreateEditBox("Y")
-		danCreateEditBox("test arena", false, {["test arena"]=3}, hasuitMakeTestArenaFrames)
-		
-		danCreateNewColumn("raid", "TOP", "TOPLEFT", 560, -5, -25)
-		danCreateEditBox("X")
-		danCreateEditBox("Y")
-	end,
-	function() --2
-		createPageBackground(150)
-		danCreateNewColumn("group", "TOP", "TOPLEFT", 350, -5, -25)
-		danCreateEditBox("Colored Background Minimum Size")
-		danCreateNewColumn("party", "TOP", "TOPLEFT", 350, -60, -25)
-		danCreateCheckButton("Hide Default")
-		danCreateEditBox("scale", false, savedUserOptions, hasuitUpdateFramesFromOptions["scale"])
-		
-		danCreateNewColumn("arena", "TOP", "TOPLEFT", 440, -5, -25)
-		danCreateEditBox("Colored Background Minimum Size", "hideLeftText")
-		danCreateNewColumn("arena", "TOP", "TOPLEFT", 440, -60, -25)
-		danCreateCheckButton("Hide Default", "hideLeftText")
-		
-		danCreateNewColumn("raid", "TOP", "TOPLEFT", 530, -60, -25)
-		danCreateCheckButton("Hide Default", "hideLeftText")
-		
-	end,
-}
+
+
+
 local highestPage = #createOptionsPages
 local function nextPage()
 	if currentEditBox then
@@ -348,10 +374,6 @@ local function openMainOptions()
 			closeButton:SetBackdropColor(0.8,0,0)
 			closeButton:SetBackdropBorderColor(0,0,0)
 			closeButton:SetSize(50,50)
-			-- local closeButtonTexture = closeButton:CreateTexture(nil, "BACKGROUND")
-			-- closeButtonTexture:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
-			-- closeButtonTexture:SetAllPoints()
-			-- closeButtonTexture:SetVertexColor(0.8,0,0)
 			closeButtonText = closeButton:CreateFontString()
 			closeButtonText:SetFontObject(danFont25)
 			closeButtonText:SetText("x")
@@ -367,10 +389,6 @@ local function openMainOptions()
 			nextButton:SetBackdropColor(0,0.2,0.4)
 			nextButton:SetBackdropBorderColor(0,0,0)
 			nextButton:SetSize(50,40)
-			-- local nextButtonTexture = nextButton:CreateTexture(nil, "BACKGROUND")
-			-- nextButtonTexture:SetTexture("Interface\\ChatFrame\\ChatFrameBackground")
-			-- nextButtonTexture:SetAllPoints()
-			-- nextButtonTexture:SetVertexColor(0,0.2,0.4)
 			nextButtonText = nextButton:CreateFontString()
 			nextButtonText:SetFontObject(danFont16)
 			nextButtonText:SetText("->")
