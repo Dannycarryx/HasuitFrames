@@ -1491,10 +1491,10 @@ initialize(198688) --Dagger in the Dark
 hasuitSetupFrameOptions = {danMainAuraFunction,         ["priority"]=280,                   ["group"]=danCommonTopRightGroupDebuffs[5], ["arena"]=danCommonTopLeftArenaDebuffs[5],}
 initialize(GetSpellName(8326)) --Ghost, todo bigger/15 sec timer in rbgs?
 
-hasuitSetupFrameOptions = {danMainAuraFunction,         ["priority"]=3,["loadOn"]=loadOnNone,["group"]=danCommonTopRightGroupDebuffs[5],        } --deserter
-initialize(GetSpellName(26013)) --Deserter --todo these need to get removed when entering instance since they're so long, then can uncomment, surprised it's needed, seems like it'll work itself out after getting the order of loadons/everything else right?
-initialize(GetSpellName(71041)) --Dungeon Deserter
-initialize(158263) --Craven (arena deserter)
+-- hasuitSetupFrameOptions = {danMainAuraFunction,         ["priority"]=3,["loadOn"]=loadOnNone,["group"]=danCommonTopRightGroupDebuffs[5],        } --deserter
+-- initialize(GetSpellName(26013)) --Deserter --todo these need to get removed when entering instance since they're so long, then can uncomment, surprised it's needed, seems like it'll work itself out after getting the order of loadons/everything else right?
+-- initialize(GetSpellName(71041)) --Dungeon Deserter
+-- initialize(158263) --Craven (arena deserter)
 
 
 

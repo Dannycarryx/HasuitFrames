@@ -1,18 +1,18 @@
 if hasuitPlayerClass~="WARRIOR" then
-	return
+    return
 end
 
 hasuitDiminishOptions["stun"] = { --available dr types: stun, fear, root, sheep, silence, disarm, showing more than 4 isn't a good idea for now
-	["arena"] = 1, --position of the icon on arena frames, right to left
-	["texture"] = 613535, --Storm Bolt
+    ["arena"] = 1, --position of the icon on arena frames, right to left
+    ["texture"] = 613535, --Storm Bolt
 }
 hasuitDiminishOptions["disorient"] = {
-	["arena"] = 2,
-	["texture"] = 132154, --Intimidating Shout
+    ["arena"] = 2,
+    ["texture"] = 132154, --Intimidating Shout
 }
 hasuitDiminishOptions["incapacitate"] = { --to hide a DR you can remove it here, just don't leave a gap on ["arena"] = x, if you remove 3 then change the next one's ["arena"] = 4 to 3 etc
-	["arena"] = 3,
-	["texture"] = 136071, --Polymorph
+    ["arena"] = 3,
+    ["texture"] = 136071, --Polymorph
 }
 
 

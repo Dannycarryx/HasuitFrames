@@ -62,8 +62,8 @@ GetBuildInfo to not have to copy what other addons put in the .toc?
 
 
 -- if UnitGUID(unit)==hasuitPlayerGUID and danCurrentAura["spellId"]==774 then --dan1, also try unit name in tooltip when this doesn't work?
-	-- print(hasuitTestAuraTable, danCurrentAura, hasuitTestAuraTable==danCurrentAura)
-	-- hasuitTestAuraTable = danCurrentAura
+    -- print(hasuitTestAuraTable, danCurrentAura, hasuitTestAuraTable==danCurrentAura)
+    -- hasuitTestAuraTable = danCurrentAura
 -- end
 
 

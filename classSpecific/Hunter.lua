@@ -1,22 +1,22 @@
 if hasuitPlayerClass~="HUNTER" then
-	return
+    return
 end
 
 hasuitDiminishOptions["stun"] = { --available dr types: stun, fear, root, sheep, silence, disarm, showing more than 4 isn't a good idea for now
-	["arena"] = 1, --position of the icon on arena frames, right to left
-	["texture"] = 132111, --Intimidation
+    ["arena"] = 1, --position of the icon on arena frames, right to left
+    ["texture"] = 132111, --Intimidation
 }
 hasuitDiminishOptions["incapacitate"] = {
-	["arena"] = 2,
-	["texture"] = 135834, --Freezing Trap
+    ["arena"] = 2,
+    ["texture"] = 135834, --Freezing Trap
 }
 hasuitDiminishOptions["root"] = {
-	["arena"] = 3,
-	["texture"] = 132149, --Entrapment
+    ["arena"] = 3,
+    ["texture"] = 132149, --Entrapment
 }
 hasuitDiminishOptions["disorient"] = { --to hide a DR you can remove it here, just don't leave a gap on ["arena"] = x, if you remove 3 then change the next one's ["arena"] = 4 to 3 etc
-	["arena"] = 4,
-	["texture"] = 136022, --Cyclone
+    ["arena"] = 4,
+    ["texture"] = 136022, --Cyclone
 }
 
 
