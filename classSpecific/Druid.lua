@@ -105,6 +105,8 @@ initialize(391889) --Adaptive Swarm dot
 
 
 
+local normalGrow = hasuitNormalGrow
+local danSort = hasuitSort
 
 local danBottomRightHots1		=	{["xDirection"]=-1,	["yDirection"]=	1,	["xMinimum"]=1,	["yMinimum"]=1,	["xLimit"]=0,	["yLimit"]=0,	["ownPoint"]="BOTTOMRIGHT",	["targetPoint"]="BOTTOMRIGHT",	["xOffset"]=	0,	["yOffset"]= 0,		["grow"]=normalGrow,	["sort"]=danSort,		} --todo combine these controllers and change how it grows instead?
 local danBottomRightHots2		=	{["xDirection"]=-1,	["yDirection"]=	1,	["xMinimum"]=1,	["yMinimum"]=1,	["xLimit"]=0,	["yLimit"]=0,	["ownPoint"]="BOTTOMRIGHT",	["targetPoint"]="BOTTOMRIGHT",	["xOffset"]=	-16,["yOffset"]= 0,		["grow"]=normalGrow,	["sort"]=danSort,		}

@@ -1,19 +1,7 @@
 
 
-local danFileName = "cooldowns.lua"
-local danPrint = function()end
-local danPrintPurple = danPrint
-local danPrintPurple2 = danPrint
-local danPrintTeal = danPrint
-local danPrintTeal2 = danPrint
 
--- C_Timer.After(0, function()
-	-- danPrint = hasuitTraceGetDanPrintFunction(hasuitGreen2, hasuitGreen2, false, danFileName)
-	-- danPrintPurple = hasuitTraceGetDanPrintFunction(hasuitPurple, hasuitPurple, false, danFileName)
-	-- danPrintPurple2 = hasuitTraceGetDanPrintFunction(hasuitPurple2, hasuitPurple2, false, danFileName)
-	-- danPrintTeal = hasuitTraceGetDanPrintFunction(hasuitTeal, hasuitTeal, false, danFileName)
-	-- danPrintTeal2 = hasuitTraceGetDanPrintFunction(hasuitTeal2, hasuitTeal2, false, danFileName)
--- end)
+
 
 
 hasuitBlessingOfAutumnIgnoreList = { --how would this interact with time stop? or other cd reduction like aug thing? if multiply then should combine on unitframe, if not then probably nothing needs to be done?
@@ -49,7 +37,6 @@ do --cooldowns loadon
 	local danRestoreCooldowns1
 	tinsert(hasuitDoThisAddon_Loaded, function()
 		danRestoreCooldowns1 = hasuitRestoreCooldowns
-		-- hasuitRestoreCooldowns = nil
 	end)
 	
 	local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
@@ -69,19 +56,16 @@ do --cooldowns loadon
 		local instanceType = hasuitInstanceType
 		if hasuitGroupSize<=5 and (instanceType=="none" or instanceType=="arena" or instanceType=="party" or instanceType=="scenario") then --should load
 			if not loadOn.shouldLoad then
-				print(hasuitGreen, "hasuitCooldownDisplayLoadOn")
 				loadOn.shouldLoad = true
 				arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
 				arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
 				if hasuitCooldownDisplayActiveGroup==false then
 					danDoThisOnUpdate(danRestoreCooldowns2)
-					-- C_Timer.After(0, danRestoreCooldowns2)
 				end
 				hasuitCooldownDisplayActiveGroup = true
 			end
 		else --should NOT load
 			if loadOn.shouldLoad~=false then
-				print(hasuitRed, "hasuitCooldownDisplayLoadOn")
 				loadOn.shouldLoad = false
 				if hasuitCooldownDisplayActiveGroup then
 					arenaCrowdControlSpellUpdateFrame:UnregisterAllEvents()
@@ -123,10 +107,8 @@ local hasuitFramesCenterSetEventType = hasuitFramesCenterSetEventType
 do
 	local function danSortCooldowns(a,b)
 		if a==b then --? definitely need this but why
-			-- danPrint("a==b", "a: "..a.priority, a.spellName, a.spellId, a.expirationTime, "b: "..b.priority, b.spellName, b.spellId, b.expirationTime)
 			return
 		elseif a.priority<b.priority then
-			-- danPrint("a.priority<b.priority", "a: "..a.priority, a.spellName, a.spellId, a.expirationTime, "b: "..b.priority, b.spellName, b.spellId, b.expirationTime)
 			return true
 		elseif a.priority==b.priority then
 			local expirationA
@@ -147,21 +129,10 @@ do
 			else
 				expirationB = b.expirationTime
 			end
-			-- if expirationA and expirationB then
-				if expirationA<expirationB then
-					-- danPrint("a.expirationTime<b.expirationTime", "a: "..a.priority, a.spellName, a.spellId, a.expirationTime, "b: "..b.priority, b.spellName, b.spellId, b.expirationTime)
-					return true
-				end
-			-- else
-				-- if not expirationA then
-					-- return expirationB and true
-					-- danPrintBig("danA", a, a.spellId)
-				-- else
-					-- danPrintBig("danB", b, b.spellId)
-				-- end
-			-- end
+			if expirationA<expirationB then
+				return true
+			end
 		end
-		-- danPrint("no return", "a: "..a.priority, a.spellName, a.spellId, a.expirationTime, "b: "..b.priority, b.spellName, b.spellId, b.expirationTime)
 	end
 	
 	local function danSortCooldownsStationaryish(a,b)
@@ -264,7 +235,6 @@ do
 		function hasuitDoThisRandomFunctionAsd(func)
 			recycleCooldownIcon = func
 		end
-		local danCooldownDoneRecycle = hasuitCooldownDoneRecycle
 		local function cleanController(controller)
 			if controller then
 				local frames = controller.frames
@@ -279,7 +249,6 @@ do
 		local danRestoreCooldowns
 		tinsert(hasuitDoThisAddon_Loaded, function()
 			danRestoreCooldowns = hasuitRestoreCooldowns
-			hasuitRestoreCooldowns = nil
 		end)
 		local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
 		local lastSize
@@ -1137,7 +1106,7 @@ do
 	
 	
 	
-	do
+	do --be careful not to overlap priority with an interrupt now that they're separated but still close in priority like this
 		local crowdControlCooldowns = hasuitCrowdControlCooldowns
 		
 		
@@ -1539,7 +1508,6 @@ do
 				for k=1,#spellIdMergerTable do
 					if cooldownOptions[1]==spellIdMergerTable[k][1] then
 						alreadyHave = true
-						-- danPrint("spellIdMergerTable", spellId)
 						break
 					end
 				end
@@ -1551,24 +1519,22 @@ do
 					end
 					cooldownOptions["loadOn"]=danCooldownDisplayLoadOn
 					hasuitSetupFrameOptions = cooldownOptions
-					initialize(spellId) --this whole do end section not super ideal but i think this is the best way to do it since all spell stuff needs to be as easy to see and make changes to as possible. doing the same setup as general/class spells above with the cooldowns would make it way worse to maintain. is that how people use the word maintain
+					initialize(spellId)
 				end
 			end
 		end
 	end
 end
 
-function hasuitResetCooldowns(frame) --should have just done the oncooldowndone function for every icon that's on cd here? not sure why i didn't. this was a source of multiple random things i had to come back to and fix afterward
+function hasuitResetCooldowns(frame) --not great but works now
 	local controller
 	local wasOtherUnitType
 	for basePriority, icon in pairs(frame.cooldownPriorities) do
 		if icon.priority==256 or icon.maxCharges then --todo make a better variable for this
-			-- danPrintBig("hasuitResetCooldowns", frame.unit, icon.priority, basePriority)
 			icon.priority = basePriority
 			icon.cooldown:Clear()
 			-- icon.alpha = 1
 			icon:SetAlpha(icon.alpha)
-			-- danPrint("hasuitResetCooldowns")
 			icon.expirationTime = nil
 			if icon.hypoExpirationTime then
 				icon.hypoExpirationTime = nil

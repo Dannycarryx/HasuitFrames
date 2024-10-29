@@ -2,23 +2,16 @@
 
 
 
-
--- GetScreenHeight
--- GetScreenWidth
--- GetBuildInfo
-
 local hasuitFrameParent = CreateFrame("Frame", "hasuitFrameParent", UIParent)
 hasuitFrameParent:SetIgnoreParentScale(true)
--- hasuitFrameParent:SetScale(0.71111112833023)
 hasuitFrameParent:SetSize(1,1)
 hasuitFrameParent:SetPoint("CENTER")
 hasuitFrameParent:SetFrameStrata("LOW")
 hasuitFrameParent:SetFrameLevel(11)
 
-hasuitLoginTime = GetTime()
+-- hasuitLoginTime = GetTime()
 hasuitPlayerGUID = UnitGUID("player")
 hasuitPlayerClass = UnitClassBase("player")
--- hasuitInstanceType is set below
 
 hasuitOutOfRangeAlpha = 0.55
 hasuitCcBreakHealthThreshold = 460000 --todo base it on level or patch or something? to not have to change this in the future
@@ -40,21 +33,6 @@ hasuitClassColorsHexList = { --string.format("Hexadecimal: %X", number)
 	["WARRIOR"] = "|cffC69B6D",
 }
 
-hasuitRed = "|cffff2222"
-hasuitRed2 = "|cffff6f6f"
-hasuitGreen = "|cff00ff00"
-hasuitGreen2 = "|cff77ff77"
-hasuitYellow = "|cffffff00"
-hasuitGrey = "|cffa1a1a1"
-hasuitOrange = "|cffffba00"
-hasuitOrange2 = "|cffeecb22"
-hasuitPurple = "|cffbf00ff"
-hasuitPurple2 = "|cffc9a0dc"
-hasuitTeal = "|cff00cccc" 
-hasuitTeal2 = "|cff66cdcd"
-hasuitBlack = "|cff000000"
-hasuitBlue = "|cff5555ff"
-
 hasuitSpecIsHealerTable = {
 	[105] = true, --resto druid
 	[1468] = true, --preservation
@@ -67,38 +45,6 @@ hasuitSpecIsHealerTable = {
 
 
 
--- function dw(...)
-	-- local t = {...}
-	-- for _, v in pairs(t) do
-		-- danPrint(hasuitPurple2..tostring(v).."|r")
-	-- end
--- end
-
-local C_Timer_After = C_Timer.After
-
-hasuitTraceGetDanPrintFunction = hasuitTraceGetDanPrintFunction or function()return function()end end
-
-local danFileName = "center.lua"
-local danPrint = function()end
-local danPrintPurple = danPrint
-local danPrintPurple2 = danPrint
-local danPrintTeal = danPrint
-local danPrintTeal2 = danPrint
-
--- C_Timer_After(0, function()
-	-- danPrint = hasuitTraceGetDanPrintFunction(hasuitGreen2, hasuitGreen2, false, danFileName)
-	-- danPrintPurple = hasuitTraceGetDanPrintFunction(hasuitPurple, hasuitPurple, false, danFileName)
-	-- danPrintPurple2 = hasuitTraceGetDanPrintFunction(hasuitPurple2, hasuitPurple2, false, danFileName)
-	-- danPrintTeal = hasuitTraceGetDanPrintFunction(hasuitTeal, hasuitTeal, false, danFileName)
-	-- danPrintTeal2 = hasuitTraceGetDanPrintFunction(hasuitTeal2, hasuitTeal2, false, danFileName)
--- end)
-
--- local danPrint = function(...)danPrint(danFileName, ...)end
-
--- local UnitGUID = function(unit)
-	-- danPrint("UnitGUID"..danFileName, unit)
-	-- return UnitGUID(unit)
--- end
 
 
 
@@ -111,7 +57,6 @@ hasuitUnitFramesForUnitType = {
 	["pet"] = {},
     ["arena"] = {},
 }
--- hasuitUnitFrameMakeHealthBarForUnitType = {}
 
 hasuitFramesCenterNamePlateGUIDs = {}
 
@@ -119,16 +64,15 @@ hasuitTrackedRaceCooldowns = {}
 
 
 
-hasuitSavedVariables = {}
+hasuitSavedVariables = {} --for things in the future like keeping track of how long spent offline/update cooldowns of people from that if it was short enough, maybe fix pvp countdown after a reload
 
-hasuitSavedEasyChecks = {}
 
 
 
 
 
 hasuitDoThisAddon_Loaded = {}
-hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {} --can sync any addons together here, give them these or other functions/run things in certain orders
+hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {} --can sync any addons together here, give them these or other functions/run things in certain orders, other addon should do the same thing with hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {} so that it doesn't matter which addon loads first
 hasuitDoThisPlayer_Entering_WorldFirstOnly = {}
 hasuitDoThisPlayer_Entering_WorldSkipsFirst = {}
 
@@ -142,7 +86,7 @@ hasuitDoThisGroup_Roster_UpdateGroupSizeChanged = {}
 
 hasuitDoThisPlayer_Target_Changed = {}
 
-hasuitDoThisUserOptionsLoaded = {}
+hasuitDoThisUserOptionsLoaded = {} --happens early on addon_loaded
 
 -- hasuitDoThisOnUpdate(func)
 -- hasuitDoThisOnUpdatePosition1(func)
@@ -150,7 +94,6 @@ hasuitDoThisUserOptionsLoaded = {}
 -- hasuitDoThisAfterCombat(func)
 
 
--- hasuitDoThisEasySavedVariables(key, optionalTable)
 
 
 
@@ -199,10 +142,10 @@ do
 			for i=1,#danDoThisEnteringFirst do
 				danDoThisEnteringFirst[i]()
 			end
-			mainLoadOnFunctionSpammable() --not really necessary since every groupsize influenced loadon will also call this initially, not clean but not sure how to improve that significantly, even if bored. just going to leave this here in case all groupsize stuff gets abandoned later or something else changes, who knows
+			mainLoadOnFunctionSpammable() --not really necessary since every groupsize loadon will also call this initially but oh well
 			local danDoThisEnteringWorld = hasuitDoThisPlayer_Entering_WorldSkipsFirst
 			hasuitDoThisPlayer_Entering_WorldSkipsFirst = nil
-			danFrame:SetScript("OnEvent", function() -- danPrint(danGreen(loadedCount).." loaded", danYellow(totalCount-loadedCount), "unloaded")
+			danFrame:SetScript("OnEvent", function()
 				local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
 				hasuitInstanceId = instanceId
 				if instanceType~=hasuitInstanceType then
@@ -234,7 +177,7 @@ do --hasuitDoThisOnUpdate, hasuitDoThisOnUpdatePosition1
 			temp[i]() --kind of catastrophic if an error happens here
 		end
 		if not danDoThis then
-			danFrame:SetScript("OnUpdate", nil) --new setup makes it so inserting to position 1 mid-onupdate doesn't break anything? is there a good way to not have to setscript onupdate an extra time if adding to the table mid-onupdate?
+			danFrame:SetScript("OnUpdate", nil) --is there a good way to not have to setscript onupdate an extra time if adding to the table mid-onupdate?
 		end
 	end
 	function hasuitDoThisOnUpdate(func)
@@ -296,7 +239,6 @@ do --hasuitDoThisAfterCombat
 	end)
 end
 
--- local savedUserOptions
 local GetNumGroupMembers = GetNumGroupMembers
 do
 	local danDoThisRelevantSizes = {}
@@ -315,7 +257,7 @@ do
 			tinsert(danDoThisRelevantSizes, relevantGroupSizes)
 			return relevantGroupSizes
 		end
-		hasuitDoThisGroup_Roster_UpdateWidthChanged =		getDoThisSizeTable({5,8,15,20,24,28,32,36,40})
+		hasuitDoThisGroup_Roster_UpdateWidthChanged =		getDoThisSizeTable({5,8,15,20,24,28,32,36,40}) --todo make this kind of thing work the same way on a table like hasuitRaidFrameWidthForGroupSize? might be nice when useroptions can change frame size and stuff
 		hasuitDoThisGroup_Roster_UpdateHeightChanged =		getDoThisSizeTable({8,10,15,40})
 		hasuitDoThisGroup_Roster_UpdateColumnsChanged =		getDoThisSizeTable({5,8,20,24,28,32,36,40})
 		hasuitDoThisGroup_Roster_UpdateGroupSize_5 =		getDoThisSizeTable({5,40})
@@ -345,7 +287,7 @@ do
 		
 		
 		-- danDoThisOnUpdate(function()
-			-- danFrame:RegisterEvent("GROUP_ROSTER_UPDATE") --prevents group_roster_update stuff from going twice on the same frame as player_login for no reason, maybe bad? --todo if alt f4ing player can log in and no group units will exist until after combat so have to do something to load frames preemptively. for now you can reload after logging in and the game will give the correct numbers
+			-- danFrame:RegisterEvent("GROUP_ROSTER_UPDATE") --don't think rosterupdate and player_login can happen at the same time
 		-- end)
 		
 		do
@@ -542,25 +484,6 @@ hasuitRaidFrameColumnsForGroupSize = { --hasuitDoThisGroup_Roster_UpdateColumnsC
 
 
 
-do --hasuitDoThisEasySavedVariables
-	local danSavedEasyChecks = hasuitSavedEasyChecks
-	tinsert(hasuitDoThisAddon_Loaded, function()
-		if next(danSavedEasyChecks) then
-			print(hasuitRed, "danSavedEasyChecks before addon loaded")
-			for k, v in pairs(danSavedEasyChecks) do
-				print(k, v)
-			end
-			hasuitDoThisOnUpdate(function()
-				hasuitDoThisEasySavedVariables("danSavedEasyChecks before addon loaded")
-			end)
-		end
-		danSavedEasyChecks = hasuitSavedEasyChecks
-	end)
-	function hasuitDoThisEasySavedVariables(key, optionalTable)
-		local danSavedTable = optionalTable or danSavedEasyChecks
-		danSavedTable[key] = (danSavedTable[key] or 0)+1
-	end
-end
 
 
 
@@ -572,13 +495,8 @@ local tremove = tremove
 
 local allTable = {}
 
--- local loadedCount = 0
--- local totalCount = 0
-
 
 local function mainLoadOnFunction()
-	-- local loadedTablesRemoved = 0
-	-- local previousLoadedCount = loadedCount
 	for dan=1, #allTable do
 		local loadedTable = allTable[dan][1]
 		local unloadedTable = allTable[dan][2]
@@ -597,7 +515,6 @@ local function mainLoadOnFunction()
 						-- if loadFunction then
 						-- loadFunction()
 					-- end
-					-- loadedCount = loadedCount+1
 					tinsert(loadedStuff, tremove(unloadedStuff, i))
 					reloadCount = reloadCount+1
 				end
@@ -615,12 +532,10 @@ local function mainLoadOnFunction()
 							-- if unloadFunction then
 								-- unloadFunction()
 							-- end
-							-- loadedCount = loadedCount-1
 							tinsert(unloadedStuff, tremove(loadedStuff, i))
 						end
 					end
 					if #loadedStuff==0 then
-						-- loadedTablesRemoved = loadedTablesRemoved+1
 						loadedTable[spellId] = nil
 					end
 				end
@@ -628,17 +543,6 @@ local function mainLoadOnFunction()
 		end
 	end
 	print("mainLoadOnFunction()")
-	-- reportString = reportString.."\n"..danGreen(loadedCount).." loaded "..danYellow((totalCount-loadedCount)).." unloaded"
-	-- local difference = loadedCount-previousLoadedCount
-	-- if difference>0 then
-		-- reportString = reportString..", +"..danGreen(difference)
-	-- elseif difference<0 then
-		-- reportString = reportString..", "..danYellow(difference)
-	-- end
-	-- if loadedTablesRemoved>0 then
-		-- reportString = reportString..", "..danYellow(loadedTablesRemoved).." loaded tables set nil"
-	-- end
-	-- danPrint(reportString)
 end
 local GetTime = GetTime
 local lastTime
@@ -652,7 +556,6 @@ function mainLoadOnFunctionSpammable()
 end
 hasuitMainLoadOnFunctionSpammable = mainLoadOnFunctionSpammable
 
--- local temporaryEventTypeTrackingTable = {}
 
 local allTablePairsLoaded = {}
 local allTablePairsUnloaded = {}
@@ -661,7 +564,6 @@ function hasuitFramesCenterAddToAllTable(tableForEventType, eventType)
 	local dan = allTable[#allTable]
 	allTablePairsLoaded[eventType] = dan[1]
 	allTablePairsUnloaded[eventType] = dan[2]
-	-- temporaryEventTypeTrackingTable[dan[2]] = eventType
 end
 
 local loadedTable
@@ -699,21 +601,9 @@ hasuitRaidFrameHeight = hasuitRaidFrameHeightForGroupSize[groupSize]
 hasuitRaidFrameColumns = hasuitRaidFrameColumnsForGroupSize[groupSize]
 
 
--- local danTestingCollectionTable = {
-	-- ["normalInitialize"]={},
-	-- ["drInitialize"]={},
--- }
--- local danTestingCollectionTableNormal = danTestingCollectionTable["normalInitialize"]
--- local danTestingCollectionTableDiminish = danTestingCollectionTable["drInitialize"]
+
 
 function hasuitFramesInitialize(spellId) --not necessarily a spellId, todo should make a function to put all options of a controller into savedvariables sorted by priority or something like that? to make it easy to see what exactly is going on. automating priority here wouldn't be worth it i think
-	-- local testing = danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]]
-	-- if not testing then
-		-- danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]] = {}
-		-- testing = danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]]
-	-- end
-	-- hasuitDoThisEasySavedVariables(spellId, testing)
-	
 	local unloadedStuff = unloadedTable[spellId]
 	if not unloadedStuff then
 		unloadedTable[spellId] = {}
@@ -729,41 +619,15 @@ function hasuitFramesInitialize(spellId) --not necessarily a spellId, todo shoul
 			loadedStuff = loadedTable[spellId]
 		end
 		tinsert(loadedStuff, hasuitSetupFrameOptions)
-		-- if spellId==188550 then 
-			-- danPrint(loadOn and loadOn.shouldLoad, "load", 188550)
-		-- end
-		-- loadedCount = loadedCount+1
-		-- totalCount = totalCount+1
 	else
-		-- if spellId==188550 then 
-			-- danPrint(loadOn and loadOn.shouldLoad, "don't load", 188550)
-		-- end
 		tinsert(unloadedStuff, hasuitSetupFrameOptions)
-		-- totalCount = totalCount+1 --just do #table?
 	end
 end
 
 function hasuitFramesInitializeMulti(spellId, doForOne) --not necessarily a spellId
-	-- local i1
-	-- if doForOne then
-		-- i1 = doForOne
-	-- else
-		-- i1 = 1
-		-- doForOne = #hasuitSetupFrameOptionsMulti
-	-- end
-	-- for i=i1, doForOne do
 	for i=doForOne or 1, doForOne or #hasuitSetupFrameOptionsMulti do
 		local options = hasuitSetupFrameOptionsMulti[i]
 		local unloadedTable = functionsTableUnloaded[options[1]]
-		
-		
-		-- local testing = danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]]
-		-- if not testing then
-			-- danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]] = {}
-			-- testing = danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]]
-		-- end
-		-- hasuitDoThisEasySavedVariables(spellId, testing)
-		
 		
 		
 		local unloadedStuff = unloadedTable[spellId]
@@ -782,11 +646,8 @@ function hasuitFramesInitializeMulti(spellId, doForOne) --not necessarily a spel
 				loadedStuff = loadedTable[spellId]
 			end
 			tinsert(loadedStuff, options)
-			-- loadedCount = loadedCount+1
-			-- totalCount = totalCount+1
 		else
 			tinsert(unloadedStuff, options)
-			-- totalCount = totalCount+1 --todo just do #table?
 		end
 	end
 end
@@ -813,7 +674,7 @@ do
 				local pre = texture
 				texture = GetSpellTexture(texture)
 				if not texture then
-					print(hasuitRed, "error no texture for", pre, "|r. spell names have to be in current spellbook to get a texture from them. if you can't get a spell name to work try looking up the spell texture on wowhead. Click the icon there and the texture is the number to the right of ID: ")
+					print("|cffff2222error no texture for", pre, "|r. spell names have to be in current spellbook to get a texture from them. if you can't get a spell name to work try looking up the spell texture on wowhead. Click the icon there and the texture is the number to the right of ID: ")
 					return
 				end
 			end
@@ -822,9 +683,8 @@ do
 				["arena"] = drCount,
 				["texture"] = texture,
 			}
-			-- print(drType, drCount, texture)
 		else
-			print(hasuitRed, "error attempting to track diminish type", drType, "twice, ignoring")
+			print("|cffff2222error attempting to track diminish type", drType, "twice, ignoring")
 		end
 	end
 end
@@ -835,14 +695,6 @@ function hasuitFramesCenterSetDrType(drType)
 	drSpellTable = trackedDiminishSpells[drType]
 end
 function hasuitFramesInitializePlusDiminish(spellId)
-	-- local testing = danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]]
-	-- if not testing then
-		-- danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]] = {}
-		-- testing = danTestingCollectionTableNormal[temporaryEventTypeTrackingTable[unloadedTable]]
-	-- end
-	-- hasuitDoThisEasySavedVariables(spellId, testing)
-	-- hasuitDoThisEasySavedVariables(spellId, danTestingCollectionTableDiminish)
-	
 	tinsert(drSpellTable, spellId)
 	local unloadedStuff = unloadedTable[spellId]
 	if not unloadedStuff then
@@ -871,118 +723,6 @@ function hasuitFramesInitializeMultiPlusDiminish(spellId)
 	tinsert(drSpellTable, spellId)
 	initializeMulti(spellId)
 end
-
-
---[[
-do --testing
-	-- local danDoThisOnUpdate = hasuitDoThisOnUpdate
-	-- local GetSpellName = C_Spell.GetSpellName
-	-- local tostring = tostring
-	-- local function danTesting(table1, table2, differenceTable, initializeType)
-		-- for eventType, spellIdTable in pairs(table1[initializeType]) do
-			-- local table2EventTypeTable = table2[initializeType]
-			-- if table2EventTypeTable then
-				-- local table2SpellIdTable = table2EventTypeTable[eventType]
-				-- if table2SpellIdTable then
-					-- for spellId, count in pairs(spellIdTable) do
-						-- local count2 = table2SpellIdTable[spellId]
-						-- if count~=count2 then
-							-- tinsert(differenceTable, tostring(initializeType)..", "..tostring(eventType)..", "..tostring(spellId)..", "..tostring(GetSpellName(spellId) or nil)..", "..tostring(count)..", "..tostring(count2))
-							-- danDoThisOnUpdate(function()
-								-- print(initializeType, eventType, hasuitRed2, spellId, count, count2)
-							-- end)
-						-- else
-							-- print(initializeType, eventType, hasuitGreen, spellId, count, count2)
-						-- end
-					-- end
-				-- else
-					-- print(hasuitRed, eventType)
-				-- end
-			-- else
-				-- print(hasuitRed, initializeType)
-			-- end
-		-- end
-		-- danDoThisOnUpdate(function()
-			-- print(" ")
-		-- end)
-		-- tinsert(differenceTable, " ")
-	-- end
-	
-	-- tinsert(hasuitDoThisAddon_Loaded, function() --collection, save tables between addon versions to compare, one at a time and then check the difference after, or could just check on the 2nd load. collection should be commented out after finished
-		-- hasuitSavedTestingOld = danTestingCollectionTable
-		-- hasuitSavedTestingNew = danTestingCollectionTable
-	-- end)
-	
-	
-	-- tinsert(hasuitDoThisAddon_Loaded, function() --compare
-		-- local old = hasuitSavedTestingOld
-		-- local new = hasuitSavedTestingNew
-		-- local differenceTable = {}
-		-- danTesting(new, old, differenceTable, "normalInitialize")
-		-- danTesting(old, new, differenceTable, "normalInitialize")
-		-- hasuitSavedTestingDifference = differenceTable
-	-- end)
-	
-	
-	
-	local function danTestCheckAllSpells()
-		local totalUnloaded = 0
-		local totalLoaded = 0
-		local spellsPerFunction = {}
-		for dan=1, #allTable do
-			local loadedTable = allTable[dan][1]
-			local unloadedTable = allTable[dan][2]
-			for spellId, unloadedStuff in pairs(unloadedTable) do
-				for i=#unloadedStuff, 1, -1 do
-					local options = unloadedStuff[i]
-					local func = options[1]
-					if danCleuDiminish~=func then
-						hasuitDoThisEasySavedVariables(tostring(spellId)..", ", hasuitSavedTestingDifference["unloaded"])
-						spellsPerFunction[func] = spellsPerFunction[func] or {}
-						spellsPerFunction[func][spellId] = (spellsPerFunction[func][spellId] or 0)+1
-					end
-					totalUnloaded = totalUnloaded+1
-				end
-				local loadedStuff = loadedTable[spellId]
-				if loadedStuff then
-					if #loadedStuff>0 then
-						for i=#loadedStuff, 1, -1 do
-							local options = loadedStuff[i]
-							local func = options[1]
-							if danCleuDiminish~=func then
-								hasuitDoThisEasySavedVariables(tostring(spellId)..", ", hasuitSavedTestingDifference["loaded"])
-								spellsPerFunction[func] = spellsPerFunction[func] or {}
-								spellsPerFunction[func][spellId] = (spellsPerFunction[func][spellId] or 0)+1
-							end
-							totalLoaded = totalLoaded+1
-						end
-					end
-				end
-			end
-			for func, spellIdTable in pairs(spellsPerFunction) do
-				for spellId, count in pairs(spellIdTable) do
-					if count~=1 then
-						hasuitDoThisEasySavedVariables(tostring(spellId)..", ", hasuitSavedTestingDifference["~=1"])
-						print(spellId, hasuitRed2,count)
-					end
-				end
-			end
-		end
-		print("total unloaded", hasuitOrange, totalUnloaded)
-		print("total loaded",  hasuitGreen, totalLoaded)
-	end
-	tinsert(hasuitDoThisAddon_Loaded, function()
-		hasuitSavedTestingDifference = {["loaded"]={},["unloaded"]={},["~=1"]={}}
-		C_Timer.After(0, function()
-			C_Timer.After(0, function()
-				C_Timer.After(0, danTestCheckAllSpells)
-			end)
-		end)
-	end)
-	
-	
-end
-]]
 
 
 
@@ -1026,10 +766,7 @@ hasuitFramesCenterGUIDTrackerNameplateAdded:RegisterEvent("FORBIDDEN_NAME_PLATE_
 hasuitFramesCenterGUIDTrackerNameplateAdded:SetScript("OnEvent", function(_, _, unit)
 	local unitGUID = UnitGUID(unit)
 	hasuitFramesCenterNamePlateGUIDs[unitGUID] = unit
-	-- local frame = hasuitUnitFrameForUnit[unitGUID]
-	-- if frame then
-		hasuitUnitFrameForUnit[unit] = hasuitUnitFrameForUnit[unitGUID]
-	-- end
+	hasuitUnitFrameForUnit[unit] = hasuitUnitFrameForUnit[unitGUID]
 end)
 
 local hasuitFramesCenterGUIDTrackerNameplateRemoved = CreateFrame("Frame")
@@ -1106,7 +843,7 @@ end)
 
 
 tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of all things that should self destruct instead of keeping track of everything individually to set nil here?
-	C_Timer_After(0, function()
+	C_Timer.After(0, function()
 		hasuitDoThisAddon_Loaded = nil
 		hasuitDoThisPlayer_Login = nil
 		hasuitDoThisPlayer_Entering_WorldFirstOnly = nil
@@ -1121,12 +858,8 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
 		
 		hasuitDoThisOnUpdate = nil
 		hasuitDoThisOnUpdatePosition1 = nil
-		-- hasuitDoThisOnUpdateSpecificPosition = nil
-		-- hasuitGetCurrentOnUpdateTable = nil
 		hasuitDoThisPlayerTargetChanged = nil
 		hasuitDoThisAfterCombat = nil
-		
-		-- hasuitDoThisEasySavedVariables = nil
 		
 		
 		hasuitFramesInitializeMulti = nil
@@ -1154,6 +887,8 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
 		hasuitGetD2anCleuSubevent = nil
 		hasuitGetD4anCleuSourceGuid = nil
 		hasuitGetD12anCleuSpellId = nil
+		
+		hasuitRestoreCooldowns = nil
 		
 		hasuitDoThisUserOptionsLoaded = nil
 		hasuitUserOptionsOnChanged = nil

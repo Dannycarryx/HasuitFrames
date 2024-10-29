@@ -1,6 +1,10 @@
 
 
 
+biggest thing right now:
+enabling people to track their own abilities? might be the last thing before a release, maybe middle cast bars too
+oh ya and fix tabs
+
 
 other important:
 player buffs/debuffs showing for specs that haven't been set up like spriest dots on arena frames, buffs on allies from player, more important for friendly buffs
@@ -21,9 +25,10 @@ maybe mostly show important external cds from healers? instead of defensives, no
 option for enemy healer on position 1 and some kind of easy macro solution to replace @arena1/@arenax, this would make a pretty big impact when there are multiple of one class and be good in general
 use talent info from inspecting to change friendly cds, i made this before in prototype cd addon and not that hard especially since the addon already inspects people, but will be a lot of work collecting all the relevant talent data and not sure how much effort it'll take to integrate this with existing setup/leaving arena frames the way they are
 aura missing function for motw/fort
-loss of control auras in pve although now i don't think there's a good way to tell what these are without tracking each one manually. at least make something to show cc on player, actually use that to tell which spellids are cc? and add manually to the addon after seen so that it will show right before it goes on player. there's a way to tell player is cced by random pve buff isn't there?
+loss of control auras in pve although now i don't think there's a good way to tell what these are without tracking each one manually. at least make something to show cc on player, actually use that to tell which spellids are cc? and add manually to the addon after seen so that it will show right before it goes on player. there's a way to tell player is cced by random pve buff isn't there? LOSS_OF_CONTROL_UPDATE?, --LOSS_OF_CONTROL_ADDED?
 option to disable all in pve or whatever
 track healer dispel cds
+if alt f4ing player can log in and no group units will exist until after combat so have to do something to load frames preemptively. for now you can reload after logging in and the game will give the correct numbers
 
 even less important:
 summon/rez/phase indicators
@@ -48,6 +53,22 @@ make color check function more specific and not based on 5 different functions l
 Recompense sac damage on next judgement, has points, not sure how/where to show it exactly but can be big
 
 clean up some naming like frame should become unitframe, everything gets a clear and unique name, so no self
+
+add an option to use uiparent scale?
+
+
+GetBuildInfo to not have to copy what other addons put in the .toc?
+
+
+
+-- if UnitGUID(unit)==hasuitPlayerGUID and danCurrentAura["spellId"]==774 then --dan1, also try unit name in tooltip when this doesn't work?
+	-- print(hasuitTestAuraTable, danCurrentAura, hasuitTestAuraTable==danCurrentAura)
+	-- hasuitTestAuraTable = danCurrentAura
+-- end
+
+
+
+
 
 
 

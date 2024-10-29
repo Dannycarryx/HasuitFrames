@@ -2,7 +2,7 @@
 ## Title: HasuitFrames
 ## Author: Dannycarry
 ## DefaultState: Enabled
-## SavedVariables: hasuitSavedEasyChecks, hasuitSavedUserOptions, hasuitSavedVariables
+## SavedVariables: hasuitSavedUserOptions, hasuitSavedVariables
 
 center.lua
 HasuitFrames.lua

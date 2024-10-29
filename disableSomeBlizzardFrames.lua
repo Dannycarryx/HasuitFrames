@@ -42,17 +42,19 @@ tinsert(hasuitDoThisPlayer_Login, function()
 		do
 			local hiddenFrame = CreateFrame("Frame")
 			hiddenFrame:Hide()
+			local function hookScriptFunction(frame)
+				frame:UnregisterAllEvents()
+			end
 			function danDisableBlizzardUnitFrame2(frame)
 				if type(frame)=="table" then
 					if not frame.danSeen then
 						frame.danSeen = true
 						tinsert(ignoredFramesList, frame)
-						frame:HookScript("OnEvent", function()
-							frame:UnregisterAllEvents()
-						end)
+						frame:HookScript("OnEvent", hookScriptFunction)
+						-- frame:HookScript("OnEvent", function()
+							-- frame:UnregisterAllEvents()
+						-- end)
 						frame:SetParent(hiddenFrame)
-					-- else
-						-- print("dan already seen", hasuitRed2, frame:GetName(), frame.unit, frame)
 					end
 				end
 			end
@@ -126,8 +128,8 @@ tinsert(hasuitDoThisPlayer_Login, function()
 							end
 						end
 					end
-				else
-					hasuitDoThisEasySavedVariables("groupMode: "..tostring(groupMode)) --can be nil sometimes
+				-- else
+					-- hasuitDoThisEasySavedVariables("groupMode: "..tostring(groupMode)) --can be nil sometimes
 				end
 				
 				danDisableBlizzardUnitFrame2(CompactRaidFrameContainer)
