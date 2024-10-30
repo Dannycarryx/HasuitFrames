@@ -3752,7 +3752,7 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
     if event=="PLAYER_ENTERING_BATTLEGROUND" then --fixing/avoiding potential problems with an arena frame with the wrong class getting used, can happen if frames fail to hide like a wargame that ended 3v1 in the starting gates and then the 1 frame persisted and caused the next game to show 2 ferals when it should've been 1 feral 1 pally
         if #arenaUnitFrames~=0 then
             hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
-            hasuitHideInactiveFrames()
+            hasuitHideInactiveFrames() --should make a more specific version of this?
         end
     end
     if event=="ARENA_OPPONENT_UPDATE" then

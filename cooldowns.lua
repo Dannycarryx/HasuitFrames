@@ -285,7 +285,7 @@ do
                         end
                     end
                 end
-            else
+            elseif groupSize<4 then
                 if lastSize==4 or lastSize==5 then
                     trinketControllerOptionsGroupUnitTypeStuff["xOffset"] = -44
                     defensiveControllerOptionsGroupUnitTypeStuff["xOffset"] = -73
@@ -297,7 +297,7 @@ do
                         if not frame.cooldownsDisabled then
                             if frame.cooldownPriorities then
                                 for _, icon in pairs(frame.cooldownPriorities) do
-                                    if icon.recycle then --idk, this got way dumber than i wanted. i guess there's a conflict between this and cooldowns loadon/controller delaying actually removing the icons? should be able to cheese it by checking icon.recycle like this?
+                                    if icon.recycle then
                                         recycleCooldownIcon(icon)
                                     end
                                 end

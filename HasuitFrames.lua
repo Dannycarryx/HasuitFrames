@@ -342,12 +342,27 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
         ccBreakHealthThreshold = hasuitCcBreakHealthThreshold
         ccBreakHealthThresholdPve = hasuitCcBreakHealthThresholdPve
     end)
+    local function ccBreakBarUpdatedEventFromFullUpdate(ccBreakBar)
+        local lastUnit = ccBreakBar.lastUnit
+        if lastUnit then
+            local unit = ccBreakBar.frame.unit
+            if lastUnit~=unit then
+                ccBreakBar.unit = unit
+                ccBreakOnEvent(ccBreakBar, "UNIT_HEALTH", unit) --these are probably kind of pointless unless put below out of this if statement, but these are the most expensive things here and idk if i really want to do that, since this whole system is inaccurate anyway
+                ccBreakOnEvent(ccBreakBar, "UNIT_ABSORB_AMOUNT_CHANGED", unit)
+                ccBreakOnEvent(ccBreakBar, "UNIT_MAXHEALTH", unit)
+            end
+            ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
+            ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
+            ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
+        end
+    end
     function hasuitSpecialAuraCcBreakThreshold()
         local danCurrentEvent = danCurrentEvent
         if danCurrentEvent=="recycled" then
             local ccBreakBar = danCurrentIcon.ccBreakBar
-            local unit = ccBreakBar.unit
             ccBreakBar.unit = nil
+            ccBreakBar.lastUnit = nil
             ccBreakBar:UnregisterAllEvents()
             local frame = ccBreakBar.frame
             local frameKey = ccBreakBar.frameKey
@@ -442,18 +457,15 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                 ccBreakBar.frame = danCurrentFrame
             end
         else
-            if danCurrentEvent=="updated" then --always means fullupdate(right?) which is where unit could change i think? although this might need to be delayed so that unitframe has a chance to actually update its unit. todo make sure this works right, i think it doesn't need the delay here
+            if danCurrentEvent=="updated" then --always means fullupdate(right?) which is where unit could change i think?
                 local ccBreakBar = danCurrentIcon.ccBreakBar
                 local unit = ccBreakBar.unit
                 if unit then
-                    if unit~=ccBreakBar.frame.unit then
-                        ccBreakBar:UnregisterAllEvents()
-                        ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
-                        ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
-                        ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
-                    end
-                -- else --tabbed out and forgot what i was gonna do with this
-                    -- hasuitDoThisEasySavedVariables("hasuitSpecialAuraCcBreakThreshold updated not unit")
+                    ccBreakBar.lastUnit = unit
+                    ccBreakBar:UnregisterAllEvents() --could be improved. something like this is a good reason to remove delay from main unittype update functions? should probably do that actually. not a fan of needing to unregister and reregister events every time here although probably not that bad. leaving a brief gap where events could be missed instead of sending fake events for this every time. this could definitely be improved
+                    C_Timer_After(0, function()
+                        ccBreakBarUpdatedEventFromFullUpdate(ccBreakBar)
+                    end)
                 end
             elseif danCurrentEvent=="added" then
                 local ccBreakBar = danCurrentIcon.ccBreakBar
@@ -465,8 +477,8 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
     
     
     
-    hasuitFramesCenterSetEventType("cleu")
     local danDoThisOnUpdate = hasuitDoThisOnUpdate
+    hasuitFramesCenterSetEventType("cleu")
     hasuitCleuCcBreakThreshold = addMultiFunction(function()
         if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
             local frame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
@@ -2329,7 +2341,7 @@ local function danCleuSpellSummon()
         end
     end
 end
-hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=417}
+hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=417} --no function to get npc id i think, only way is the unitguid string? or tracking it on spell_summon like this
 initialize(691) --Summon Felhunter
 hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=1860}
 initialize(697) --Summon Void walker

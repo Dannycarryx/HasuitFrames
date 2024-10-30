@@ -7,6 +7,8 @@
 
 
 
+local screenHeight
+
 local danCreateCheckButton
 local danCreateEditBox
 local danCreateNewHeader
@@ -45,6 +47,9 @@ local createOptionsPages = {
         
         danSetPointAndDirection("TOP", "TOPLEFT", 170, -61, -25)
         danCreateEditBox("scale", "scale")
+        if screenHeight~=1080 then
+            danCreateCheckButton("usePixelPerfectModifier", "pixel perfect?")
+        end
         
         danSetPointAndDirection("TOP", "TOPLEFT", 480, 19, -25)
         danCreateNewHeader("arena")
@@ -59,7 +64,8 @@ local createOptionsPages = {
 }
 
 
-
+local usePixelPerfectModifier
+local activeScaleMultiplier
 
 local savedUserOptions
 local userOptionsOnChanged = {} --or just clicked/pressed enter, value doesn't have to actually change
@@ -86,6 +92,7 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
             ["hideBlizzardRaid"]=true,
             
             ["scale"]=1,
+            -- ["usePixelPerfectModifier"]=false, --this exists, default is off, won't show as an option if screen height is 1080 because it'd be irrelevant
         }
         hasuitSavedUserOptions = savedUserOptions
     end
@@ -105,20 +112,36 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
     end
     
     
-    
-    
-    
-    -- local pixelPerfectMult = 768/1080 --GxFullscreenResolution, GxWindowedResolution, todo
-    local lastScale = savedUserOptions["scale"]
-    hasuitFrameParent:SetScale(lastScale*0.71111112833023)
-    userOptionsOnChanged["scale"] = function()
-        local scale = savedUserOptions["scale"]
-        if lastScale==1 and scale~=1 then
-            print("changing the scale from 1 could make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually")
+    local scaleChange
+    local width, height = GetPhysicalScreenSize() --idk what i'm doing here but maybe this is ok
+    screenHeight = height
+    local usePixelPerfectModifier
+    if height==1080 then
+        usePixelPerfectModifier = true
+        activeScaleMultiplier = 0.71111112833023
+    else
+        local pixelPerfectMult = 768/height
+        usePixelPerfectModifier = savedUserOptions["usePixelPerfectModifier"]
+        activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111112833023
+        
+        userOptionsOnChanged["usePixelPerfectModifier"] = function()
+            usePixelPerfectModifier = savedUserOptions["usePixelPerfectModifier"]
+            activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111112833023 --GetDefaultScale?
+            scaleChange()
         end
-        lastScale = scale
-        hasuitFrameParent:SetScale(scale*0.71111112833023)
     end
+    
+    local pixelWarningMessage = "changing the scale from 1 could make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually"
+    hasuitFrameParent:SetScale(savedUserOptions["scale"]*activeScaleMultiplier)
+    function scaleChange()
+        local scale = savedUserOptions["scale"]
+        if pixelWarningMessage and usePixelPerfectModifier and scale~=1 then
+            print(pixelWarningMessage)
+            pixelWarningMessage = nil
+        end
+        hasuitFrameParent:SetScale(scale*activeScaleMultiplier)
+    end
+    userOptionsOnChanged["scale"] = scaleChange
 end)
 
 

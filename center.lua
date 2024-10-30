@@ -150,7 +150,7 @@ do
                 hasuitInstanceId = instanceId
                 if instanceType~=hasuitInstanceType then
                     hasuitInstanceType = instanceType
-                    mainLoadOnFunctionSpammable()
+                    mainLoadOnFunctionSpammable() --maybe just move this to loadons only to make it less confusing
                 end
                 for i=1,#danDoThisEnteringWorld do
                     danDoThisEnteringWorld[i]()
@@ -541,7 +541,6 @@ local function mainLoadOnFunction()
             end
         end
     end
-    print("mainLoadOnFunction()")
 end
 local GetTime = GetTime
 local lastTime
@@ -673,7 +672,7 @@ do
                 local pre = texture
                 texture = GetSpellTexture(texture)
                 if not texture then
-                    print("|cffff2222error no texture for", pre, "|r. spell names have to be in current spellbook to get a texture from them. if you can't get a spell name to work try looking up the spell texture on wowhead. Click the icon there and the texture is the number to the right of ID: ")
+                    print("|cffff2222HasuitFrames error no texture for", pre, "|r. spell names have to be in current spellbook to get a texture from them. if you can't get a spell name to work try looking up the spell texture on wowhead. Click the icon there and the texture is the number to the right of ID: ")
                     return
                 end
             end
@@ -683,7 +682,7 @@ do
                 ["texture"] = texture,
             }
         else
-            print("|cffff2222error attempting to track diminish type", drType, "twice, ignoring")
+            print("|cffff2222HasuitFrames error attempting to track diminish type", drType, "twice, ignoring")
         end
     end
 end
@@ -854,6 +853,7 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
         hasuitDoThisGroup_Roster_UpdateColumnsChanged = nil
         hasuitDoThisGroup_Roster_UpdateGroupSize_5 = nil
         hasuitDoThisGroup_Roster_UpdateGroupSize_5_8 = nil
+        hasuitDoThisRelevantSizes = nil
         
         hasuitDoThisOnUpdate = nil
         hasuitDoThisOnUpdatePosition1 = nil

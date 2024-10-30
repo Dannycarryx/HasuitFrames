@@ -3,18 +3,17 @@
 
 biggest thing right now:
 enabling people to track their own abilities? might be the last thing before a release, maybe middle cast bars too
-oh ya and fix tabs
 
 
 other important:
-player buffs/debuffs showing for specs that haven't been set up like spriest dots on arena frames, buffs on allies from player, more important for friendly buffs
 middle cast bars
 display for spellcasts and who they're from for people with ranged kicks like shaman
 make party interrupt display for m+
 display for purgable buffs for people that have purge
 pet frames
-make click through frames good to use like probably needs to have both left and right click target a unit so that either can be used depending on whether player wants camera move or player move, also option to disable both and only use mouseover, and option to just have normal frames. i think click through could be cool in raids for more mobility/less flinging cursor above raid frames to control movement but never got it to work before this so no experience. need to keep right click as focus on arena frames. small bonus to the click through stuff is can't accidentally click a frame and get prevented from turning. ages ago i tried to set things up so that everything that didn't have a reason to be clicked would ignore mouse clicks for this reason, although not sure if i've accidentally clicked anything but some stupid nameplate icons or the new popup saying the instance name or whatever. also todo make sure those are propagated through as much as possible. those are actually important to make less annoying
-also way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
+fix new 4/5 cd system. problem is cds reset when groupsize leaves 4 or 5
+improve/figure out scale. whole system needs to be made for size stuff and idk what i'm doing with other people's screen sizes
+way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
 
 less important:
 audio warnings for things or some way of knowing when offensive cds get pressed at least without needing to rely on another addon
@@ -28,7 +27,8 @@ aura missing function for motw/fort
 loss of control auras in pve although now i don't think there's a good way to tell what these are without tracking each one manually. at least make something to show cc on player, actually use that to tell which spellids are cc? and add manually to the addon after seen so that it will show right before it goes on player. there's a way to tell player is cced by random pve buff isn't there? LOSS_OF_CONTROL_UPDATE?, --LOSS_OF_CONTROL_ADDED?
 option to disable all in pve or whatever
 track healer dispel cds
-if alt f4ing player can log in and no group units will exist until after combat so have to do something to load frames preemptively. for now you can reload after logging in and the game will give the correct numbers
+if alt f4ing player can log in and no group units will exist until after combat so have to do something to position buttons preemptively. for now you can reload after logging in and the game will give the correct numbers. eventually should make system for buttons always being in correct positions for different group sizes and then the preemptive thing would work itself out but that's (a lot?) more involved
+option to just have normal frames instead of click-through to move, option to disable targeting when frame is clicked and only move camera/player, rely on mouseover for spells and never target, more for pvers, option to enable/disable this depending on instancetype or groupsize?
 
 even less important:
 summon/rez/phase indicators
@@ -38,13 +38,14 @@ figure out why arena spec icons break and don't show up sometimes
 Restitution
 Seasoned Winds
 unit_in_range onevents now that it's registered to each unitframe anyway
-remove delay on unit update event like rosterupdate and make more unit events instead of registering them for all units. or something, not 100% sure how the game expects things to be handled if like a maxhealth event happens for a unit and rosterupdate happens at the same time. like what order does that happen in? have to assume if i remove the delay on rosterupdate those will always match correctly. that delay was probably the source of some problems
-get rid of extra max health/color check on roster update if the delay was the reason it was needed. not sure. think that might have been a problem even when there was no delay
+make more unit events instead of registering them for all units?
+not 100% sure how the game expects things to be handled if like a maxhealth event happens for a unit and rosterupdate happens at the same time. like what order does that happen in? because roster update is limited to one per gettime and i thought it happened toward the end of events for the gettime
+go through stuff and make everything make sense with unittype update functions being delayed by onupdate(except for the first button positions on login to avoid combat)
+might be good to remove the delay if unittype update event is triggered from a unitaura fullupdate guid not matching? idk. need to figure out the best system for keeping track of correct .unit on a unitframe without leaving anything open to gaps. unit_aura could be a good way but need to look at order of events stuff again with this in mind
 
-might want to do a pretty big rework of unit events, maybe make most of them similar to unit_health system and do an extra check for everything any time a unitguid's (main as in the one addon registers unit events for) unit token gets changed. that way could keep the useful delay and never have to worry about it causing problems. i'll test exactly how the order for things work but i think this might end up being the best way to do unit events/roster updates. (i think unit events can happen on the same gettime as roster update but roster update always happens toward the end of events for current gettime, making me wonder if events can happen for a unit and then that unit changes to something else on the same gettime. i know it's capped to one per gettime like a unit's unit_health). currently the addon gets carried by unit_aura fullupdates and a check in the addon's function for that whether unitguid matches
 dr system should be remade to be less awful to work with and made more similar to other icons, probably not given their own dedicated spots for an entire arena but not sure
 could improve drs to be more accurate too and not give incorrect border color sometimes if cc hits right on the edge of dr timer like at 18.6 sec, drs are rng for a small window there (i think) and current system doesn't consider that. should also test how that works in tww, might not even be rng anymore who knows
-whole loading sequence should be looked at. initialize should just put stuff into unloaded table, then run all loadon checks/class specific checks and decide whether to load or even just remove completely during playerlogin, also decide whether options[1] function should care about ignoring player or not here. can save a little bit of performance skipping the is or is not player checks for spells that player can't cast anyway
+whole loading sequence should be looked at. initialize should just put stuff into unloaded table? then run all loadon checks/class specific checks and decide whether to load or even just remove completely during playerlogin, also decide whether options[1] function should care about ignoring player or not based on player's class. can save a little bit of performance skipping the is or is not player checks for spells that player can't cast anyway
 
 get rid of the gap that can happen if arena1/3 are targeting something but not arena2, maybe do something to make lines more distinct if a class is targeting their same class
 
@@ -56,15 +57,7 @@ clean up some naming like frame should become unitframe, everything gets a clear
 
 add an option to use uiparent scale?
 
-
-GetBuildInfo to not have to copy what other addons put in the .toc?
-
-
-
--- if UnitGUID(unit)==hasuitPlayerGUID and danCurrentAura["spellId"]==774 then --dan1, also try unit name in tooltip when this doesn't work?
-    -- print(hasuitTestAuraTable, danCurrentAura, hasuitTestAuraTable==danCurrentAura)
-    -- hasuitTestAuraTable = danCurrentAura
--- end
+fix occasional green background showing through low opacity frames, probably because of big range event or something like that that doesn't have a check for the background color
 
 
 
