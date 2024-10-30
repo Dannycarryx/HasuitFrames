@@ -15,7 +15,7 @@ diminish("disorient", 332402) --Song of Chi-Ji, you can delete or move drs aroun
 
 
 
-hasuitSetupFrameOptions = hasuitFramesOptionsClassSpecificHarmful --------------------------------dots/debuffs from you, shown bottom left on enemy frames
+hasuitSetupSpellOptions = hasuitFramesSpellOptionsClassSpecificHarmful --------------------------------dots/debuffs from you, shown bottom left on enemy frames
 initialize(411038) --Sphere of Despair
 
 
@@ -25,31 +25,31 @@ initialize(411038) --Sphere of Despair
 
 local normalGrow = hasuitNormalGrow
 
-hasuitFramesOptionsClassSpecificHelpful = nil
-danBottomRight_BottomRight  =   {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT",["targetPoint"]="BOTTOMRIGHT",["xOffset"]=0,["yOffset"]=0,["grow"]=normalGrow,["sort"]=danSortPriorityExpirationTime}
+hasuitFramesSpellOptionsClassSpecificHelpful = nil
+hasuitController_BottomRight_BottomRight    =       {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=hasuitSortPriorityExpirationTime}
 
-local commonHelpful = {["controller"]=danBottomRight_BottomRight,["size"]=18,   ["frameLevel"]=20,  ["hideCooldownText"]=false, ["alpha"]=1}
-hasuitSetupFrameOptions = {auraSourceIsPlayer,  ["priority"]=-1,    ["group"]=commonHelpful, ["specialAuraFunction"]=redLifebloom} hasuitUsedRedLifebloom = true
+local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=18, ["hideCooldownText"]=false, ["alpha"]=1}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=-1,    ["group"]=danCommonHelpful, ["specialAuraFunction"]=hasuitSpecialAuraFunction_RedLifebloom} hasuitUsedRedLifebloom = true
 initialize(124682) --Enveloping Mist
 
-local commonHelpful = {["controller"]=danBottomRight_BottomRight,["size"]=15,   ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1}
-hasuitSetupFrameOptions = {auraSourceIsPlayer,  ["priority"]=1, ["group"]=commonHelpful, ["specialAuraFunction"]=auraCanChangeTextureSpecialFunction, ["specialSize"]=18}
+local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,  ["alpha"]=1}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=1,     ["group"]=danCommonHelpful, ["specialAuraFunction"]=hasuitSpecialAuraFunction_CanChangeTexture, ["specialSize"]=18}
 initialize(119611) --Renewing Mist
 
-local commonHelpful = {["controller"]=danBottomRight_BottomRight,["size"]=15,   ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1}
-hasuitSetupFrameOptions = {auraSourceIsPlayer,  ["priority"]=2, ["group"]=commonHelpful}
+local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,  ["alpha"]=1}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2,     ["group"]=danCommonHelpful}
 initialize(115175) --Soothing Mist
 
 
 
-local danBottomRight_BottomRight2   =   {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT",["targetPoint"]="BOTTOMRIGHT",["xOffset"]=0,["yOffset"]=19,["grow"]=normalGrow,["sort"]=danSortPriorityExpirationTime}
-local commonHelpful = {["controller"]=danBottomRight_BottomRight2,["size"]=15,  ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1}
-hasuitSetupFrameOptions = {auraSourceIsPlayer,  ["priority"]=1, ["group"]=commonHelpful}
+local hasuitController_BottomRight_BottomRight2   = {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=19, ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=hasuitSortPriorityExpirationTime}
+local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight2,["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=1,     ["group"]=danCommonHelpful}
 initialize("Chi Harmony") --Chi Harmony
 initialize(205655) --Dome of Mist
 initialize(353503) --Counteract Magic
 
-hasuitSetupFrameOptions = {auraSourceIsPlayer,  ["priority"]=0, ["group"]=commonHelpful}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=0,     ["group"]=danCommonHelpful}
 initialize(411036) --Sphere of Hope
 
 
@@ -66,7 +66,7 @@ local playerGUID = hasuitPlayerGUID
 
 do --helps time mana tea cancels
     local icon = hasuitGetIcon(true)
-    icon:SetParent(hasuitFrameParent)
+    icon:SetParent(hasuitFramesParent)
     icon:ClearAllPoints()
     icon:SetPoint("CENTER", UIParent, "CENTER", -74, -4)
     icon:SetSize(64, 64)
@@ -88,7 +88,7 @@ do --helps time mana tea cancels
     iconText:SetFont("Fonts/FRIZQT__.TTF", 40, "OUTLINE")
     iconText:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -1, 1)
     local danManaTeaConsumed = 0
-    hasuitSetupFrameOptions = {function()
+    hasuitSetupSpellOptions = {function()
         if danGetD4anCleuSourceGuid()==playerGUID then
             local d2anCleuSubevent = danGetD2anCleuSubevent()
             if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
@@ -114,7 +114,7 @@ end
     -- local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
     -- local floor = math.floor
     -- danManaTeaProcDuration = 0
-    -- hasuitSetupFrameOptions = {function()
+    -- hasuitSetupSpellOptions = {function()
         -- if danGetD4anCleuSourceGuid()==playerGUID then
             -- local d2anCleuSubevent = danGetD2anCleuSubevent()
             -- if d2anCleuSubevent=="SPELL_AURA_APPLIED" or d2anCleuSubevent=="SPELL_AURA_REFRESH" then 
@@ -150,7 +150,7 @@ end
     -- end
     
     -- local danGetD12anCleuSpellId = hasuitGetD12anCleuSpellId
-    -- hasuitSetupFrameOptions = {function()
+    -- hasuitSetupSpellOptions = {function()
         -- if danGetD4anCleuSourceGuid()==playerGUID then 
             -- if danGetD2anCleuSubevent()=="SPELL_CAST_SUCCESS" then
                 -- local d12anCleuSpellId = danGetD12anCleuSpellId()

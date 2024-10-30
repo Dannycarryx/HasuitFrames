@@ -24,13 +24,13 @@ local danAddToController
 local iconFramesCreated = 0
 local danBackdrop
 
-local danCurrentFrameOptions
-local danCurrentFrameOptionsCommon
+local danCurrentSpellOptions
+local danCurrentSpellOptionsCommon
 local removedAuraSharedFunction
 local updatedAuraSharedFunction
 
 local danUnitAuraIsFullUpdate
--- danSortExpirationTime
+-- hasuitSortExpirationTime
 local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 
 local pairs = pairs
@@ -84,8 +84,8 @@ do
         local stuff = hasuitCleuSpellIdFunctions[d12anCleuSpellId] or hasuitCleuSpellIdFunctions[d13anCleuSpellName] --be careful to not initialize a spellid and a spellname for the same spell
         if stuff then
             for i=1, #stuff do 
-                danCurrentFrameOptions = stuff[i]
-                danCurrentFrameOptions[1]()
+                danCurrentSpellOptions = stuff[i]
+                danCurrentSpellOptions[1]()
             end
         end
     end
@@ -118,8 +118,8 @@ end
 
 
 
-local pveAuraOptions
-local pveAuraOptionsIsBossAura
+local pveAuraSpellOptions
+local pveAuraSpellOptionsIsBossAura
 
 local danCurrentUnit
 local danCurrentEvent
@@ -135,9 +135,9 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     local hasuitCleuSpellIdFunctionsPve = danGetHasuitCleuSpellIdFunctions()
     danGetHasuitCleuSpellIdFunctions = nil
     
-    local pveAuraOptionsUnknownType
-    local cleuINCOptions
-    local unitCastOptions
+    local pveAuraSpellOptionsUnknownType
+    local pveCleuINCSpellOptions
+    local pveUnitCastSpellOptions
     
     local isChanneled
     local band = bit.band
@@ -151,8 +151,8 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
         local stuff = hasuitCleuSpellIdFunctionsPve[d12anCleuSpellId] or hasuitCleuSpellIdFunctionsPve[d13anCleuSpellName]
         if stuff then
             for i=1, #stuff do 
-                danCurrentFrameOptions = stuff[i]
-                danCurrentFrameOptions[1]()
+                danCurrentSpellOptions = stuff[i]
+                danCurrentSpellOptions[1]()
             end
         end
         
@@ -182,42 +182,42 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
                     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
                         if d15anCleuOther=="DEBUFF" then
                             hasuitFramesCenterSetEventType("aura")
-                            hasuitSetupFrameOptions = pveAuraOptionsUnknownType
+                            hasuitSetupSpellOptions = pveAuraSpellOptionsUnknownType
                             initialize(d12anCleuSpellId)
                         end
                         
                     elseif d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
                         if not isChanneled then
                             hasuitFramesCenterSetEventType("cleu")
-                            hasuitSetupFrameOptions = cleuINCOptions
+                            hasuitSetupSpellOptions = pveCleuINCSpellOptions
                             initialize(d12anCleuSpellId)
-                            danCurrentFrameOptions = cleuINCOptions
-                            danCurrentFrameOptions[1]()
+                            danCurrentSpellOptions = pveCleuINCSpellOptions
+                            danCurrentSpellOptions[1]()
                         else
                             danCurrentEvent = "UNIT_SPELLCAST_CHANNEL_START"
                             hasuitFramesCenterSetEventType("unitCasting")
-                            hasuitSetupFrameOptions = unitCastOptions
+                            hasuitSetupSpellOptions = pveUnitCastSpellOptions
                             initialize(d12anCleuSpellId)
-                            danCurrentFrameOptions = unitCastOptions
-                            danCurrentFrameOptions[1]()
+                            danCurrentSpellOptions = pveUnitCastSpellOptions
+                            danCurrentSpellOptions[1]()
                         end
                         
                     elseif d2anCleuSubevent=="SPELL_CAST_START" then --todo pve version that switches targets, todo different border color for these?
                         danCurrentEvent = "UNIT_SPELLCAST_START"
                         hasuitFramesCenterSetEventType("unitCasting")
-                        hasuitSetupFrameOptions = unitCastOptions
+                        hasuitSetupSpellOptions = pveUnitCastSpellOptions
                         initialize(d12anCleuSpellId)
-                        danCurrentFrameOptions = unitCastOptions
-                        danCurrentFrameOptions[1]()
+                        danCurrentSpellOptions = pveUnitCastSpellOptions
+                        danCurrentSpellOptions[1]()
                         
                     elseif d2anCleuSubevent=="SPELL_EMPOWER_START" then --todo pve version that switches targets, also options to not track? castbar inc stuff isn't reliable anymore in pve but nice to see casts on frames even if the dest target isn't right? INC will always be right
                         danCurrentUnit = hasuitFramesCenterNamePlateGUIDs[d4anCleuSourceGuid]
                         danCurrentEvent = "UNIT_SPELLCAST_EMPOWER_START"
                         hasuitFramesCenterSetEventType("unitCasting")
-                        hasuitSetupFrameOptions = unitCastOptions
+                        hasuitSetupSpellOptions = pveUnitCastSpellOptions
                         initialize(d12anCleuSpellId)
-                        danCurrentFrameOptions = unitCastOptions
-                        danCurrentFrameOptions[1]()
+                        danCurrentSpellOptions = pveUnitCastSpellOptions
+                        danCurrentSpellOptions[1]()
                         
                     end
                 end
@@ -257,35 +257,35 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     
     
     
-    local auraOptionsCommon =           {["size"]=16,   ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1}
-    local auraOptionsIsBossAuraCommon = {["size"]=22,   ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1}
-    pveAuraOptions =                    {["priority"]=480,  ["group"]=auraOptionsCommon, ["loadOn"]=hasuitLoadOnEnablePve}
-    pveAuraOptionsIsBossAura =          {["priority"]=470,  ["group"]=auraOptionsIsBossAuraCommon, ["loadOn"]=hasuitLoadOnEnablePve} --todo should pve debuffs be guaranteed to show up? could make something to make them smaller to fit on frames if they go over a limit, in instance not in open world
-    pveAuraOptionsUnknownType =         {}
+    local danCommonPveAura =            {["size"]=16,   ["hideCooldownText"]=true,  ["alpha"]=1}
+    local danCommonPveAuraIsBossAura =  {["size"]=22,   ["hideCooldownText"]=true,  ["alpha"]=1}
+    pveAuraSpellOptions =               {["priority"]=480,  ["group"]=danCommonPveAura, ["loadOn"]=hasuitLoadOnEnablePve}
+    pveAuraSpellOptionsIsBossAura =     {["priority"]=470,  ["group"]=danCommonPveAuraIsBossAura, ["loadOn"]=hasuitLoadOnEnablePve} --todo should pve debuffs be guaranteed to show up? could make something to make them smaller to fit on frames if they go over a limit, in instance not in open world
+    pveAuraSpellOptionsUnknownType =    {}
     
-    local cleuINCOptionsCommon =        {["size"]=14,   ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1}
-    cleuINCOptions =                    {["priority"]=490,["group"]=cleuINCOptionsCommon,["duration"]=2.5,["isPve"]=true, ["loadOn"]=hasuitLoadOnEnablePve} --todo fix
+    local danCommonPveCleuINC =         {["size"]=14,   ["hideCooldownText"]=true,  ["alpha"]=1}
+    pveCleuINCSpellOptions =            {["priority"]=490,  ["group"]=danCommonPveCleuINC,["duration"]=2.5,["isPve"]=true, ["loadOn"]=hasuitLoadOnEnablePve} --todo fix
     
-    local unitCastOptionsCommon =       {["size"]=12,   ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1}
-    unitCastOptions =                   {["priority"]=495,["group"]=unitCastOptionsCommon, ["loadOn"]=hasuitLoadOnEnablePve}
+    local danCommonPveUnitCast =        {["size"]=12,   ["hideCooldownText"]=true,  ["alpha"]=1}
+    pveUnitCastSpellOptions =           {["priority"]=495,  ["group"]=danCommonPveUnitCast, ["loadOn"]=hasuitLoadOnEnablePve}
     
     tinsert(hasuitDoThisAddon_Loaded, function()
-        auraOptionsCommon["controller"] = danTopRight_TopRight
-        auraOptionsIsBossAuraCommon["controller"] = danTopRight_TopRight
-        pveAuraOptions[1] = danMainAuraFunction
-        pveAuraOptionsIsBossAura[1] = danMainAuraFunction
-        pveAuraOptionsUnknownType[1] = danMainAuraFunctionPveUnknown
+        danCommonPveAura["controller"] = hasuitController_TopRight_TopRight
+        danCommonPveAuraIsBossAura["controller"] = hasuitController_TopRight_TopRight
+        pveAuraSpellOptions[1] = hasuitSpellFunction_MainAuraFunction
+        pveAuraSpellOptionsIsBossAura[1] = hasuitSpellFunction_MainAuraFunction
+        pveAuraSpellOptionsUnknownType[1] = hasuitSpellFunction_MainAuraFunctionPveUnknown
         
-        cleuINCOptionsCommon["controller"] = danTopRight_TopRight
-        cleuINCOptions[1] = danCleuINC
+        danCommonPveCleuINC["controller"] = hasuitController_TopRight_TopRight
+        pveCleuINCSpellOptions[1] = hasuitSpellFunction_CleuINC
         
-        unitCastOptionsCommon["controller"] = danTopRight_TopRight
-        unitCastOptions[1] = danUnitCasting
+        danCommonPveUnitCast["controller"] = hasuitController_TopRight_TopRight
+        pveUnitCastSpellOptions[1] = hasuitSpellFunction_UnitCasting
     end)
     
     
     hasuitFramesCenterSetEventType("aura") -- ___ manual pve track/ignore list here
-    hasuitSetupFrameOptions = pveAuraOptions
+    hasuitSetupSpellOptions = pveAuraSpellOptions
     initialize(422806) --Smothering Shadows (99% damage/healing reduced in the cave)
     trackedPveSubevents["SPELL_AURA_APPLIED"][422806] = true --prevents pve cleu from auto tracking this spellid when seen. it already doesn't but if they change the way it's coded i won't notice, or if m+ changes it or whatever. this debuff's sourceguid/band== thing is messed up which is why it doesn't auto track, not totally sure what's happening with it. most actual pve debuffs that get ignored like this seem bad to track anyway so not sure what's best to do here, also stuff like heroism debuff and pve potions get filtered out from this which is good. can get a better opinion over time
     
@@ -343,26 +343,25 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
         ccBreakHealthThresholdPve = hasuitCcBreakHealthThresholdPve
     end)
     local function ccBreakBarUpdatedEventFromFullUpdate(ccBreakBar)
-        local lastUnit = ccBreakBar.lastUnit
-        if lastUnit then
+        if ccBreakBar.fullUpdateActive then
             local unit = ccBreakBar.frame.unit
-            if lastUnit~=unit then
+            if unit then
                 ccBreakBar.unit = unit
-                ccBreakOnEvent(ccBreakBar, "UNIT_HEALTH", unit) --these are probably kind of pointless unless put below out of this if statement, but these are the most expensive things here and idk if i really want to do that, since this whole system is inaccurate anyway
+                ccBreakOnEvent(ccBreakBar, "UNIT_HEALTH", unit)
                 ccBreakOnEvent(ccBreakBar, "UNIT_ABSORB_AMOUNT_CHANGED", unit)
                 ccBreakOnEvent(ccBreakBar, "UNIT_MAXHEALTH", unit)
+                ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
+                ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
+                ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
             end
-            ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
-            ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
-            ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
         end
     end
-    function hasuitSpecialAuraCcBreakThreshold()
+    function hasuitSpecialAuraFunction_AuraCcBreakThreshold()
         local danCurrentEvent = danCurrentEvent
         if danCurrentEvent=="recycled" then
             local ccBreakBar = danCurrentIcon.ccBreakBar
             ccBreakBar.unit = nil
-            ccBreakBar.lastUnit = nil
+            ccBreakBar.fullUpdateActive = nil
             ccBreakBar:UnregisterAllEvents()
             local frame = ccBreakBar.frame
             local frameKey = ccBreakBar.frameKey
@@ -384,7 +383,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                 local startingHealth = UnitHealth(unit)
                 local startingAbsorb = UnitGetTotalAbsorbs(unit)
                 local preStartingHealth = danCurrentFrame.ccBreakPreStartingHealth
-                local ccBreakBarMaxValue = ccBreakHealthThreshold*danCurrentFrameOptions["ccBreakHealthThresholdMultiplier"]
+                local ccBreakBarMaxValue = ccBreakHealthThreshold*danCurrentSpellOptions["ccBreakHealthThresholdMultiplier"]
                 if preStartingHealth then
                     local change = startingHealth-preStartingHealth
                     if change<0 then
@@ -445,8 +444,8 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                     ccBreakBar:SetValue(startingValue) --gear doesn't matter, can be naked and still have the same amount of damage to break on a training dummy anyway
                     ccBreakBar.ccBreakThresholdValue = startingValue
                 else
-                    local startingValue = ccBreakHealthThresholdPve*danCurrentFrameOptions["ccBreakHealthThresholdMultiplier"]+startingValueOffset
-                    ccBreakBar:SetValue(startingValue) --pve durations? won't be great because not every cc is shorter in pve like frost nova, just get rid of this after temporary?
+                    local startingValue = ccBreakHealthThresholdPve*danCurrentSpellOptions["ccBreakHealthThresholdMultiplier"]+startingValueOffset
+                    ccBreakBar:SetValue(startingValue) --pve durations? won't be great because not every cc is shorter in pvp like frost nova, just get rid of this after, temporary?
                     ccBreakBar.ccBreakThresholdValue = startingValue
                 end
                 ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
@@ -459,18 +458,16 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
         else
             if danCurrentEvent=="updated" then --always means fullupdate(right?) which is where unit could change i think?
                 local ccBreakBar = danCurrentIcon.ccBreakBar
-                local unit = ccBreakBar.unit
-                if unit then
-                    ccBreakBar.lastUnit = unit
-                    ccBreakBar:UnregisterAllEvents() --could be improved. something like this is a good reason to remove delay from main unittype update functions? should probably do that actually. not a fan of needing to unregister and reregister events every time here although probably not that bad. leaving a brief gap where events could be missed instead of sending fake events for this every time. this could definitely be improved
-                    C_Timer_After(0, function()
-                        ccBreakBarUpdatedEventFromFullUpdate(ccBreakBar)
-                    end)
-                end
-            elseif danCurrentEvent=="added" then
+                ccBreakBar.fullUpdateActive = true
+                ccBreakBar:UnregisterAllEvents() --could be improved. something like this is a good reason to remove delay from main unittype update functions? should probably do that actually. not a fan of needing to unregister and reregister events every time here although probably not that bad. this could definitely be improved
+                C_Timer_After(0, function()
+                    ccBreakBarUpdatedEventFromFullUpdate(ccBreakBar) --ok idk what im doing here, should work itself out when improving things later
+                end)
+                
+            elseif danCurrentEvent=="added" then --todo i don't think this is right
                 local ccBreakBar = danCurrentIcon.ccBreakBar
                 ccBreakBar.specialFunction = nil
-                ccBreakBar:SetValue(0) --could do something like make bar red and reversed when it goes over the threshhold but idk might be noise more than anything. seems like ccs that can break always take at least a certain amount of damage before breaking but after that number it's rng. not sure exactly how it works. if i can get the total count to be 100% accurate and know when it breaks from damage could keep a saved minimum to know where the rng starts and could keep data points to know if the chance increases as more damage is taken
+                ccBreakBar:SetValue(0) --could do something like make bar red and reversed when it goes over the threshhold but idk might be noise more than anything. seems like ccs that can break always take at least a certain amount of damage before breaking but after that number it's rng. not sure exactly how it works
             end
         end
     end
@@ -479,7 +476,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
     
     local danDoThisOnUpdate = hasuitDoThisOnUpdate
     hasuitFramesCenterSetEventType("cleu")
-    hasuitCleuCcBreakThreshold = addMultiFunction(function()
+    hasuitSpellFunction_CleuCcBreakThreshold = addMultiFunction(function()
         if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
             local frame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
             if frame and not frame.ccBreakPreStartingHealth then
@@ -502,7 +499,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                         local unit = frame.unit
                         ccBreakBar.ccBreakHealthValue = UnitHealth(unit)
                         ccBreakBar.ccBreakAbsorbValue = UnitGetTotalAbsorbs(unit)
-                        local startingValue = ccBreakHealthThreshold*danCurrentFrameOptions["ccBreakHealthThresholdMultiplier"]
+                        local startingValue = ccBreakHealthThreshold*danCurrentSpellOptions["ccBreakHealthThresholdMultiplier"]
                         ccBreakBar:SetValue(startingValue)
                         ccBreakBar.ccBreakThresholdValue = startingValue
                     end
@@ -612,8 +609,8 @@ hasuitUnitAuraFrame:SetScript("OnEvent", function(_, _, unit, auraTable)
             if stuff then
                 danCurrentEvent = "added"
                 for j=1, #stuff do 
-                    danCurrentFrameOptions = stuff[j]
-                    danCurrentFrameOptions[1]()
+                    danCurrentSpellOptions = stuff[j]
+                    danCurrentSpellOptions[1]()
                 end
             end
         end
@@ -747,8 +744,8 @@ function danUnitAuraIsFullUpdate()
                 else --looking at this later, shouldn't there need to be something for danCurrentFrame.specialAuraInstanceIDsRemove[auraInstanceID]? i want to redo stuff related to that and hypo
                     danCurrentEvent = "added"
                     for j=1, #stuff do
-                        danCurrentFrameOptions = stuff[j]
-                        danCurrentFrameOptions[1]()
+                        danCurrentSpellOptions = stuff[j]
+                        danCurrentSpellOptions[1]()
                     end
                 end
                 recentlyChecked[auraInstanceID] = true
@@ -834,7 +831,7 @@ do
     danFont11:SetFont("Fonts/FRIZQT__.TTF", 11, "OUTLINE")
 
 
-    local textTypes = { --todo remake the way text works
+    local textOptionsTable = { --todo remake the way text works
         [11] =              {danFont11,                                                                         ["xOffset"]=2,  ["yOffset"]=0},
         
         ["KICKArena"]=      {danFont11, 0.8, 0.8, 0.8, 0.8, ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1},
@@ -853,7 +850,7 @@ do
         
         
     }
-    for k in pairs(textTypes) do
+    for k in pairs(textOptionsTable) do
         unusedTextFrames[k] = {}
     end
 
@@ -867,7 +864,7 @@ do
             -- danPrintTeal("danGetText+1", "active: "..textFramesCreated-#unusedTextFrames[textType], "inactive: "..#unusedTextFrames[textType])
             -- textFramesCreated = textFramesCreated+1
             
-            local textOptions = textTypes[textType]
+            local textOptions = textOptionsTable[textType]
             local textFrame = CreateFrame("Frame")
             textFrame.textType = textType
             textFrame.text = textFrame:CreateFontString()
@@ -1209,7 +1206,7 @@ do
                 ccBreakBar:SetPoint("BOTTOMLEFT", icon, "BOTTOMLEFT", 2, 2)
                 ccBreakBar:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
                 ccBreakBar:SetHeight(3)
-                ccBreakBar:SetFrameLevel(22) --how does this interact when framelevel doesn't get set on icon until it gets setparent to frame?
+                ccBreakBar:SetFrameLevel(25) --how does this interact when framelevel doesn't get set on icon until it gets setparent to frame?
                 ccBreakBar:SetScript("OnEvent", ccBreakOnEvent)
                 local background = ccBreakBar:CreateTexture(nil, "BACKGROUND")
                 ccBreakBar.background = background
@@ -1316,8 +1313,9 @@ danCleanController = function(self)
     danSortController(self)
 end
 local function initializeController(controllerOptions)
-    danCurrentFrame.controllersPairs[controllerOptions] = CreateFrame("Frame")
+    danCurrentFrame.controllersPairs[controllerOptions] = CreateFrame("Frame", nil, danCurrentFrame)
     local controller = danCurrentFrame.controllersPairs[controllerOptions]
+    controller:SetFrameLevel(controllerOptions["frameLevel"])
     tinsert(danCurrentFrame.controllersArray, controller)
     controller.options = controllerOptions
     controller.grow = controllerOptions["grow"]
@@ -1340,7 +1338,7 @@ function hasuitInitializeController(frame, controllerOptions)
 end
 
 function danAddToController() --this was the very first system made for the addon, just rejuvenations growing in 4 different directions at the top right of a healthbar
-    local controllerOptions = danCurrentFrameOptionsCommon["controller"]
+    local controllerOptions = danCurrentSpellOptionsCommon["controller"]
     danCurrentController = danCurrentFrame.controllersPairs[controllerOptions]
     if not danCurrentController then
         danCurrentController = initializeController(controllerOptions)
@@ -1401,10 +1399,10 @@ hasuitSort = function(a,b)
         end
     end
 end
-danSortExpirationTime = function(a,b)
+hasuitSortExpirationTime = function(a,b)
     return a.expirationTime<b.expirationTime
 end
-danSortPriorityExpirationTime = function(a,b)
+hasuitSortPriorityExpirationTime = function(a,b)
     if a.priority<b.priority then
         return true
     elseif a.priority==b.priority then
@@ -1527,19 +1525,19 @@ end
 
 
 local function danSharedIconFunction()
-    danCurrentIcon:SetParent(danCurrentFrame)
-    danCurrentIcon:ClearAllPoints()
-    danCurrentIcon.size = danCurrentFrameOptionsCommon["size"]
-    danCurrentIcon:SetSize(danCurrentIcon.size, danCurrentIcon.size)
-    danCurrentIcon:SetFrameLevel(danCurrentFrameOptionsCommon["frameLevel"])
-    danCurrentIcon.alpha = danCurrentFrameOptionsCommon["alpha"]
-    danCurrentIcon:SetAlpha(danCurrentIcon.alpha)
-    danCurrentIcon.priority = danCurrentFrameOptions["priority"]
-    danCurrentIcon.overridesSame = danCurrentFrameOptions["overridesSame"]
-    danCurrentIcon.active = true
     danAddToController()
+    danCurrentIcon:SetParent(danCurrentController)
+    danCurrentIcon:ClearAllPoints()
+    danCurrentIcon.size = danCurrentSpellOptionsCommon["size"]
+    danCurrentIcon:SetSize(danCurrentIcon.size, danCurrentIcon.size)
+    danCurrentIcon.alpha = danCurrentSpellOptionsCommon["alpha"]
+    danCurrentIcon:SetAlpha(danCurrentIcon.alpha)
+    danCurrentIcon.priority = danCurrentSpellOptions["priority"]
+    danCurrentIcon.overridesSame = danCurrentSpellOptions["overridesSame"]
+    danCurrentIcon.active = true
 end
 
+local danMainAuraFunction
 do
     local function auraExpiredOnHide(cooldown) --if cooldown timer runs out before aura removed event it will keep cd dark briefly instead of the normal wow behavior of it lighting up at the end of its duration sometimes
         if cooldown.auraExpiredEarlyCount<5 then
@@ -1556,12 +1554,12 @@ do
     end
     
     -- hasuitFramesCenterSetEventType("aura")
-    danMainAuraFunction = addMultiFunction(function()
-        danCurrentFrameOptionsCommon = danCurrentFrameOptions[danCurrentFrame.unitType]
-        if not danCurrentFrameOptionsCommon then
+    hasuitSpellFunction_MainAuraFunction = addMultiFunction(function()
+        danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
+        if not danCurrentSpellOptionsCommon then
             return
         end
-        danCurrentIcon = danGetIcon(danCurrentFrameOptionsCommon["specialIconType"] or danCurrentFrameOptions["specialIconType"] or danCurrentAura["isHelpful"] or danCurrentAura["dispelName"] or "") --todo mainaurafunction should be broken up and icon should be made in another function/other useful things
+        danCurrentIcon = danGetIcon(danCurrentSpellOptionsCommon["specialIconType"] or danCurrentSpellOptions["specialIconType"] or danCurrentAura["isHelpful"] or danCurrentAura["dispelName"] or "") --todo mainaurafunction should be broken up and icon should be made in another function/other useful things
         danSharedIconFunction()
         danCurrentIcon.iconTexture:SetTexture(danCurrentAura["icon"])
         local expirationTime = danCurrentAura["expirationTime"]
@@ -1570,7 +1568,7 @@ do
         local cooldown = danCurrentIcon.cooldown
         cooldown:SetCooldown(danCurrentIcon.startTime, danCurrentAura["duration"])
         
-        if not danCurrentFrameOptionsCommon["hideCooldownText"] then
+        if not danCurrentSpellOptionsCommon["hideCooldownText"] then
             danCurrentIcon.cooldownText:SetFontObject(cooldownTextFonts[danCurrentIcon.size])
             startCooldownTimerText(danCurrentIcon)
             danCurrentIcon.cooldownTextShown = true
@@ -1586,8 +1584,8 @@ do
             tinsert(danCurrentFrame.auraInstanceIDs[auraInstanceID], danCurrentIcon)
         end
         
-        if danCurrentFrameOptions["textKey"] then
-            danSetIconText(danCurrentFrameOptions["textKey"], danCurrentFrameOptions["actualText"])
+        if danCurrentSpellOptions["textKey"] then
+            danSetIconText(danCurrentSpellOptions["textKey"], danCurrentSpellOptions["actualText"])
         elseif danCurrentAura["applications"]>0 then
             if danCurrentAura["applications"]>1 then
                 danSetIconText(11, danCurrentAura["applications"])
@@ -1596,59 +1594,60 @@ do
             end
         end
         
-        local specialFunction = danCurrentFrameOptions["specialAuraFunction"]
+        local specialFunction = danCurrentSpellOptions["specialAuraFunction"]
         if specialFunction then
             danCurrentIcon.specialFunction = specialFunction
             specialFunction()
         end
     end)
+    danMainAuraFunction = hasuitSpellFunction_MainAuraFunction
 end
 
-function danMainAuraFunctionPveUnknown()
+function hasuitSpellFunction_MainAuraFunctionPveUnknown()
     local spellId = danCurrentAura["spellId"]
     if danCurrentAura["isBossAura"] then
-        hasuitUnitAuraFunctions[spellId][#hasuitUnitAuraFunctions[spellId]] = pveAuraOptionsIsBossAura --don't need something like pveIsBossAuraTemporaryIndexTracking[d12anCleuSpellId] = #hasuitUnitAuraFunctions[d12anCleuSpellId] for the cleu. only one spellid per subevent gets tracked anyway and then future ones get ignored in the tracking part of pve cleu
-        danCurrentFrameOptions = pveAuraOptionsIsBossAura
+        hasuitUnitAuraFunctions[spellId][#hasuitUnitAuraFunctions[spellId]] = pveAuraSpellOptionsIsBossAura --don't need something like pveIsBossAuraTemporaryIndexTracking[d12anCleuSpellId] = #hasuitUnitAuraFunctions[d12anCleuSpellId] for the cleu. only one spellid per subevent gets tracked anyway and then future ones get ignored in the tracking part of pve cleu
+        danCurrentSpellOptions = pveAuraSpellOptionsIsBossAura
     else
-        hasuitUnitAuraFunctions[spellId][#hasuitUnitAuraFunctions[spellId]] = pveAuraOptions
-        danCurrentFrameOptions = pveAuraOptions
+        hasuitUnitAuraFunctions[spellId][#hasuitUnitAuraFunctions[spellId]] = pveAuraSpellOptions
+        danCurrentSpellOptions = pveAuraSpellOptions
     end
     danMainAuraFunction()
 end
 
-auraSourceIsPlayer = addMultiFunction(function()
+hasuitSpellFunction_AuraSourceIsPlayer = addMultiFunction(function()
     if danCurrentAura["sourceUnit"]=="player" then
         danMainAuraFunction()
     end
 end)
-function auraSourceIsPlayerAndHarmful()
+function hasuitSpellFunction_AuraSourceIsPlayerAndHarmful()
     if danCurrentAura["sourceUnit"]=="player" and danCurrentAura["isHarmful"] then
         danMainAuraFunction()
     end
 end
-function auraSourceIsPlayerAndHelpful()
+function hasuitSpellFunction_AuraSourceIsPlayerAndHelpful()
     if danCurrentAura["sourceUnit"]=="player" and danCurrentAura["isHelpful"] then
         danMainAuraFunction()
     end
 end
 
-auraSourceIsNotPlayer = addMultiFunction(function() --todo something similar to pve boss aura function to decide whether to give spell this function or skip it if class can't cast it anyway? or an alt initialize function, not sure exactly what i was thinking here but something during initialize to decide this is probably best? pve boss aura thing doesn't seem like it'd be useful here
+hasuitSpellFunction_AuraSourceIsNotPlayer = addMultiFunction(function() --todo something similar to pve boss aura function to decide whether to give spell this function or skip it if class can't cast it anyway? or an alt initialize function, not sure exactly what i was thinking here but something during initialize to decide this is probably best? pve boss aura thing doesn't seem like it'd be useful here
     if danCurrentAura["sourceUnit"]~="player" then
         danMainAuraFunction()
     end
 end)
-auraIsDebuffOnly = addMultiFunction(function()
+hasuitAuraIsDebuffOnly = addMultiFunction(function()
     if danCurrentAura["isHarmful"] then
         danMainAuraFunction()
     end
 end)
-hasuitAuraPoints1Required = addMultiFunction(function()
-    if danCurrentAura["points"][1]==danCurrentFrameOptions["points1"] then
+hasuitSpellFunction_AuraPoints1Required = addMultiFunction(function()
+    if danCurrentAura["points"][1]==danCurrentSpellOptions["points1"] then
         danMainAuraFunction()
     end
 end)
-hasuitAuraPoints2Required = addMultiFunction(function()
-    if danCurrentAura["points"][2]==danCurrentFrameOptions["points2"] then
+hasuitSpellFunction_AuraPoints2Required = addMultiFunction(function()
+    if danCurrentAura["points"][2]==danCurrentSpellOptions["points2"] then
         danMainAuraFunction()
     end
 end)
@@ -1667,7 +1666,7 @@ danAuraMissingFunction = addMultiFunction(function(icon)
     local cooldown = danCurrentIcon.cooldown
     cooldown:SetCooldown(danCurrentIcon.startTime, danCurrentAura["duration"])
     
-    if not danCurrentFrameOptionsCommon["hideCooldownText"] then
+    if not danCurrentSpellOptionsCommon["hideCooldownText"] then
         danCurrentIcon.cooldownText:SetFontObject(cooldownTextFonts[danCurrentIcon.size])
         startCooldownTimerText(danCurrentIcon)
         danCurrentIcon.cooldownTextShown = true
@@ -1683,8 +1682,8 @@ danAuraMissingFunction = addMultiFunction(function(icon)
         tinsert(danCurrentFrame.auraInstanceIDs[auraInstanceID], danCurrentIcon)
     end
     
-    if danCurrentFrameOptions["textKey"] then
-        danSetIconText(danCurrentFrameOptions["textKey"], danCurrentFrameOptions["actualText"])
+    if danCurrentSpellOptions["textKey"] then
+        danSetIconText(danCurrentSpellOptions["textKey"], danCurrentSpellOptions["actualText"])
     elseif danCurrentAura["applications"]>0 then
         if danCurrentAura["applications"]>1 then
             danSetIconText(11, danCurrentAura["applications"])
@@ -1693,7 +1692,7 @@ danAuraMissingFunction = addMultiFunction(function(icon)
         end
     end
     
-    local specialFunction = danCurrentFrameOptions["specialAuraFunction"]
+    local specialFunction = danCurrentSpellOptions["specialAuraFunction"]
     if specialFunction then
         danCurrentIcon.specialFunction = specialFunction
         specialFunction()
@@ -1702,8 +1701,8 @@ end)
 
 
 danAuraMissingFunctionHidesWhileActive = addMultiFunction(function()
-    danCurrentFrameOptionsCommon = danCurrentFrameOptions[danCurrentFrame.unitType]
-    if danCurrentFrameOptionsCommon then
+    danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
+    if danCurrentSpellOptionsCommon then
         
     end
 end)
@@ -1711,7 +1710,7 @@ end)
 
 
 
-function hypo2ndTimerThing(icon, cooldownExpirationTime)
+local function hypo2ndTimerThing(icon, cooldownExpirationTime)
     if icon.hypoExpirationTime>cooldownExpirationTime then
         if icon.priority==256 and not icon.isPrimary then
             local currentTime = GetTime()
@@ -1733,7 +1732,7 @@ end
 
 
 
-function auraRemovedHypoCooldownFunction(frame)
+local function auraRemovedHypoCooldownFunction(frame)
     local cooldowns = frame.cooldowns
     if cooldowns then
         local affectedSpells = frame.hypoAffectedSpells
@@ -1757,16 +1756,16 @@ function auraRemovedHypoCooldownFunction(frame)
     frame.specialAuras[frame.hypoSpellId] = nil
     frame.hypoSpellId = nil
 end
-danAuraHypoCooldownFunction = addMultiFunction(function()
-    if danCurrentFrame.unitClass==danCurrentFrameOptions["unitClass"] then
+hasuitSpellFunction_AuraHypoCooldownFunction = addMultiFunction(function()
+    if danCurrentFrame.unitClass==danCurrentSpellOptions["unitClass"] then
         local cooldowns = danCurrentFrame.cooldowns
         if cooldowns then
             danCurrentFrame.hypoSpellId = danCurrentAura["spellId"]
             danCurrentFrame.specialAuraInstanceIDsRemove[danCurrentAura["auraInstanceID"]] = auraRemovedHypoCooldownFunction
             danCurrentFrame.specialAuras[danCurrentFrame.hypoSpellId] = danCurrentAura["auraInstanceID"]
-            local affectedSpells = danCurrentFrameOptions["affectedSpells"]
+            local affectedSpells = danCurrentSpellOptions["affectedSpells"]
             danCurrentFrame.hypoAffectedSpells = affectedSpells
-            danCurrentFrame.hypoAffectedSpellsPairs = danCurrentFrameOptions["affectedSpellsPairs"]
+            danCurrentFrame.hypoAffectedSpellsPairs = danCurrentSpellOptions["affectedSpellsPairs"]
             for i=1,#affectedSpells do
                 local affectedIcon = cooldowns[affectedSpells[i]]
                 if affectedIcon and affectedIcon.spellId==affectedSpells[i] then
@@ -1787,19 +1786,19 @@ danAuraHypoCooldownFunction = addMultiFunction(function()
 end)
 
 local danCooldownReductionFunction
-danAuraPoints1CooldownReduction = addMultiFunction(function()
-    if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["points"][1]==danCurrentFrameOptions["points1"] then --could be better since this won't correct itself if the aura was put on a unit not visible to player at time of cast. could do something to keep track of that and make it not a problem
+hasuitSpellFunction_AuraPoints1CooldownReduction = addMultiFunction(function()
+    if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["points"][1]==danCurrentSpellOptions["points1"] then --could be better since this won't correct itself if the aura was put on a unit not visible to player at time of cast. could do something to keep track of that and make it not a problem
         danCooldownReductionFunction()
     end
 end)
-danAuraPoints2CooldownReduction = addMultiFunction(function()
-    if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["points"][2]==danCurrentFrameOptions["points2"] then
+hasuitSpellFunction_AuraPoints2CooldownReduction = addMultiFunction(function()
+    if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["points"][2]==danCurrentSpellOptions["points2"] then
         danCooldownReductionFunction()
     end
 end)
 
-danAuraPoints2CooldownReductionExternal = addMultiFunction(function()
-    if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["points"][2]==danCurrentFrameOptions["points2"] and danCurrentAura["sourceUnit"] then
+hasuitSpellFunction_AuraPoints2CooldownReductionExternal = addMultiFunction(function()
+    if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["points"][2]==danCurrentSpellOptions["points2"] and danCurrentAura["sourceUnit"] then
         local frame = danCurrentFrame
         danCurrentFrame = hasuitUnitFrameForUnit[danCurrentAura["sourceUnit"]] --fml
         if danCurrentFrame then
@@ -1809,9 +1808,9 @@ danAuraPoints2CooldownReductionExternal = addMultiFunction(function()
     end
 end)
 
-function danAuraPoints1HidesOther()
-    if danCurrentAura["points"][1]==danCurrentFrameOptions["points1"] then
-        local hideSpellId = danCurrentFrameOptions["hideSpellId"]
+function hasuitSpellFunction_AuraPoints1HidesOther()
+    if danCurrentAura["points"][1]==danCurrentSpellOptions["points1"] then
+        local hideSpellId = danCurrentSpellOptions["hideSpellId"]
         local icon = danCurrentFrame.cooldowns[hideSpellId]
         if icon and icon.spellId==hideSpellId then
             icon.priority = icon.basePriority+800
@@ -1821,8 +1820,8 @@ function danAuraPoints1HidesOther()
     end
 end
 
-function danAuraDurationCooldownReduction()
-    if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["duration"]==danCurrentFrameOptions["duration"] and danCurrentAura["sourceUnit"] then
+function hasuitSpellFunction_AuraDurationCooldownReduction()
+    if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["duration"]==danCurrentSpellOptions["duration"] and danCurrentAura["sourceUnit"] then
         local frame = danCurrentFrame
         danCurrentFrame = hasuitUnitFrameForUnit[danCurrentAura["sourceUnit"]]
         if danCurrentFrame then
@@ -1902,7 +1901,7 @@ do --smoke bomb, technically not going to be reliable if player is in a differen
 
 
 
-    function danSmokeBombSpecialFunctionForArenaFrames() --only unit aura event exists for this spell atm, no cleu
+    function hasuitSpecialAuraFunction_SmokeBombFunctionForArenaFrames() --only unit aura event exists for this spell atm, no cleu
         if danCurrentEvent=="recycled" then
             local frame = danCurrentIcon.frame
             smokeBombRangeMissingOnTarget(frame)
@@ -1919,11 +1918,11 @@ do --smoke bomb, technically not going to be reliable if player is in a differen
             
             smokeBombRangeActiveOnTarget(danCurrentFrame)
         -- else
-            -- hasuitDoThisEasySavedVariables("danSmokeBombSpecialFunctionForArenaFrames not added")
+            -- hasuitDoThisEasySavedVariables("hasuitSpecialAuraFunction_SmokeBombFunctionForArenaFrames not added")
         end
     end
 
-    function danSmokeBombSpecialFunctionForPlayer()
+    function hasuitSpecialAuraFunction_SmokeBombForPlayer()
         if danCurrentEvent=="recycled" then
             for i=1,#arenaUnitFrames do
                 if arenaUnitFrames[i].bombIsActive then
@@ -1970,12 +1969,12 @@ do --smoke bomb, technically not going to be reliable if player is in a differen
                 end
             end
         -- else
-            -- hasuitDoThisEasySavedVariables("danSmokeBombSpecialFunctionForPlayer not added")
+            -- hasuitDoThisEasySavedVariables("hasuitSpecialAuraFunction_SmokeBombForPlayer not added")
         end
     end
 end
 
-function hasuitShadowyDuelFunction()
+function hasuitSpecialAuraFunction_ShadowyDuel()
     if danCurrentEvent=="recycled" then
         danCurrentIcon.frame.shadowyDuel = nil
         danCurrentIcon.frame = nil
@@ -2003,7 +2002,7 @@ end
 
 local hideCooldown
 local danCleuCooldownStart
-function hasuitFeignDeath() --todo check for real dead when this falls off? if needed, --feign death
+function hasuitSpecialAuraFunction_FeignDeath() --todo check for real dead when this falls off? if needed, --feign death
     if danCurrentEvent=="recycled" then
         local frame = danCurrentIcon.frame --as a reminder, danCurrentFrame isn't set if OnCooldownDone is the reason for the recycle
         
@@ -2042,9 +2041,9 @@ do
     tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function()
         blessingOfAutumnIgnoreList = hasuitBlessingOfAutumnIgnoreList
         hasuitBlessingOfAutumnIgnoreList = nil
-        blessingOfAutumnSpecialFunction = nil --bored todo could clean up global table? shouldn't have any value keeping anything there really, plan is for people to put stuff into player login table or similar where it'll all still be available and they can make that stuff local in their own addon, then might as well be removed from global after?
+        hasuitSpecialAuraFunction_BlessingOfAutumn = nil --bored todo could clean up global table? shouldn't have any value keeping anything there really, plan is for people to put stuff into player login table or similar where it'll all still be available and they can make that stuff local in their own addon, then might as well be removed from global after?
     end)
-    local danOptions = {["CDr"]=0.3}
+    local danSpellOptions = {["CDr"]=0.3}
     local function asd(timer) --might just work well as is without anything extra needing to be done, one potential problem is enemy stealthing, could fix that easily if a new system is made related to that or todo?: if the fullupdate just gets ignored if enemy is known to have used stealth ability, the setscript hide thing should get disabled for those icons?, other problem is just remembering to add relevant stuff to the ignore list, not sure of a good way to automate that
         local icon = timer.icon
         local newTimer = C_Timer_NewTimer(1, asd)
@@ -2060,16 +2059,16 @@ do
                 end
             end
         end
-        danOptions["affectedSpells"] = affectedSpells
-        danCurrentFrameOptions = danOptions
+        danSpellOptions["affectedSpells"] = affectedSpells
+        danCurrentSpellOptions = danSpellOptions
         danCooldownReductionFunction()
     end
-    function blessingOfAutumnSpecialFunction() --pretty sure if multiple blessings of autumn can be on someone this setup will still work fine and take them all into account, but we'll see, or not because what 5 man group gets 2 holy paladins that both decide to use it on the same target?
+    function hasuitSpecialAuraFunction_BlessingOfAutumn() --pretty sure if multiple blessings of autumn can be on someone this setup will still work fine and take them all into account, but we'll see, or not because what 5 man group gets 2 holy paladins that both decide to use it on the same target?
         if danCurrentEvent=="recycled" then
             danCurrentIcon.frame = nil
             danCurrentIcon.blessingOfAutumnTimer:Cancel()
             danCurrentIcon.blessingOfAutumnTimer = nil
-            danOptions["affectedSpells"] = nil
+            danSpellOptions["affectedSpells"] = nil
             
         elseif danCurrentEvent=="added" then
             local icon = danCurrentIcon
@@ -2078,7 +2077,7 @@ do
             -- end
             
             icon.frame = danCurrentFrame
-            local newTimer = C_Timer_NewTimer(0.1, asd) --delaying this is good for 2 things, makes it so changing danCurrentFrameOptions will happen away from unit aura event. that might not matter but will prevent any problems related to that for free, especially in the future if i change something or reuse this for another spell or something, and makes it so that it can be frontloaded and not have to worry about the last tick going 0.3 sec too far, i think, although that might not be true on server lagged auras that don't get a removed event on time, who knows? also what is the point of modrate arg on setcooldown? seems like there's no way to get a cd to just go faster but maybe i'm missing something
+            local newTimer = C_Timer_NewTimer(0.1, asd) --delaying this is good for 2 things, makes it so changing danCurrentSpellOptions will happen away from unit aura event. that might not matter but will prevent any problems related to that for free, especially in the future if i change something or reuse this for another spell or something, and makes it so that it can be frontloaded and not have to worry about the last tick going 0.3 sec too far, i think, although that might not be true on server lagged auras that don't get a removed event on time, who knows? also what is the point of modrate arg on setcooldown? seems like there's no way to get a cd to just go faster but maybe i'm missing something
             icon.blessingOfAutumnTimer = newTimer
             newTimer.icon = icon
         end
@@ -2086,7 +2085,7 @@ do
 end
 
 
-function hasuitDarkSimShowingWhatGotStolenSpecialFunction() --surprised points just tells exactly what spell they got. spent all day making something out of like 10 tellmewhen icons interacting with each other to show reliably what spell got stolen years ago
+function hasuitSpecialAuraFunction_DarkSimShowingWhatGotStolen() --surprised points just tells exactly what spell they got. spent all day making something out of like 10 tellmewhen icons interacting with each other to show reliably what spell got stolen years ago
     danCurrentIcon.iconTexture:SetTexture(GetSpellTexture(danCurrentAura["points"][1])) --whole function is untested
     danSetIconText(hasuitKICKTextKey, "stolen")
     danCurrentIcon.specialFunction = nil
@@ -2110,7 +2109,7 @@ do
         [240] = "|cffff4433",
         [270] = "|cffff3333",
     }
-    function danAuraOrbOfPowerSpecialFunction()
+    function hasuitSpecialAuraFunction_OrbOfPower()
         if danCurrentEvent=="updated" then
             local points2 = danCurrentAura["points"][2]
             local damageTakenIncreasedString = (orbsTextColors[points2] or "|cffff2222")..points2
@@ -2138,7 +2137,7 @@ do
         [90] = "|cffff4433",
         [100] ="|cffff3333",
     }
-    function danAuraFlagDebuffSpecialFunctionBg()
+    function hasuitSpecialAuraFunction_FlagDebuffBg()
         if danCurrentEvent=="updated" or danCurrentEvent=="added" then
             local points1 = danCurrentAura["points"][1]
             local damageTakenIncreasedString = (bgFlagDebuffTextColors[points1] or "|cffff2222")..points1
@@ -2170,23 +2169,23 @@ end
 
 hasuitFramesCenterSetEventType("cleu") --make sure to always check subevent even if a spellid only has one subevent (and a function is made just for that spellid, like solar beam). d 12 can be damage amount from swings. honestly should probably base all cleu and spell_aura stuff on spellname instead of spellid(with GetSpellName on initialize for different languages) and have an ignore list for certain spellids. would make everything easier and even more efficient, especially easier for new spells getting added like oppressing roar randomly has a new spellid that does the same thing in tww. looks like the only difference is one removes 1 enrage effect
 
-danCleuInterrupted = addMultiFunction(function() --todo could do something with extraSchool 17th parameter
+hasuitSpellFunction_CleuInterrupted = addMultiFunction(function() --todo could do something with extraSchool 17th parameter
     if d2anCleuSubevent=="SPELL_INTERRUPT" then 
         danCurrentFrame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
         if danCurrentFrame then
-            danCurrentFrameOptionsCommon = danCurrentFrameOptions[danCurrentFrame.unitType]
-            if danCurrentFrameOptionsCommon then
+            danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
+            if danCurrentSpellOptionsCommon then
                 danCurrentEvent = "KICK"
                 danCurrentIcon = danGetIcon("KICK")
                 danSharedIconFunction()
                 danCurrentIcon.iconTexture:SetTexture(GetSpellTexture(d15anCleuOther))
                 local currentTime = GetTime()
-                local duration = danCurrentFrameOptions["duration"]
+                local duration = danCurrentSpellOptions["duration"]
                 danCurrentIcon.startTime = currentTime
                 danCurrentIcon.expirationTime = currentTime+duration
                 danCurrentIcon.cooldown:SetCooldown(currentTime, duration)
                 
-                if not danCurrentFrameOptionsCommon["hideCooldownText"] then
+                if not danCurrentSpellOptionsCommon["hideCooldownText"] then
                     danCurrentIcon.cooldownText:SetFontObject(cooldownTextFonts[danCurrentIcon.size])
                     startCooldownTimerText(danCurrentIcon)
                     danCurrentIcon.cooldownTextShown = true
@@ -2201,19 +2200,19 @@ danCleuInterrupted = addMultiFunction(function() --todo could do something with 
     end
 end)
 local spellINCTable = {}
-danCleuINC = addMultiFunction(function() --todo should be remade --especially if there's a way to get things to work right with less specific stuff in the options table, like anything auto tracked in pve
+hasuitSpellFunction_CleuINC = addMultiFunction(function() --todo should be remade --especially if there's a way to get things to work right with less specific stuff in the options table, like anything auto tracked in pve
     if d4anCleuSourceGuid~=hasuitPlayerGUID then
         danCurrentFrame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
         if danCurrentFrame then
-            danCurrentFrameOptionsCommon = danCurrentFrameOptions[danCurrentFrame.unitType]
-            if danCurrentFrameOptionsCommon then
+            danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
+            if danCurrentSpellOptionsCommon then
                 if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
                     danCurrentEvent = "INC"
                     danCurrentIcon = danGetIcon("")
                     danSharedIconFunction()
                     danCurrentIcon.iconTexture:SetTexture(GetSpellTexture(d12anCleuSpellId))
                     local currentTime = GetTime()
-                    local duration = danCurrentFrameOptions["duration"]
+                    local duration = danCurrentSpellOptions["duration"]
                     danCurrentIcon.startTime = currentTime
                     danCurrentIcon.expirationTime = currentTime+duration
                     danCurrentIcon.cooldown:SetCooldown(currentTime, duration)
@@ -2221,12 +2220,12 @@ danCleuINC = addMultiFunction(function() --todo should be remade --especially if
                     
                     
                     danCurrentIcon.cooldown:SetScript("OnCooldownDone", danCooldownDoneRecycle)
-                    if danCurrentFrameOptionsCommon["size"]<=20 then
+                    if danCurrentSpellOptionsCommon["size"]<=20 then
                         danSetIconText("INC5", "INC")
                     else
                         danSetIconText("INC10", "INC")
                     end
-                    local spellINCString = danCurrentFrameOptions["ignoreSource"] and d8anCleuDestGuid..d13anCleuSpellName or d4anCleuSourceGuid..d8anCleuDestGuid..d13anCleuSpellName
+                    local spellINCString = danCurrentSpellOptions["ignoreSource"] and d8anCleuDestGuid..d13anCleuSpellName or d4anCleuSourceGuid..d8anCleuDestGuid..d13anCleuSpellName
                     local t = spellINCTable[spellINCString]
                     if not t then
                         spellINCTable[spellINCString] = {}
@@ -2250,11 +2249,11 @@ danCleuINC = addMultiFunction(function() --todo should be remade --especially if
                     end
                     
                 elseif 
-                not danCurrentFrameOptions["spellINCType"] and d2anCleuSubevent=="SPELL_DAMAGE"
+                not danCurrentSpellOptions["spellINCType"] and d2anCleuSubevent=="SPELL_DAMAGE"
                 or d2anCleuSubevent=="SPELL_MISSED" --todo absorbed? 2 different kinds of absorbs and only want to use that if it's a full absorb and prevented a normal damage subevent
-                or (danCurrentFrameOptions["spellINCType"]=="aura" or danCurrentFrameOptions["isPve"]) and (d2anCleuSubevent=="SPELL_AURA_APPLIED" or d2anCleuSubevent=="SPELL_AURA_REFRESH" or d2anCleuSubevent=="SPELL_AURA_APPLIED_DOSE")
+                or (danCurrentSpellOptions["spellINCType"]=="aura" or danCurrentSpellOptions["isPve"]) and (d2anCleuSubevent=="SPELL_AURA_APPLIED" or d2anCleuSubevent=="SPELL_AURA_REFRESH" or d2anCleuSubevent=="SPELL_AURA_APPLIED_DOSE")
                 then
-                    local spellINCString = danCurrentFrameOptions["ignoreSource"] and d8anCleuDestGuid..d13anCleuSpellName or d4anCleuSourceGuid..d8anCleuDestGuid..d13anCleuSpellName
+                    local spellINCString = danCurrentSpellOptions["ignoreSource"] and d8anCleuDestGuid..d13anCleuSpellName or d4anCleuSourceGuid..d8anCleuDestGuid..d13anCleuSpellName
                     local t = spellINCTable[spellINCString]
                     if t and t[1] then
                         t[1].cooldown:Clear()
@@ -2270,10 +2269,10 @@ tinsert(hasuitDoThisPlayer_Login, function()
     danPlayerFrame = hasuitPlayerFrame
 end)
 
-danCleuDiminish = addMultiFunction(function()
+hasuitSpellFunction_CleuDiminish = addMultiFunction(function()
     danCurrentFrame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
     if danCurrentFrame then
-        local drType = danCurrentFrameOptions[danCurrentFrame.unitType] or danCurrentFrame==danPlayerFrame and danCurrentFrameOptions["arena"]
+        local drType = danCurrentSpellOptions[danCurrentFrame.unitType] or danCurrentFrame==danPlayerFrame and danCurrentSpellOptions["arena"]
         if drType then
             if d2anCleuSubevent=="SPELL_AURA_APPLIED" or d2anCleuSubevent=="SPELL_AURA_REFRESH" then 
                 danCurrentEvent = "DR"
@@ -2333,32 +2332,49 @@ hasuitNpcIds = {
 
 
 local unitKBelongsToV = {} --todo reset on instance changed or something? hopefully all pet stuff will work itself out after adding pet frames
-local function danCleuSpellSummon()
+local function hasuitSpellFunction_CleuSpellSummon()
     if d2anCleuSubevent=="SPELL_SUMMON" then
         unitKBelongsToV[d8anCleuDestGuid] = {d4anCleuSourceGuid}
-        if danCurrentFrameOptions["npcId"] then
-            unitKBelongsToV[d8anCleuDestGuid][2] = hasuitNpcIds[danCurrentFrameOptions["npcId"]]
+        if danCurrentSpellOptions["npcId"] then
+            unitKBelongsToV[d8anCleuDestGuid][2] = hasuitNpcIds[danCurrentSpellOptions["npcId"]]
         end
     end
 end
-hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=417} --no function to get npc id i think, only way is the unitguid string? or tracking it on spell_summon like this
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellSummon, ["npcId"]=417} --no function to get npc id i think, only way is the unitguid string? or tracking it on spell_summon like this
 initialize(691) --Summon Felhunter
-hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=1860}
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellSummon, ["npcId"]=1860}
 initialize(697) --Summon Void walker
-hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=1863}
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellSummon, ["npcId"]=1863}
 initialize(366222) --Summon Sayaad
-hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=416}
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellSummon, ["npcId"]=416}
 initialize(688) --Summon Imp
-hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=17252}
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellSummon, ["npcId"]=17252}
 initialize(30146) --Summon Felguard
 
-hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=26125}
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellSummon, ["npcId"]=26125}
 initialize(46585) --Raise Dead 2 min cd
-hasuitSetupFrameOptions = {danCleuSpellSummon, ["npcId"]=26125} --todo 63560 dark transformation
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellSummon, ["npcId"]=26125} --todo 63560 dark transformation
 initialize(46584) --Raise Dead 30 sec cd
 
 
 do
+    local function danUnitPetUpdateCooldown(unitGUID, spellId) --todo more accurate reset if the same pet gets resummoned still on cd
+        local frame = hasuitUnitFrameForUnit[unitGUID]
+        if frame then
+            local icon = frame.cooldowns and frame.cooldowns[spellId]
+            if icon then
+                icon.iconTexture:SetTexture(GetSpellTexture(spellId))
+                if icon.priority==256 then
+                    icon.priority = icon.basePriority
+                    icon.cooldown:Clear()
+                    -- icon.alpha = 1
+                    icon:SetAlpha(icon.alpha)
+                    danCurrentController = icon.controller
+                    danSortController()
+                end
+            end
+        end
+    end
     local lastEventId
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("UNIT_PET")
@@ -2396,27 +2412,10 @@ do
     end)
 end
 
-function danUnitPetUpdateCooldown(unitGUID, spellId) --todo more accurate reset if the same pet gets resummoned still on cd
-    local frame = hasuitUnitFrameForUnit[unitGUID]
-    if frame then
-        local icon = frame.cooldowns and frame.cooldowns[spellId]
-        if icon then
-            icon.iconTexture:SetTexture(GetSpellTexture(spellId))
-            if icon.priority==256 then
-                icon.priority = icon.basePriority
-                icon.cooldown:Clear()
-                -- icon.alpha = 1
-                icon:SetAlpha(icon.alpha)
-                danCurrentController = icon.controller
-                danSortController()
-            end
-        end
-    end
-end
 function danCooldownReductionFunction() --could split this into multiple functions to ignore hypo/multiple affected spells
-    -- local CDr = danCurrentFrameOptions["CDr"] --cursed? no explanation for how this happened but character here: , invisible by default on notepad++
-    local CDr = danCurrentFrameOptions["CDr"]
-    local affectedSpells = danCurrentFrameOptions["affectedSpells"]
+    -- local CDr = danCurrentSpellOptions["CDr"] --cursed? no explanation for how this happened but character here: , invisible by default on notepad++
+    local CDr = danCurrentSpellOptions["CDr"]
+    local affectedSpells = danCurrentSpellOptions["affectedSpells"]
     local hypoAffectedSpellsPairs = danCurrentFrame.hypoAffectedSpellsPairs
     for i=1,#affectedSpells do
         local icon = danCurrentFrame.cooldowns[affectedSpells[i]]
@@ -2458,7 +2457,7 @@ function danCooldownReductionFunction() --could split this into multiple functio
         end
     end
 end
-function danCleuSuccessCooldownReduction() --i probably made it like this to keep cooldowns cleaner instead of including a subevent in the options
+function hasuitSpellFunction_CleuSuccessCooldownReduction() --i probably made it like this to keep cooldowns cleaner instead of including a subevent in the options
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2466,7 +2465,7 @@ function danCleuSuccessCooldownReduction() --i probably made it like this to kee
         end
     end
 end
-function danCleuInterruptCooldownReduction()
+function hasuitSpellFunction_CleuInterruptCooldownReduction()
     if d2anCleuSubevent=="SPELL_INTERRUPT" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2474,7 +2473,7 @@ function danCleuInterruptCooldownReduction()
         end
     end
 end
-function danCleuHealCooldownReduction()
+function hasuitSpellFunction_CleuHealCooldownReduction()
     if d2anCleuSubevent=="SPELL_HEAL" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2482,7 +2481,7 @@ function danCleuHealCooldownReduction()
         end
     end
 end
-function danCleuEnergizeCooldownReduction()
+function hasuitSpellFunction_CleuEnergizeCooldownReduction()
     if d2anCleuSubevent=="SPELL_ENERGIZE" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2490,7 +2489,7 @@ function danCleuEnergizeCooldownReduction()
         end
     end
 end
-function danCleuAppliedCooldownReduction()
+function hasuitSpellFunction_CleuAppliedCooldownReduction()
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2498,7 +2497,7 @@ function danCleuAppliedCooldownReduction()
         end
     end
 end
-function danCleuSpellEmpowerInterruptCooldownReduction()
+function hasuitSpellFunction_CleuSpellEmpowerInterruptCooldownReduction()
     if d2anCleuSubevent=="SPELL_EMPOWER_INTERRUPT" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2507,7 +2506,7 @@ function danCleuSpellEmpowerInterruptCooldownReduction()
     end
 end
 
-function danCleuAppliedCooldownReductionSourceIsDest()
+function hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest()
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" and d4anCleuSourceGuid==d8anCleuDestGuid then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2516,16 +2515,16 @@ function danCleuAppliedCooldownReductionSourceIsDest()
     end
 end
 
-function danCleuSuccessCooldownReductionSpec()
+function hasuitSpellFunction_CleuSuccessCooldownReductionSpec()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
-        if danCurrentFrame and danCurrentFrameOptions["specId"]==danCurrentFrame.specId then
+        if danCurrentFrame and danCurrentSpellOptions["specId"]==danCurrentFrame.specId then
             danCooldownReductionFunction()
         end
     end
 end
 
-function danCleuInterruptCooldownReductionSolarBeam() --solar beam
+function hasuitSpellFunction_CleuInterruptCooldownReductionSolarBeam() --solar beam
     if d2anCleuSubevent=="SPELL_INTERRUPT" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2536,7 +2535,7 @@ function danCleuInterruptCooldownReductionSolarBeam() --solar beam
     end
 end
 
-function danCleuAppliedCooldownReductionThiefsBargain354827() --might reuse for other stuff later
+function hasuitSpellFunction_CleuAppliedCooldownReductionThiefsBargain354827() --might reuse for other stuff later
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame and not danCurrentFrame.thiefsBargain then
@@ -2619,7 +2618,7 @@ function danCleuCooldownStart(GriftahsEmbellishingPowder) --there's a ~0.2 secon
     danCurrentController = danCurrentIcon.controller
     danSortController()
 end
-danCleuSuccessCooldownStart1 = addMultiFunction(function()
+hasuitSpellFunction_CleuSuccessCooldownStart1 = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2630,7 +2629,7 @@ danCleuSuccessCooldownStart1 = addMultiFunction(function()
         end
     end
 end)
-danCleuSuccessCooldownStart2 = addMultiFunction(function()
+hasuitSpellFunction_CleuSuccessCooldownStart2 = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2641,7 +2640,7 @@ danCleuSuccessCooldownStart2 = addMultiFunction(function()
         end
     end
 end)
-danCleuHealCooldownStart = addMultiFunction(function()
+hasuitSpellFunction_CleuHealCooldownStart = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_HEAL" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2652,7 +2651,7 @@ danCleuHealCooldownStart = addMultiFunction(function()
         end
     end
 end)
-danCleuSpellEmpowerStartCooldownStart2 = addMultiFunction(function()
+hasuitSpellFunction_CleuSpellEmpowerStartCooldownStart2 = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_EMPOWER_START" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2663,7 +2662,7 @@ danCleuSpellEmpowerStartCooldownStart2 = addMultiFunction(function()
         end
     end
 end)
-danCleuAppliedCooldownStart = addMultiFunction(function()
+hasuitSpellFunction_CleuAppliedCooldownStart = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2674,7 +2673,7 @@ danCleuAppliedCooldownStart = addMultiFunction(function()
         end
     end
 end)
-danCleuRemovedCooldownStart = addMultiFunction(function()
+hasuitSpellFunction_CleuRemovedCooldownStart = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_AURA_REMOVED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2686,7 +2685,7 @@ danCleuRemovedCooldownStart = addMultiFunction(function()
     end
 end)
 
-danCleuAppliedCooldownStartPreventMultiple = addMultiFunction(function() --if used for multiple spellids for the same class/spec will cause problems
+hasuitSpellFunction_CleuAppliedCooldownStartPreventMultiple = addMultiFunction(function() --if used for multiple spellids for the same class/spec will cause problems
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2706,7 +2705,7 @@ danCleuAppliedCooldownStartPreventMultiple = addMultiFunction(function() --if us
 end)
 
 
-danCleuSuccessCooldownStartSolarBeam = addMultiFunction(function() --solar beam
+hasuitSpellFunction_CleuSuccessCooldownStartSolarBeam = addMultiFunction(function() --solar beam
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2726,7 +2725,7 @@ end)
 
 
 
-danCleuSuccessCooldownStartPvPTrinket = addMultiFunction(function()
+hasuitSpellFunction_CleuSuccessCooldownStartPvPTrinket = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2740,7 +2739,7 @@ danCleuSuccessCooldownStartPvPTrinket = addMultiFunction(function()
                 
                 
                 
-                for spellId, t in pairs(danCurrentFrameOptions["sharedCd"]) do
+                for spellId, t in pairs(danCurrentSpellOptions["sharedCd"]) do
                     danCurrentIcon = danCurrentFrame.cooldowns[spellId]
                     if danCurrentIcon then
                         local newExpirationTime = GetTime()+t["minimumDuration"]
@@ -2755,7 +2754,7 @@ danCleuSuccessCooldownStartPvPTrinket = addMultiFunction(function()
     end
 end)
 
-danCleuAppliedCooldownStartRacial = addMultiFunction(function()
+hasuitSpellFunction_CleuAppliedCooldownStartRacial = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2767,10 +2766,10 @@ danCleuAppliedCooldownStartRacial = addMultiFunction(function()
                 if danCurrentIcon then
                     local currentPvpTrinketSpellId = danCurrentIcon.spellId
                     if currentPvpTrinketSpellId==336126 or currentPvpTrinketSpellId==42292 then
-                        local newExpirationTime = GetTime()+danCurrentFrameOptions["minimumDuration"]
+                        local newExpirationTime = GetTime()+danCurrentSpellOptions["minimumDuration"]
                         if not danCurrentIcon.expirationTime or danCurrentIcon.expirationTime<newExpirationTime then
                             d12anCleuSpellId = currentPvpTrinketSpellId
-                            danCleuCooldownStart(danCurrentFrameOptions["differenceFromNormalDuration"])
+                            danCleuCooldownStart(danCurrentSpellOptions["differenceFromNormalDuration"])
                         end
                     end
                 end
@@ -2778,7 +2777,7 @@ danCleuAppliedCooldownStartRacial = addMultiFunction(function()
         end
     end
 end)
-danCleuAppliedRacialNotTrackedAffectingPvpTrinket = addMultiFunction(function() --doesn't need multi?
+hasuitSpellFunction_CleuAppliedRacialNotTrackedAffectingPvpTrinket = addMultiFunction(function() --doesn't need multi?
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
@@ -2786,10 +2785,10 @@ danCleuAppliedRacialNotTrackedAffectingPvpTrinket = addMultiFunction(function() 
             if danCurrentIcon then
                 local currentPvpTrinketSpellId = danCurrentIcon.spellId
                 if currentPvpTrinketSpellId==336126 or currentPvpTrinketSpellId==42292 then
-                    local newExpirationTime = GetTime()+danCurrentFrameOptions["minimumDuration"]
+                    local newExpirationTime = GetTime()+danCurrentSpellOptions["minimumDuration"]
                     if not danCurrentIcon.expirationTime or danCurrentIcon.expirationTime<newExpirationTime then
                         d12anCleuSpellId = currentPvpTrinketSpellId
-                        danCleuCooldownStart(danCurrentFrameOptions["differenceFromNormalDuration"])
+                        danCleuCooldownStart(danCurrentSpellOptions["differenceFromNormalDuration"])
                     end
                 end
             end
@@ -2808,7 +2807,7 @@ do
     local timeStopIgnoreList = { --not tested since making cd text
         [378441] = true, --Time Stop, not sure if this would get ignored by other dragon's time stop. putting this here does nothing for self time stop because aura applied happens before success for self cast. Could do cdAura instead and initialize the cd first
     }
-    function danCleu378441TimeStop() --could do something with :Pause() instead, cd text was broken for it when i originally tried to do it that way (omnicc)
+    function hasuitSpellFunction_Cleu378441TimeStop() --could do something with :Pause() instead, cd text was broken for it when i originally tried to do it that way (omnicc)
         if d2anCleuSubevent=="SPELL_AURA_APPLIED" then --todo cleaner interaction with hypo and make it work if hypo is the only source of cd, it probably won't atm, also the hypo stuff here is completely untested. probably has a bad interaction with charges so bop..
             danCurrentFrame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
             if danCurrentFrame and danCurrentFrame.cooldownPriorities then
@@ -2878,7 +2877,7 @@ end
 
 
 
-danCleuCooldownStartPet = addMultiFunction(function()
+hasuitSpellFunction_CleuCooldownStartPet = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
         local asd=unitKBelongsToV[d4anCleuSourceGuid]
         if asd then
@@ -2898,7 +2897,7 @@ end)
 
 local activeCasts = {}
 
-danCleuCasting = addMultiFunction(function()
+hasuitSpellFunction_CleuCasting = addMultiFunction(function()
     if d4anCleuSourceGuid~=hasuitPlayerGUID then
         local sourceFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         local sourceUnit = sourceFrame and sourceFrame.unit
@@ -2912,18 +2911,18 @@ danCleuCasting = addMultiFunction(function()
         end
         
         if danCurrentFrame then
-            danCurrentFrameOptionsCommon = danCurrentFrameOptions[danCurrentFrame.unitType]
-            if danCurrentFrameOptionsCommon then
+            danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
+            if danCurrentSpellOptionsCommon then
                 if d2anCleuSubevent=="SPELL_EMPOWER_START" or d2anCleuSubevent=="SPELL_CAST_START" then
                     if not activeCasts[d4anCleuSourceGuid] then
-                        danCurrentIcon = danGetIcon(danCurrentFrameOptions["castType"])
+                        danCurrentIcon = danGetIcon(danCurrentSpellOptions["castType"])
                         activeCasts[d4anCleuSourceGuid] = {danCurrentIcon}
                         activeCasts[d4anCleuSourceGuid]["startTime"] = GetTime()
                     else
                         if activeCasts[d4anCleuSourceGuid]["startTime"]~=GetTime() then
                             return
                         end
-                        danCurrentIcon = danGetIcon(danCurrentFrameOptions["castType"])
+                        danCurrentIcon = danGetIcon(danCurrentSpellOptions["castType"])
                         tinsert(activeCasts[d4anCleuSourceGuid], danCurrentIcon)
                     end
                     
@@ -2938,7 +2937,7 @@ danCleuCasting = addMultiFunction(function()
                         duration = endTime-startTime
                     else
                         startTime = GetTime()
-                        duration = danCurrentFrameOptions["backupDuration"]
+                        duration = danCurrentSpellOptions["backupDuration"]
                         endTime = startTime+duration
                         texture = GetSpellTexture(d12anCleuSpellId)
                     end
@@ -3032,7 +3031,7 @@ do
     end
     hasuitUnitDiedFunction = unitDiedFunction
     
-    hasuitSetupFrameOptions = {function() --UNIT_DIED ___
+    hasuitSetupSpellOptions = {function() --UNIT_DIED ___
         if d2anCleuSubevent=="UNIT_DIED" then
             local frame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
             if frame then 
@@ -3102,8 +3101,8 @@ hasuitUnitCastSucceededFrame:SetScript("OnEvent", function(_, event, unit, castI
         d12anCleuSpellId = spellId
         danCurrentEvent = event
         for i=1, #stuff do 
-            danCurrentFrameOptions = stuff[i]
-            danCurrentFrameOptions[1]()
+            danCurrentSpellOptions = stuff[i]
+            danCurrentSpellOptions[1]()
         end
     end
 end)
@@ -3113,7 +3112,7 @@ end)
 hasuitFramesCenterSetEventType("unitCastSucceeded")
 
 
-danUnitCastSucceededCooldownStart = addMultiFunction(function()
+hasuitSpellFunction_UnitCastSucceededCooldownStart = addMultiFunction(function()
     danCurrentFrame = hasuitUnitFrameForUnit[danCurrentUnit]
     danCurrentIcon = danCurrentFrame and danCurrentFrame.cooldowns[d12anCleuSpellId]
     if danCurrentIcon then
@@ -3127,7 +3126,7 @@ do
         danInspectNewUnitFrame = hasuitInspectNewUnitFrame
         hasuitInspectNewUnitFrame = nil
     end)
-    danUnitCastSucceededChangedTalents = addMultiFunction(function()
+    hasuitSpellFunction_UnitCastSucceededChangedTalents = addMultiFunction(function()
         local frame = hasuitUnitFrameForUnit[danCurrentUnit]
         if frame then
             frame.inspected = false
@@ -3143,7 +3142,7 @@ end
 
 
 
-function hasuitSoulOfTheForest() --similar to feign death, todo this isn't used yet, something like this can help fix soul hots probably
+function hasuitSpecialAuraFunction_SoulOfTheForest() --similar to feign death, todo this isn't used yet, something like this can help fix soul hots probably
     if danCurrentEvent=="recycled" then
         danCurrentIcon.frame.hasSoul = nil
         danCurrentIcon.frame = nil
@@ -3161,7 +3160,7 @@ end
 
 local activeSoulHots = {}
 local bigRejuvSizeIncrease = 3
-function soulHotsSpecialFunction() --one of the very first things made for this addon, should be fixed or remade (or given ["points"] or different spellid by blizzard), changing instances/overgrowth doesn't show it right sometimes, probably doesn't follow a unit around if people join/leave because of unit_aura full update
+function hasuitSpecialAuraFunction_SoulHots() --one of the very first things made for this addon, should be fixed or remade (or given ["points"] or different spellid by blizzard), changing instances/overgrowth doesn't show it right sometimes, probably doesn't follow a unit around if people join/leave because of unit_aura full update
     if danCurrentEvent=="recycled" then
         danCurrentIcon.soul = nil
         danCurrentIcon.border:SetAlpha(0)
@@ -3205,7 +3204,7 @@ local danSoulTime = {}
 local danSoulAbility = {}
 local sourceHasSoul = {}
 hasuitFramesCenterSetEventType("cleu")
-hasuitSetupFrameOptions = {function() --soul of the forest empowered hots
+hasuitSetupSpellOptions = {function() --soul of the forest empowered hots 1
     local frame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
     if frame and frame.disableSoul then
         return
@@ -3236,8 +3235,7 @@ initialize(774) --rejuvenation
 initialize(155777) --germination
 initialize(48438) --wild growth
 
-
-hasuitSetupFrameOptions = {function()
+hasuitSetupSpellOptions = {function() --soul of the forest empowered hots 2
     if d2anCleuSubevent == "SPELL_AURA_APPLIED" then
         sourceHasSoul[d4anCleuSourceGuid] = true
     elseif d2anCleuSubevent == "SPELL_AURA_REMOVED" then --todo do something about unit becoming unseen and losing soul? might work itself out after remaking soul stuff
@@ -3292,7 +3290,7 @@ soulLoadingFrame:RegisterEvent("LOADING_SCREEN_DISABLED")
 
 
 
-function redLifebloom(icon) --specialFunction
+function hasuitSpecialAuraFunction_RedLifebloom(icon) --specialFunction
     if icon then
         icon.red = true
         icon.iconTexture:SetVertexColor(1, 0.55, 0.55)
@@ -3327,12 +3325,12 @@ function redLifebloom(icon) --specialFunction
     danCurrentIcon.expectedTime = GetTime()+timerTime
     local icon = danCurrentIcon
     danCurrentIcon.timer = C_Timer_NewTimer(timerTime, function()
-        redLifebloom(icon)
+        hasuitSpecialAuraFunction_RedLifebloom(icon)
     end)
 end
 tinsert(hasuitDoThisPlayer_Login, function()
     if not hasuitUsedRedLifebloom then
-        redLifebloom = nil
+        hasuitSpecialAuraFunction_RedLifebloom = nil
     else
         hasuitUsedRedLifebloom = nil
     end
@@ -3341,7 +3339,7 @@ end)
 do
     local playerClass = hasuitPlayerClass
     if playerClass=="MONK" then
-        function auraCanChangeTextureSpecialFunction() --comment added later: should probably just assume any aura might change texture on an aura update? and then ya the size change thing here will be specific
+        function hasuitSpecialAuraFunction_CanChangeTexture() --comment added later: should probably just assume any aura might change texture on an aura update? and then ya the size change thing here will be specific
             if danCurrentEvent=="updated" then
                 if danCurrentAura["icon"]==627487 then
                     if danCurrentIcon.size~=danCurrentIcon.normalSize then
@@ -3364,8 +3362,8 @@ do
                 danCurrentIcon.specialSize = nil
                 
             else --"added"
-                local specialSize = danCurrentFrameOptions["specialSize"]
-                danCurrentIcon.normalSize = danCurrentFrameOptionsCommon["size"]
+                local specialSize = danCurrentSpellOptions["specialSize"]
+                danCurrentIcon.normalSize = danCurrentSpellOptionsCommon["size"]
                 danCurrentIcon.specialSize = specialSize
                 if danCurrentAura["icon"]==5901829 then --+50% chi harmony texture, could also maybe tell by points2
                     danCurrentIcon.size = specialSize
@@ -3375,7 +3373,7 @@ do
         end
     -- elseif playerClass=="DRUID" then
         -- local danTreants = {}
-        -- hasuitSetupFrameOptions = {function()
+        -- hasuitSetupSpellOptions = {function()
             -- if d2anCleuSubevent=="SPELL_SUMMON" then
                 -- if d4anCleuSourceGuid==hasuitPlayerGUID then
                     -- local treantGUID = d8anCleuDestGuid
@@ -3391,7 +3389,7 @@ do
             -- local sourceUnit = danCurrentAura["sourceUnit"]
             -- local unitGUID = sourceUnit and UnitGUID(sourceUnit)
             -- if unitGUID and danTreants[unitGUID] then
-                -- danMainAuraFunction()
+                -- hasuitSpellFunction_MainAuraFunction()
             -- end
         -- end
     end
@@ -3442,8 +3440,8 @@ hasuitGeneralCastStartFrame:SetScript("OnEvent", function(_, event, unit, castId
         danCurrentUnit = unit
         danCurrentEvent = event
         for i=1, #stuff do 
-            danCurrentFrameOptions = stuff[i]
-            danCurrentFrameOptions[1]()
+            danCurrentSpellOptions = stuff[i]
+            danCurrentSpellOptions[1]()
         end
     end
 end)
@@ -3511,16 +3509,16 @@ end
 hasuitFramesCenterSetEventType("unitCasting")
 
 
-danUnitCasting = addMultiFunction(function()
+hasuitSpellFunction_UnitCasting = addMultiFunction(function()
     local sourceGUID = UnitGUID(danCurrentUnit)
     if sourceGUID~=hasuitPlayerGUID then
         local destGUID = UnitGUID(danCurrentUnit.."target")
         if destGUID then
             danCurrentFrame = hasuitUnitFrameForUnit[destGUID]
             if danCurrentFrame then
-                danCurrentFrameOptionsCommon = danCurrentFrameOptions[danCurrentFrame.unitType]
-                if danCurrentFrameOptionsCommon then
-                    if danCurrentFrameOptions["ignoreSameUnitType"] then
+                danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
+                if danCurrentSpellOptionsCommon then
+                    if danCurrentSpellOptions["ignoreSameUnitType"] then
                         if hasuitUnitFrameForUnit[sourceGUID] and hasuitUnitFrameForUnit[sourceGUID].unitType==danCurrentFrame.unitType then
                             return
                         end

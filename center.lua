@@ -2,12 +2,12 @@
 
 
 
-local hasuitFrameParent = CreateFrame("Frame", "hasuitFrameParent", UIParent)
-hasuitFrameParent:SetIgnoreParentScale(true)
-hasuitFrameParent:SetSize(1,1)
-hasuitFrameParent:SetPoint("CENTER")
-hasuitFrameParent:SetFrameStrata("LOW")
-hasuitFrameParent:SetFrameLevel(11)
+local hasuitFramesParent = CreateFrame("Frame", "hasuitFramesParent", UIParent)
+hasuitFramesParent:SetIgnoreParentScale(true)
+hasuitFramesParent:SetSize(1,1)
+hasuitFramesParent:SetPoint("CENTER")
+hasuitFramesParent:SetFrameStrata("LOW")
+hasuitFramesParent:SetFrameLevel(11)
 
 -- hasuitLoginTime = GetTime()
 hasuitPlayerGUID = UnitGUID("player")
@@ -608,7 +608,7 @@ function hasuitFramesInitialize(spellId) --not necessarily a spellId, todo shoul
         unloadedStuff = unloadedTable[spellId]
     end
     
-    local loadOn = hasuitSetupFrameOptions["loadOn"]
+    local loadOn = hasuitSetupSpellOptions["loadOn"]
     if not loadOn or loadOn.shouldLoad then
         
         local loadedStuff = loadedTable[spellId]
@@ -616,16 +616,16 @@ function hasuitFramesInitialize(spellId) --not necessarily a spellId, todo shoul
             loadedTable[spellId] = {}
             loadedStuff = loadedTable[spellId]
         end
-        tinsert(loadedStuff, hasuitSetupFrameOptions)
+        tinsert(loadedStuff, hasuitSetupSpellOptions)
     else
-        tinsert(unloadedStuff, hasuitSetupFrameOptions)
+        tinsert(unloadedStuff, hasuitSetupSpellOptions)
     end
 end
 
 function hasuitFramesInitializeMulti(spellId, doForOne) --not necessarily a spellId
-    for i=doForOne or 1, doForOne or #hasuitSetupFrameOptionsMulti do
-        local options = hasuitSetupFrameOptionsMulti[i]
-        local unloadedTable = functionsTableUnloaded[options[1]]
+    for i=doForOne or 1, doForOne or #hasuitSetupSpellOptionsMulti do
+        local spellOptions = hasuitSetupSpellOptionsMulti[i]
+        local unloadedTable = functionsTableUnloaded[spellOptions[1]]
         
         
         local unloadedStuff = unloadedTable[spellId]
@@ -634,24 +634,24 @@ function hasuitFramesInitializeMulti(spellId, doForOne) --not necessarily a spel
             unloadedStuff = unloadedTable[spellId]
         end
         
-        local loadOn = options["loadOn"]
+        local loadOn = spellOptions["loadOn"]
         if not loadOn or loadOn.shouldLoad then
-            local loadedTable = functionsTableLoaded[options[1]]
+            local loadedTable = functionsTableLoaded[spellOptions[1]]
             
             local loadedStuff = loadedTable[spellId]
             if not loadedStuff then
                 loadedTable[spellId] = {}
                 loadedStuff = loadedTable[spellId]
             end
-            tinsert(loadedStuff, options)
+            tinsert(loadedStuff, spellOptions)
         else
-            tinsert(unloadedStuff, options)
+            tinsert(unloadedStuff, spellOptions)
         end
     end
 end
 
 
-hasuitDiminishOptions = {}
+hasuitDiminishSpellOptionsTable = {}
 hasuitTrackedDiminishSpells = {
     ["stun"]={},
     ["disorient"]={}, --fear
@@ -664,15 +664,20 @@ hasuitTrackedDiminishSpells = {
 
 do
     local GetSpellTexture = C_Spell.GetSpellTexture
-    local diminishOptions = hasuitDiminishOptions
+    local diminishOptions = hasuitDiminishSpellOptionsTable
     local drCount = 0
+    local tonumber = tonumber
     function hasuitFramesTrackDiminishTypeAndTexture(drType, texture)
         if not diminishOptions[drType] then
             if type(texture)=="string" then
                 local pre = texture
                 texture = GetSpellTexture(texture)
                 if not texture then
-                    print("|cffff2222HasuitFrames error no texture for", pre, "|r. spell names have to be in current spellbook to get a texture from them. if you can't get a spell name to work try looking up the spell texture on wowhead. Click the icon there and the texture is the number to the right of ID: ")
+                    if tonumber(pre) then
+                        print("|cffff2222HasuitFrames error no texture for \""..pre.."\"|r. This looks like you need to remove the \"'s") --todo how to show which file/line this is coming from? Without needing people to add something to their private addon just for this. maybe something with debug
+                    else
+                        print("|cffff2222HasuitFrames error no texture for", pre, "|r. spell names have to be in current spellbook to get a texture from them. if you can't get a spell name to work try looking up the spell texture on wowhead. Click the icon there and the texture is the number to the right of ID:  , alternatively you can use /run print(C_Spell.GetSpellTexture(spell))")
+                    end
                     return
                 end
             end
@@ -682,7 +687,7 @@ do
                 ["texture"] = texture,
             }
         else
-            print("|cffff2222HasuitFrames error attempting to track diminish type", drType, "twice, ignoring")
+            print("|cffff2222HasuitFrames error attempting to track diminish type", drType, "twice, ignoring|r, everything should still work fine. Removing the duplicate will get rid of this error message")
         end
     end
 end
@@ -700,7 +705,7 @@ function hasuitFramesInitializePlusDiminish(spellId)
         unloadedStuff = unloadedTable[spellId]
     end
     
-    local loadOn = hasuitSetupFrameOptions["loadOn"]
+    local loadOn = hasuitSetupSpellOptions["loadOn"]
     if not loadOn or loadOn.shouldLoad then
         
         local loadedStuff = loadedTable[spellId]
@@ -708,9 +713,9 @@ function hasuitFramesInitializePlusDiminish(spellId)
             loadedTable[spellId] = {}
             loadedStuff = loadedTable[spellId]
         end
-        tinsert(loadedStuff, hasuitSetupFrameOptions)
+        tinsert(loadedStuff, hasuitSetupSpellOptions)
     else
-        tinsert(unloadedStuff, hasuitSetupFrameOptions)
+        tinsert(unloadedStuff, hasuitSetupSpellOptions)
     end
 end
 
@@ -863,7 +868,7 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
         
         hasuitFramesInitializeMulti = nil
         hasuitFramesInitializeMultiPlusDiminish = nil
-        hasuitSetupFrameOptionsMulti = nil
+        hasuitSetupSpellOptionsMulti = nil
         hasuitFramesCenterAddMultiFunction = nil
         functionsTableLoaded = nil
         functionsTableUnloaded = nil
@@ -871,15 +876,15 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
         hasuitFramesCenterAddToAllTable = nil
         -- hasuitFramesCenterSetEventType = nil
         
-        hasuitDiminishOptions = nil
+        hasuitDiminishSpellOptionsTable = nil
         hasuitTrackedDiminishSpells = nil
         hasuitFramesTrackDiminishTypeAndTexture = nil
         hasuitFramesCenterSetDrType = nil
         hasuitFramesInitializePlusDiminish = nil
         
-        hasuitFramesOptionsClassSpecificHarmful = nil
-        hasuitFramesOptionsClassSpecificHelpful = nil
-        -- danBottomRight_BottomRight = nil
+        hasuitFramesSpellOptionsClassSpecificHarmful = nil
+        hasuitFramesSpellOptionsClassSpecificHelpful = nil
+        -- hasuitController_BottomRight_BottomRight = nil
         
         hasuitOutOfRangeAlpha = nil
         

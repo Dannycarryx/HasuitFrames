@@ -72,7 +72,7 @@ local userOptionsOnChanged = {} --or just clicked/pressed enter, value doesn't h
 hasuitUserOptionsOnChanged = userOptionsOnChanged
 tinsert(hasuitDoThisAddon_Loaded, 1, function()
     savedUserOptions = hasuitSavedUserOptions
-    if not savedUserOptions then --will need to have checks for any new options added after release
+    if not savedUserOptions then --will need to have checks for any new options added after release, maybe there's a better way to set this up
         savedUserOptions = { --defaults ___
             ["partyX"]=-381,
             ["partyY"]=127, --old comment: number-hasuitRaidFrameHeightForGroupSize[5]-3?
@@ -96,7 +96,7 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
         }
         hasuitSavedUserOptions = savedUserOptions
     end
-    savedUserOptions["partyTest"] = 3 --need to fix cds for party of 5, todo would also be nice to show them in test mode
+    savedUserOptions["partyTest"] = 3 --need to fix cds for party of 5, todo would also be nice to show them in test mode, very bored todo don't save this to savedvariables?
     savedUserOptions["arenaTest"] = 3
     savedUserOptions["raidTest"] = 8
     
@@ -118,28 +118,28 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
     local usePixelPerfectModifier
     if height==1080 then
         usePixelPerfectModifier = true
-        activeScaleMultiplier = 0.71111112833023
+        activeScaleMultiplier = 0.71111111111111
     else
         local pixelPerfectMult = 768/height
         usePixelPerfectModifier = savedUserOptions["usePixelPerfectModifier"]
-        activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111112833023
+        activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111111111111
         
         userOptionsOnChanged["usePixelPerfectModifier"] = function()
             usePixelPerfectModifier = savedUserOptions["usePixelPerfectModifier"]
-            activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111112833023 --GetDefaultScale?
+            activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111111111111 --GetDefaultScale?
             scaleChange()
         end
     end
     
     local pixelWarningMessage = "changing the scale from 1 could make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually"
-    hasuitFrameParent:SetScale(savedUserOptions["scale"]*activeScaleMultiplier)
+    hasuitFramesParent:SetScale(savedUserOptions["scale"]*activeScaleMultiplier)
     function scaleChange()
         local scale = savedUserOptions["scale"]
         if pixelWarningMessage and usePixelPerfectModifier and scale~=1 then
             print(pixelWarningMessage)
             pixelWarningMessage = nil
         end
-        hasuitFrameParent:SetScale(scale*activeScaleMultiplier)
+        hasuitFramesParent:SetScale(scale*activeScaleMultiplier)
     end
     userOptionsOnChanged["scale"] = scaleChange
 end)
@@ -377,8 +377,9 @@ local function openMainOptions()
     end
 end
 local function openMainOptionsFirst()
+    userOptionsShown = true
     userOptionsFrame:SetIgnoreParentScale(true)
-    userOptionsFrame:SetScale(0.71111112833023)
+    userOptionsFrame:SetScale(0.71111111111111)
     userOptionsFrame:SetBackdrop(danBackdrop)
     userOptionsFrame:SetSize(710,30)
     userOptionsFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 200)
@@ -401,10 +402,10 @@ local function openMainOptionsFirst()
     closeButton:SetBackdropColor(0.8,0,0)
     closeButton:SetBackdropBorderColor(0,0,0)
     closeButton:SetSize(50,50)
-    closeButtonText = closeButton:CreateFontString()
-    closeButtonText:SetFontObject(danFont25)
-    closeButtonText:SetText("x")
-    closeButtonText:SetPoint("CENTER",1,1)
+    local text = closeButton:CreateFontString()
+    text:SetFontObject(danFont25)
+    text:SetText("x")
+    text:SetPoint("CENTER",1,1)
     closeButton:SetPoint("TOPRIGHT",userOptionsFrame,"TOPRIGHT")
     closeButton:SetFrameLevel(3)
     closeButton:EnableMouse(true)
@@ -416,11 +417,11 @@ local function openMainOptionsFirst()
     nextButton:SetBackdropColor(0,0.2,0.4)
     nextButton:SetBackdropBorderColor(0,0,0)
     nextButton:SetSize(50,40)
-    nextButtonText = nextButton:CreateFontString()
-    nextButtonText:SetFontObject(danFont16)
-    nextButtonText:SetText("->")
-    nextButtonText:SetPoint("CENTER",1,1)
-    nextButtonText:SetJustifyH("CENTER")
+    local text = nextButton:CreateFontString()
+    text:SetFontObject(danFont16)
+    text:SetText("->")
+    text:SetPoint("CENTER",1,1)
+    text:SetJustifyH("CENTER")
     nextButton:SetPoint("TOPRIGHT",closeButton,"TOPLEFT")
     nextButton:SetFrameLevel(3)
     nextButton:EnableMouse(true)

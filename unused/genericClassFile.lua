@@ -3,11 +3,11 @@
 
 local function danGenericClassFile() --todo figure out how to get relevant spells for each class/spec from spellbook and make everything. this function could exist as a backup/to use on new xpac or something
     
-    local common = {["controller"]=danBottomLeft_BottomLeft,["size"]=15,    ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1,    }
-    local commonOptionsHarmful = {auraSourceIsPlayerAndHarmful, ["priority"]=1, ["arena"]=common, ["loadOn"]=danLoadOnArenaOnly}
+    local danCommon = {["controller"]=hasuitController_BottomLeft_BottomLeft,  ["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
+    local danCommonOptionsHarmful = {hasuitSpellFunction_AuraSourceIsPlayerAndHarmful, ["priority"]=1, ["arena"]=danCommon, ["loadOn"]=danLoadOnArenaOnly}
     
-    local common = {["controller"]=danBottomRight_BottomRight,["size"]=15,  ["frameLevel"]=20,  ["hideCooldownText"]=true,  ["alpha"]=1,    }
-    local commonOptionsHelpful = {auraSourceIsPlayerAndHelpful, ["priority"]=1, ["group"]=common}
+    local danCommon = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
+    local danCommonOptionsHelpful = {hasuitSpellFunction_AuraSourceIsPlayerAndHelpful, ["priority"]=1, ["group"]=danCommon}
     
     local GetSpellName = C_Spell.GetSpellName
     
@@ -16,7 +16,7 @@ local function danGenericClassFile() --todo figure out how to get relevant spell
     local hasuitSpellManualListHarmful = hasuitSpellManualListHarmful
     if hasuitSpellManualListHarmful then
         hasuitFramesCenterSetEventType("aura")
-        hasuitSetupFrameOptions = commonOptionsHarmful
+        hasuitSetupSpellOptions = danCommonOptionsHarmful
         for i=1,#hasuitSpellManualListHarmful do
             hasuitFramesInitialize(hasuitSpellManualListHarmful[i])
             initializedHarmfulPlayerSpells[hasuitSpellManualListHarmful[i]] = true
@@ -27,7 +27,7 @@ local function danGenericClassFile() --todo figure out how to get relevant spell
     local hasuitSpellManualListHelpful = hasuitSpellManualListHelpful
     if hasuitSpellManualListHelpful then
         hasuitFramesCenterSetEventType("aura")
-        hasuitSetupFrameOptions = commonOptionsHelpful
+        hasuitSetupSpellOptions = danCommonOptionsHelpful
         for i=1,#hasuitSpellManualListHelpful do
             hasuitFramesInitialize(hasuitSpellManualListHelpful[i])
             initializedHelpfulPlayerSpells[hasuitSpellManualListHelpful[i]] = true
@@ -68,7 +68,7 @@ local function danGenericClassFile() --todo figure out how to get relevant spell
                     initializedHarmfulPlayerSpells[spellId] = true
                     local spellName = GetSpellName(spellId)
                     hasuitFramesCenterSetEventType("aura") --todo make these things go away everywhere?, todo fix things like zen spheres in a better way?
-                    hasuitSetupFrameOptions = commonOptionsHarmful
+                    hasuitSetupSpellOptions = danCommonOptionsHarmful
                     hasuitFramesInitialize(spellId)
                 end
             elseif isHelpful(spellId) then
@@ -76,7 +76,7 @@ local function danGenericClassFile() --todo figure out how to get relevant spell
                     initializedHelpfulPlayerSpells[spellId] = true
                     local spellName = GetSpellName(spellId)
                     hasuitFramesCenterSetEventType("aura")
-                    hasuitSetupFrameOptions = commonOptionsHelpful
+                    hasuitSetupSpellOptions = danCommonOptionsHelpful
                     hasuitFramesInitialize(spellId)
                 end
             end

@@ -8,12 +8,10 @@ enabling people to track their own abilities? might be the last thing before a r
 other important:
 middle cast bars
 display for spellcasts and who they're from for people with ranged kicks like shaman
-make party interrupt display for m+
 display for purgable buffs for people that have purge
 pet frames
-fix new 4/5 cd system. problem is cds reset when groupsize leaves 4 or 5
-improve/figure out scale. whole system needs to be made for size stuff and idk what i'm doing with other people's screen sizes
 way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
+make party interrupt display for m+
 
 less important:
 audio warnings for things or some way of knowing when offensive cds get pressed at least without needing to rely on another addon
@@ -29,6 +27,8 @@ option to disable all in pve or whatever
 track healer dispel cds
 if alt f4ing player can log in and no group units will exist until after combat so have to do something to position buttons preemptively. for now you can reload after logging in and the game will give the correct numbers. eventually should make system for buttons always being in correct positions for different group sizes and then the preemptive thing would work itself out but that's (a lot?) more involved
 option to just have normal frames instead of click-through to move, option to disable targeting when frame is clicked and only move camera/player, rely on mouseover for spells and never target, more for pvers, option to enable/disable this depending on instancetype or groupsize?
+fix new 4/5 cd system. problem is cds reset when groupsize leaves 4 or 5. could be fixed more easily with a savedvariables system for remembering cooldowns for short logouts/reloads/unitframe hides and comes back?
+improve/figure out scale. whole system needs to be made for size stuff and idk what i'm doing with other people's screen sizes
 
 even less important:
 summon/rez/phase indicators
@@ -59,8 +59,7 @@ add an option to use uiparent scale?
 
 fix occasional green background showing through low opacity frames, probably because of big range event or something like that that doesn't have a check for the background color
 
-
-
+improve overridesSame to be able to override based on more than just its own priority? don't want a dispellable stun to override an unbreakable stun but also want to sort the newer stun ahead of older stun, or that should probably be based on duration if it isn't already
 
 
 

@@ -553,7 +553,7 @@ end
 
 
 
-local hasuitFrameParent = hasuitFrameParent
+local hasuitFramesParent = hasuitFramesParent
 
 
 function danGetHealthBar()
@@ -564,7 +564,7 @@ function danGetHealthBar()
         -- danPrintPurple("danGetHealthBar+1", "active: "..healthBarsCreated-#unusedHealthBars, "inactive: "..#unusedHealthBars)
         healthBarsCreated = healthBarsCreated+1
         
-        local frame = CreateFrame("StatusBar", nil, hasuitFrameParent) --SetFrameLevel of parent is 11
+        local frame = CreateFrame("StatusBar", nil, hasuitFramesParent) --SetFrameLevel of parent is 11
         frame.id = healthBarsCreated
         
         frame:SetStatusBarTexture("Interface\\RaidFrame\\Raid-Bar-Hp-Fill")
@@ -584,7 +584,7 @@ function danGetHealthBar()
         local border = frame.border
         border:SetPoint("TOPLEFT", frame, "TOPLEFT", -1, 1)
         border:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 1, 1)
-        border:SetFrameLevel(25)
+        border:SetFrameLevel(27)
         border:SetBackdrop(danBorder)
         border:SetBackdropBorderColor(0, 0, 0)
         border.frame = frame
@@ -986,7 +986,7 @@ do
             
             line.colorSet = nil
             line.lineNumber = nil
-            line:SetParent(hasuitFrameParent)
+            line:SetParent(hasuitFramesParent)
             line:Hide()
             danHideUnitFrame2(line) --todo get rid of here? or really it should work itself out after making a proper system for recycling unusual stuff and including "arenaLines" and "groupLines" with the main unitframes table
         end
@@ -1288,7 +1288,7 @@ do
         else
             local roleIcon = CreateFrame("Frame")
             
-            roleIcon = hasuitFrameParent:CreateTexture()
+            roleIcon = hasuitFramesParent:CreateTexture()
             roleIcon:SetSize(16,16)
             roleIcon:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
             roleIcon:SetAtlas(danSetAtlasThing)
@@ -1688,7 +1688,7 @@ tinsert(hasuitDoThisPlayer_Login, 1, function()
         
         for x=1,5 do
             for y=1,4 do
-                local clickButton = CreateFrame("Button", "d"..x.."-"..y, hasuitFrameParent, "SecureUnitButtonTemplate") --danclick, for macros to target frames, /click d1-1 will always target player (should just be /target [@player] to be safe with relog in combat until that gets fixed), /click d5-1 will target lowest frame in a party(usually party4 but if group is <6 and not everyone is in party it should target whatever that raid unit is at the bottom), /click d1-2 will target first unit of row 2(unitframe directly below player frame) etc, bored todo option to enable/disable? probably not worth the space in useroptions although that could be a way to make people aware that it's even a feature
+                local clickButton = CreateFrame("Button", "d"..x.."-"..y, hasuitFramesParent, "SecureUnitButtonTemplate") --danclick, for macros to target frames, /click d1-1 will always target player (should just be /target [@player] to be safe with relog in combat until that gets fixed), /click d5-1 will target lowest frame in a party(usually party4 but if group is <6 and not everyone is in party it should target whatever that raid unit is at the bottom), /click d1-2 will target first unit of row 2(unitframe directly below player frame) etc, bored todo option to enable/disable? probably not worth the space in useroptions although that could be a way to make people aware that it's even a feature
                 clickButton:RegisterForClicks("AnyDown")
                 clickButton:SetAttribute("*type1", "target")
                 clickButton:SetAttribute("toggleForVehicle", true) --trying this out
@@ -1708,7 +1708,7 @@ tinsert(hasuitDoThisPlayer_Login, 1, function()
         
         for i=1,#buttonUnits do
             local unit = buttonUnits[i]
-            local button = CreateFrame("Button", nil, hasuitFrameParent, "SecureUnitButtonTemplate")
+            local button = CreateFrame("Button", nil, hasuitFramesParent, "SecureUnitButtonTemplate")
             hasuitButtonForUnit[unit] = button
             button:SetFrameStrata("LOW")
             button:SetFrameLevel(10)
@@ -2477,7 +2477,7 @@ end
 
 
 local hasuitFramesInitialize = hasuitFramesInitialize
-local danCleuDiminish = danCleuDiminish
+local hasuitSpellFunction_CleuDiminish = hasuitSpellFunction_CleuDiminish
 local trackedDiminishSpells = hasuitTrackedDiminishSpells
 tinsert(hasuitDoThisAddon_Loaded, function()
     hasuitFramesCenterSetEventType("cleu")
@@ -2500,11 +2500,11 @@ tinsert(hasuitDoThisAddon_Loaded, function()
         loadOnCondition() --these are redundant i think, should get rid of them when changing initialize function? or probably already could
         drLoadOn = loadOn
     end
-    for drType, options in pairs(hasuitDiminishOptions) do
-        arenaDiminishTextures[options["arena"]] = options["texture"]
-        options[1] = danCleuDiminish
-        options["loadOn"] = drLoadOn
-        hasuitSetupFrameOptions = options
+    for drType, spellOptions in pairs(hasuitDiminishSpellOptionsTable) do
+        arenaDiminishTextures[spellOptions["arena"]] = spellOptions["texture"]
+        spellOptions[1] = hasuitSpellFunction_CleuDiminish
+        spellOptions["loadOn"] = drLoadOn
+        hasuitSetupSpellOptions = spellOptions
         local drSpellTable = trackedDiminishSpells[drType]
         for i=1,#drSpellTable do
             hasuitFramesInitialize(drSpellTable[i])
@@ -2738,10 +2738,10 @@ do
         end
     end
     hasuitCooldownOnCooldownDone = cooldownOnCooldownDone
-    -- local cooldownsControllers = hasuitCooldownsControllers --temporary?
+    -- local cooldownsControllers = hasuitController_Cooldowns --temporary?
     function danAddSpecializationCooldowns(specId, isClassUpdate)
-        for i=1,#hasuitCooldownsControllers do
-            local controllerOptions = hasuitCooldownsControllers[i]
+        for i=1,#hasuitController_Cooldowns do
+            local controllerOptions = hasuitController_Cooldowns[i]
             local unitTypeStuff = controllerOptions[danCurrentUnitType]
             if unitTypeStuff then
                 local specCooldowns = unitTypeStuff["specCooldowns"][specId]
@@ -2763,7 +2763,7 @@ do
                             newSpellIds[spellId] = true
                             if not icon then
                                 icon = hasuitGetIcon("trueNoReverse")
-                                icon:SetParent(danCurrentFrame)
+                                icon:SetParent(controller)
                                 icon:ClearAllPoints()
                                 
                                 local size = cooldownOptions["size"] or defaultSize
@@ -3069,8 +3069,7 @@ do
     end)
 end
 hasuitFramesCenterSetEventType("unitCastSucceeded")
-hasuitSetupFrameOptions = {danUnitCastSucceededChangedTalents}
-danUnitCastSucceededChangedTalents = nil
+hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCastSucceededChangedTalents}
 hasuitFramesInitialize(200749) --Activating Specialization, maybe not needed now that spec change event is being tracked, todo?
 hasuitFramesInitialize(384255) --Changing Talents
 
