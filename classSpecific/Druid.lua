@@ -114,7 +114,7 @@ local danController_BottomRight_BottomRightHots3 =  {["xDirection"]=-1, ["yDirec
 local danController_BottomRight_BottomRightHots4 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=0, ["yMinimum"]=0, ["xLimit"]=1,   ["yLimit"]=0.45,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-57,["yOffset"]= 0, ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,}
 
 local danController_BottomRight_BottomRightHots5 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=1,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=  0,["yOffset"]= 16,["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,}
-local danController_BottomRight_BottomRightHots6 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-16,["yOffset"]= 16,["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,}
+-- local danController_BottomRight_BottomRightHots6 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-16,["yOffset"]= 16,["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,}
 
 danController_BottomRight_BottomRightHots3["controlsOther"]=danController_BottomRight_BottomRightHots4
 
@@ -151,14 +151,14 @@ initialize(290754) --Lifebloom from Full Bloom (early spring)
 
 
 local danCommon = {["controller"]=danController_BottomRight_BottomRightHots4, ["size"]=13, ["alpha"]=1,    ["hideCooldownText"]=true,  }
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=5,["loadOn"]=hasuitLoadOnPartySize,["group"]=danCommon,   }
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=5,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommon,   }
 initialize("Grove Tending")
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=6,["loadOn"]=hasuitLoadOnPartySize,["group"]=danCommon,   }
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=6,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommon,   }
 local danCommon = {["controller"]=danController_BottomRight_BottomRightHots4, ["size"]=13, ["alpha"]=1,    ["hideCooldownText"]=true,  }
 -- initialize("Cultivation")
 -- initialize("Spring Blossoms")
 local danCommon = {["controller"]=danController_BottomRight_BottomRightHots4, ["size"]=12, ["alpha"]=1,    ["hideCooldownText"]=true,  }
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=7,["loadOn"]=hasuitLoadOnPartySize,["group"]=danCommon,   }
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=7,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommon,   }
 initialize("Tranquility")
 
 -- local danCommon = {["controller"]=danController_BottomRight_BottomRightHots4, ["size"]=12, ["alpha"]=1,  ["hideCooldownText"]=true,  }
@@ -169,7 +169,7 @@ initialize("Tranquility")
 
 
 local danCommon = {["controller"]=danController_BottomRight_BottomRightHots5, ["size"]=14, ["alpha"]=1,    ["hideCooldownText"]=true,  }
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=0,["loadOn"]=hasuitLoadOnPartySize,["group"]=danCommon,           }
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=0,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommon,           }
 -- initialize(391891    ) --adaptive swarm
 initialize(429222) --"Minor Cenarion Ward"
 

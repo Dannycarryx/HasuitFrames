@@ -28,7 +28,6 @@ hasuitBlessingOfAutumnIgnoreList = { --how would this interact with time stop? o
 
 local tinsert = tinsert
 
-local danCooldownDisplayLoadOn
 do --cooldowns loadon
     local danDoThisOnUpdate = hasuitDoThisOnUpdate
     local arenaCrowdControlSpellUpdateFrame = hasuitArenaCrowdControlSpellUpdateFrame
@@ -93,10 +92,9 @@ do --cooldowns loadon
     tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
     tinsert(hasuitDoThisGroup_Roster_UpdateGroupSize_5.functions, loadOnCondition)
     loadOnCondition()
-    danCooldownDisplayLoadOn = loadOn
-    hasuitCooldownDisplayLoadOn = loadOn
+    hasuitLoadOn_CooldownDisplay = loadOn
 end
-
+local hasuitLoadOn_CooldownDisplay = hasuitLoadOn_CooldownDisplay --todo do this everywhere without making things ugly
 
 
 
@@ -196,7 +194,7 @@ do
     hasuitDefensiveCooldowns={}
     hasuitInterruptCooldowns={}
     hasuitCrowdControlCooldowns={}
-    hasuitController_Cooldowns = {
+    hasuitController_CooldownsControllers = {
         { --trinket
             ["grow"]=cooldownGrowLimited,
             ["sort"]=danSortCooldowns,
@@ -256,10 +254,10 @@ do
         end)
         local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
         local lastSize
-        local trinketControllerOptions = hasuitController_Cooldowns[1]
-        local defensiveControllerOptions = hasuitController_Cooldowns[2]
-        local interruptControllerOptions = hasuitController_Cooldowns[3]
-        local crowdControlControllerOptions = hasuitController_Cooldowns[4]
+        local trinketControllerOptions = hasuitController_CooldownsControllers[1]
+        local defensiveControllerOptions = hasuitController_CooldownsControllers[2]
+        local interruptControllerOptions = hasuitController_CooldownsControllers[3]
+        local crowdControlControllerOptions = hasuitController_CooldownsControllers[4]
         local trinketControllerOptionsGroupUnitTypeStuff = trinketControllerOptions["group"]
         local defensiveControllerOptionsGroupUnitTypeStuff = defensiveControllerOptions["group"]
         local interruptControllerOptionsGroupUnitTypeStuff = interruptControllerOptions["group"]
@@ -386,7 +384,7 @@ do
                 }
                 
             else
-                hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedRacialNotTrackedAffectingPvpTrinket,["loadOn"]=danCooldownDisplayLoadOn, --Will of the Forsaken
+                hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedRacialNotTrackedAffectingPvpTrinket,["loadOn"]=hasuitLoadOn_CooldownDisplay, --Will of the Forsaken
                     ["minimumDuration"]=30,["differenceFromNormalDuration"]=-90}
                 initialize(7744) --Will of the Forsaken
                 
@@ -498,7 +496,7 @@ do
             
             
             hasuitFramesCenterSetEventType("aura")
-            hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints2CooldownReductionExternal,["CDr"]=20,["affectedSpells"]={102342},["loadOn"]=danCooldownDisplayLoadOn,["points2"]=0} --Ironbark
+            hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints2CooldownReductionExternal,["CDr"]=20,["affectedSpells"]={102342},["loadOn"]=hasuitLoadOn_CooldownDisplay,["points2"]=0} --Ironbark
             initialize(102342) --Ironbark
             
         end
@@ -581,8 +579,8 @@ do
             {cdCle2,["spellId"]=116849, ["priority"]=20,    ["duration"]=75},--Life Cocoon, base 120, todo -75% from heart of the jade serpent
         }
         hasuitFramesCenterSetEventType("cleu")
-        -- hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest,["CDr"]=60,["affectedSpells"]={388615, 115310},["loadOn"]=danCooldownDisplayLoadOn} --peaceweaver
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest,["CDr"]=30,["affectedSpells"]={388615, 115310},["loadOn"]=danCooldownDisplayLoadOn} --peaceweaver?
+        -- hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest,["CDr"]=60,["affectedSpells"]={388615, 115310},["loadOn"]=hasuitLoadOn_CooldownDisplay} --peaceweaver
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest,["CDr"]=30,["affectedSpells"]={388615, 115310},["loadOn"]=hasuitLoadOn_CooldownDisplay} --peaceweaver?
         initialize(353319) --peaceweaver
         
 
@@ -675,7 +673,7 @@ do
         tinsert(coldSnapAffectedSpells, 11426)
         
         hasuitFramesCenterSetEventType("aura")
-        hasuitSetupSpellOptions = {hasuitSpellFunction_AuraHypoCooldownFunction,["affectedSpells"]={45438,414658,235219},["affectedSpellsPairs"]={[45438]=true,[414658]=true,[235219]=true},["unitClass"]="MAGE",["loadOn"]=danCooldownDisplayLoadOn}
+        hasuitSetupSpellOptions = {hasuitSpellFunction_AuraHypoCooldownFunction,["affectedSpells"]={45438,414658,235219},["affectedSpellsPairs"]={[45438]=true,[414658]=true,[235219]=true},["unitClass"]="MAGE",["loadOn"]=hasuitLoadOn_CooldownDisplay}
         initialize(41425) --Hypothermia
         
         
@@ -695,7 +693,7 @@ do
         defensiveCooldowns[264]={--Restoration
             {cdCle2,["spellId"]=98008,  ["priority"]=24,    ["duration"]=174},--Spirit Link Totem
         }
-        hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints1CooldownReduction,["CDr"]=30,["affectedSpells"]={108271},["loadOn"]=danCooldownDisplayLoadOn,["points1"]=-40} --Astral Shift
+        hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints1CooldownReduction,["CDr"]=30,["affectedSpells"]={108271},["loadOn"]=hasuitLoadOn_CooldownDisplay,["points1"]=-40} --Astral Shift
         initialize(108271) --Astral Shift
 
         
@@ -727,7 +725,7 @@ do
             
             hasuitFramesCenterSetEventType("cleu")
             
-            hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReductionThiefsBargain354827,["CDr"]=24,["affectedSpells"]={11327},["loadOn"]=danCooldownDisplayLoadOn} --Vanish
+            hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReductionThiefsBargain354827,["CDr"]=24,["affectedSpells"]={11327},["loadOn"]=hasuitLoadOn_CooldownDisplay} --Vanish
             initialize(354827) --Thief's Bargain
         end 
         
@@ -760,11 +758,11 @@ do
             {cdCle2,["spellId"]=15286,  ["priority"]=28,    ["duration"]=90},--Vampiric Embrace
         }
         
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=3,["affectedSpells"]={33206},["loadOn"]=danCooldownDisplayLoadOn} --Pain Suppression, todo ignore unless disc and tracking pain supp
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=3,["affectedSpells"]={33206},["loadOn"]=hasuitLoadOn_CooldownDisplay} --Pain Suppression, todo ignore unless disc and tracking pain supp
         initialize(17) --Power Word: Shield
         initialize(47536) --Rapture --this instead of shield aura applied because of spellsteal? not sure if that would cause problems, also shielding into a cyclone or something like that probably prevents aura applied
         
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuHealCooldownReduction,["CDr"]=-108.9,["affectedSpells"]={47788},["loadOn"]=danCooldownDisplayLoadOn} --Guardian Spirit
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuHealCooldownReduction,["CDr"]=-108.9,["affectedSpells"]={47788},["loadOn"]=hasuitLoadOn_CooldownDisplay} --Guardian Spirit
         initialize(48153) --Guardian Spirit proc
         
         
@@ -805,10 +803,10 @@ do
             
             
             hasuitFramesCenterSetEventType("aura")
-            hasuitSetupSpellOptions = {hasuitSpellFunction_AuraHypoCooldownFunction,["affectedSpells"]={642,633,1022,204018},["unitClass"]="PALADIN",["loadOn"]=danCooldownDisplayLoadOn}
+            hasuitSetupSpellOptions = {hasuitSpellFunction_AuraHypoCooldownFunction,["affectedSpells"]={642,633,1022,204018},["unitClass"]="PALADIN",["loadOn"]=hasuitLoadOn_CooldownDisplay}
             initialize(25771) --Forbearance
             
-            hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints1HidesOther,["points1"]=-40,["hideSpellId"]=184662,["loadOn"]=danCooldownDisplayLoadOn} --Shield of Vengeance
+            hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints1HidesOther,["points1"]=-40,["hideSpellId"]=184662,["loadOn"]=hasuitLoadOn_CooldownDisplay} --Shield of Vengeance
             initialize(403876) --Divine Protection
             
         end
@@ -885,7 +883,7 @@ do
             }
             
             
-            hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterruptCooldownReductionSolarBeam,["CDr"]=15,["affectedSpells"]={78675},["loadOn"]=danCooldownDisplayLoadOn}--Solar Beam
+            hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterruptCooldownReductionSolarBeam,["CDr"]=15,["affectedSpells"]={78675},["loadOn"]=hasuitLoadOn_CooldownDisplay}--Solar Beam
             initialize(97547) --Solar Beam interrupt
             
         end
@@ -901,7 +899,7 @@ do
         -- }
         -- interruptCooldowns[252]={--Unholy
         -- }
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuEnergizeCooldownReduction,["CDr"]=3,["affectedSpells"]={47528},["loadOn"]=danCooldownDisplayLoadOn}--Mind Freeze
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuEnergizeCooldownReduction,["CDr"]=3,["affectedSpells"]={47528},["loadOn"]=hasuitLoadOn_CooldownDisplay}--Mind Freeze
         initialize(378849) --Coldthirst
         
         
@@ -1019,7 +1017,7 @@ do
         
         tinsert(shiftingPowerAffectedSpells, 2139) --counterspell
         
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterruptCooldownReduction,["CDr"]=4,["affectedSpells"]={2139},["loadOn"]=danCooldownDisplayLoadOn}
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterruptCooldownReduction,["CDr"]=4,["affectedSpells"]={2139},["loadOn"]=hasuitLoadOn_CooldownDisplay}
         initialize(2139) --counterspell 4 sec reduction
 
 
@@ -1215,10 +1213,10 @@ do
             tinsert(timeSkipAffectedSpells, 403631) --Breath of Eons
             tinsert(timeSkipAffectedSpells, 442204) --Breath of Eons
             
-            hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellEmpowerInterruptCooldownReduction,["CDr"]="reset",["affectedSpells"]={382266, 357208},["loadOn"]=danCooldownDisplayLoadOn} --Fire Breath, could have just done like 10000 for cdr instead of having "reset" be a thing?
+            hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSpellEmpowerInterruptCooldownReduction,["CDr"]="reset",["affectedSpells"]={382266, 357208},["loadOn"]=hasuitLoadOn_CooldownDisplay} --Fire Breath, could have just done like 10000 for cdr instead of having "reset" be a thing?
             initialize(382266) --Fire Breath
             initialize(357208) --Fire Breath
-            hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReduction,["CDr"]=3,["affectedSpells"]={357210, 433874, 442204},["loadOn"]=danCooldownDisplayLoadOn} --Deep Breath, bored todo 3 sec cap? might not get reached every time, assuming i understand how this works from reading the tooltip
+            hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReduction,["CDr"]=3,["affectedSpells"]={357210, 433874, 442204},["loadOn"]=hasuitLoadOn_CooldownDisplay} --Deep Breath, bored todo 3 sec cap? might not get reached every time, assuming i understand how this works from reading the tooltip
             initialize(434473) --Bombardments
         end
 
@@ -1233,7 +1231,7 @@ do
         -- }
         -- crowdControlCooldowns[270]={--Mistweaver
         -- }
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterruptCooldownReduction,["CDr"]=5,["affectedSpells"]={115078},["loadOn"]=danCooldownDisplayLoadOn} --paralysis, do people take [Energy Transfer]?
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterruptCooldownReduction,["CDr"]=5,["affectedSpells"]={115078},["loadOn"]=hasuitLoadOn_CooldownDisplay} --paralysis, do people take [Energy Transfer]?
         initialize(116705) --spear hand strike
         
         
@@ -1271,12 +1269,12 @@ do
         -- crowdControlCooldowns[255]={--Survival
         -- }
         
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=0.5,["affectedSpells"]={19577, 109248},["loadOn"]=danCooldownDisplayLoadOn} --intimidation and binding shot
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=0.5,["affectedSpells"]={19577, 109248},["loadOn"]=hasuitLoadOn_CooldownDisplay} --intimidation and binding shot
         initialize(259495) --wildfire bomb
         initialize(19434) --Aimed Shot
         initialize(34026) --bm kill command
         
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest,["CDr"]="reset",["affectedSpells"]={213691},["loadOn"]=danCooldownDisplayLoadOn} --Scatter Shot
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest,["CDr"]="reset",["affectedSpells"]={213691},["loadOn"]=hasuitLoadOn_CooldownDisplay} --Scatter Shot
         initialize(385646) --Quick Load from health 40%
         
         
@@ -1388,7 +1386,7 @@ do
         -- }
         
         local hoj = {853}
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=6,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=6,["affectedSpells"]=hoj,["loadOn"]=hasuitLoadOn_CooldownDisplay} --Hammer of Justice
         initialize(53600) --Shield of the Righteous
         initialize(415091) --Shield of the Righteous?
         initialize(2812) --Denounce
@@ -1400,11 +1398,11 @@ do
         initialize(156322) --Eternal Flame
         initialize(85256) --Templar's Verdict
         
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=10,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=10,["affectedSpells"]=hoj,["loadOn"]=hasuitLoadOn_CooldownDisplay} --Hammer of Justice
         initialize(427453) --Hammer of Light, untested, seemed like maybe this was breaking vs a ret paladin?
         initialize(429826) --Hammer of Light ^
         
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=16,["affectedSpells"]=hoj,["loadOn"]=danCooldownDisplayLoadOn} --Hammer of Justice
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=16,["affectedSpells"]=hoj,["loadOn"]=hasuitLoadOn_CooldownDisplay} --Hammer of Justice
         initialize(198034) --Divine Hammer, todo 1 Holy Power per sec
         initialize(198137) --Divine Hammer ^
         
@@ -1443,24 +1441,24 @@ do
     hasuitFramesCenterSetEventType("cleu")
     
     if #shiftingPowerAffectedSpells>0 then
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=3,["affectedSpells"]=shiftingPowerAffectedSpells,["loadOn"]=danCooldownDisplayLoadOn}
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=3,["affectedSpells"]=shiftingPowerAffectedSpells,["loadOn"]=hasuitLoadOn_CooldownDisplay}
         initialize(382445) --Shifting Power CDr
     end
     if #coldSnapAffectedSpells>0 then
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]="reset",["affectedSpells"]=coldSnapAffectedSpells,["loadOn"]=danCooldownDisplayLoadOn}
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]="reset",["affectedSpells"]=coldSnapAffectedSpells,["loadOn"]=hasuitLoadOn_CooldownDisplay}
         initialize(235219) --Cold Snap
     end
     
     
     if #vanishAffectedSpells>0 then
-        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReductionSpec,["CDr"]=22.5,["affectedSpells"]=vanishAffectedSpells,["specId"]=261,["loadOn"]=danCooldownDisplayLoadOn}
+        hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReductionSpec,["CDr"]=22.5,["affectedSpells"]=vanishAffectedSpells,["specId"]=261,["loadOn"]=hasuitLoadOn_CooldownDisplay}
         initialize(1856) --Vanish for sub rogue --different for pvp?.. 22.5 instead of 30 but can i trust the tooltip? todo find other pvp only durations
     end
     
     
     
     
-    hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu378441TimeStop,["loadOn"]=danCooldownDisplayLoadOn} --Time Stop cooldown pause
+    hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu378441TimeStop,["loadOn"]=hasuitLoadOn_CooldownDisplay} --Time Stop cooldown pause
     initialize(378441)
     
     
@@ -1471,9 +1469,9 @@ do
     
     if #timeSkipAffectedSpells>0 then
         hasuitFramesCenterSetEventType("aura")
-        hasuitSetupSpellOptions = {hasuitSpellFunction_AuraDurationCooldownReduction,["CDr"]=30,["affectedSpells"]=timeSkipAffectedSpells,["loadOn"]=danCooldownDisplayLoadOn,["duration"]=3} --todo assume 10% until cast duration is seen and then change it if 3 sec talent is taken? hopefully aug gets tank treatment so this doesn't matter much except in m+
+        hasuitSetupSpellOptions = {hasuitSpellFunction_AuraDurationCooldownReduction,["CDr"]=30,["affectedSpells"]=timeSkipAffectedSpells,["loadOn"]=hasuitLoadOn_CooldownDisplay,["duration"]=3} --todo assume 10% until cast duration is seen and then change it if 3 sec talent is taken? hopefully aug gets tank treatment so this doesn't matter much except in m+
         initialize(404977) --Time Skip
-        hasuitSetupSpellOptions = {hasuitSpellFunction_AuraDurationCooldownReduction,["CDr"]=20,["affectedSpells"]=timeSkipAffectedSpells,["loadOn"]=danCooldownDisplayLoadOn,["duration"]=2}
+        hasuitSetupSpellOptions = {hasuitSpellFunction_AuraDurationCooldownReduction,["CDr"]=20,["affectedSpells"]=timeSkipAffectedSpells,["loadOn"]=hasuitLoadOn_CooldownDisplay,["duration"]=2}
         initialize(404977) --Time Skip
     end
     
@@ -1521,7 +1519,7 @@ do
                         lastFunction = cooldownSpellOptions[1]
                         hasuitFramesCenterSetEventTypeFromFunction(lastFunction)
                     end
-                    cooldownSpellOptions["loadOn"]=danCooldownDisplayLoadOn
+                    cooldownSpellOptions["loadOn"]=hasuitLoadOn_CooldownDisplay
                     hasuitSetupSpellOptions = cooldownSpellOptions
                     initialize(spellId)
                 end

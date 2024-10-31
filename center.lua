@@ -664,11 +664,11 @@ hasuitTrackedDiminishSpells = {
 
 do
     local GetSpellTexture = C_Spell.GetSpellTexture
-    local diminishOptions = hasuitDiminishSpellOptionsTable
+    local diminishOptionsTable = hasuitDiminishSpellOptionsTable
     local drCount = 0
     local tonumber = tonumber
     function hasuitFramesTrackDiminishTypeAndTexture(drType, texture)
-        if not diminishOptions[drType] then
+        if not diminishOptionsTable[drType] then
             if type(texture)=="string" then
                 local pre = texture
                 texture = GetSpellTexture(texture)
@@ -682,7 +682,7 @@ do
                 end
             end
             drCount = drCount+1
-            diminishOptions[drType] = {
+            diminishOptionsTable[drType] = {
                 ["arena"] = drCount,
                 ["texture"] = texture,
             }

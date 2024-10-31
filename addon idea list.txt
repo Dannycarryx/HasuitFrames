@@ -29,6 +29,7 @@ if alt f4ing player can log in and no group units will exist until after combat 
 option to just have normal frames instead of click-through to move, option to disable targeting when frame is clicked and only move camera/player, rely on mouseover for spells and never target, more for pvers, option to enable/disable this depending on instancetype or groupsize?
 fix new 4/5 cd system. problem is cds reset when groupsize leaves 4 or 5. could be fixed more easily with a savedvariables system for remembering cooldowns for short logouts/reloads/unitframe hides and comes back?
 improve/figure out scale. whole system needs to be made for size stuff and idk what i'm doing with other people's screen sizes
+initialize(198034) --Divine Hammer, todo 1 Holy Power per sec, use same system as blessingofautumn for this?
 
 even less important:
 summon/rez/phase indicators
@@ -61,7 +62,7 @@ fix occasional green background showing through low opacity frames, probably bec
 
 improve overridesSame to be able to override based on more than just its own priority? don't want a dispellable stun to override an unbreakable stun but also want to sort the newer stun ahead of older stun, or that should probably be based on duration if it isn't already
 
-
+clean up cooldowns.lua
 
 
 

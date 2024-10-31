@@ -2738,12 +2738,12 @@ do
         end
     end
     hasuitCooldownOnCooldownDone = cooldownOnCooldownDone
-    -- local cooldownsControllers = hasuitController_Cooldowns --temporary?
+    -- local cooldownsControllers = hasuitController_CooldownsControllers --temporary?
     function danAddSpecializationCooldowns(specId, isClassUpdate)
-        for i=1,#hasuitController_Cooldowns do
-            local controllerOptions = hasuitController_Cooldowns[i]
+        for i=1,#hasuitController_CooldownsControllers do
+            local controllerOptions = hasuitController_CooldownsControllers[i]
             local unitTypeStuff = controllerOptions[danCurrentUnitType]
-            if unitTypeStuff then
+            if unitTypeStuff then --similar to danCommon
                 local specCooldowns = unitTypeStuff["specCooldowns"][specId]
                 local oldSpecCooldowns = not isClassUpdate and unitTypeStuff["specCooldowns"][danCurrentFrame.specId]
                 local newSpellIds = {}

@@ -251,30 +251,30 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
         end
         tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
         loadOnCondition()
-        hasuitLoadOnEnablePve = loadOn
+        hasuitLoadOn_EnablePve = loadOn
     end
-    local hasuitLoadOnEnablePve = hasuitLoadOnEnablePve
+    local hasuitLoadOn_EnablePve = hasuitLoadOn_EnablePve
     
     
     
     local danCommonPveAura =            {["size"]=16,   ["hideCooldownText"]=true,  ["alpha"]=1}
     local danCommonPveAuraIsBossAura =  {["size"]=22,   ["hideCooldownText"]=true,  ["alpha"]=1}
-    pveAuraSpellOptions =               {["priority"]=480,  ["group"]=danCommonPveAura, ["loadOn"]=hasuitLoadOnEnablePve}
-    pveAuraSpellOptionsIsBossAura =     {["priority"]=470,  ["group"]=danCommonPveAuraIsBossAura, ["loadOn"]=hasuitLoadOnEnablePve} --todo should pve debuffs be guaranteed to show up? could make something to make them smaller to fit on frames if they go over a limit, in instance not in open world
+    pveAuraSpellOptions =               {["priority"]=480,  ["group"]=danCommonPveAura, ["loadOn"]=hasuitLoadOn_EnablePve}
+    pveAuraSpellOptionsIsBossAura =     {["priority"]=470,  ["group"]=danCommonPveAuraIsBossAura, ["loadOn"]=hasuitLoadOn_EnablePve} --todo should pve debuffs be guaranteed to show up? could make something to make them smaller to fit on frames if they go over a limit, in instance not in open world
     pveAuraSpellOptionsUnknownType =    {}
     
     local danCommonPveCleuINC =         {["size"]=14,   ["hideCooldownText"]=true,  ["alpha"]=1}
-    pveCleuINCSpellOptions =            {["priority"]=490,  ["group"]=danCommonPveCleuINC,["duration"]=2.5,["isPve"]=true, ["loadOn"]=hasuitLoadOnEnablePve} --todo fix
+    pveCleuINCSpellOptions =            {["priority"]=490,  ["group"]=danCommonPveCleuINC,["duration"]=2.5,["isPve"]=true, ["loadOn"]=hasuitLoadOn_EnablePve} --todo fix
     
     local danCommonPveUnitCast =        {["size"]=12,   ["hideCooldownText"]=true,  ["alpha"]=1}
-    pveUnitCastSpellOptions =           {["priority"]=495,  ["group"]=danCommonPveUnitCast, ["loadOn"]=hasuitLoadOnEnablePve}
+    pveUnitCastSpellOptions =           {["priority"]=495,  ["group"]=danCommonPveUnitCast, ["loadOn"]=hasuitLoadOn_EnablePve}
     
     tinsert(hasuitDoThisAddon_Loaded, function()
         danCommonPveAura["controller"] = hasuitController_TopRight_TopRight
         danCommonPveAuraIsBossAura["controller"] = hasuitController_TopRight_TopRight
-        pveAuraSpellOptions[1] = hasuitSpellFunction_MainAuraFunction
-        pveAuraSpellOptionsIsBossAura[1] = hasuitSpellFunction_MainAuraFunction
-        pveAuraSpellOptionsUnknownType[1] = hasuitSpellFunction_MainAuraFunctionPveUnknown
+        pveAuraSpellOptions[1] = hasuitSpellFunction_AuraMainFunction
+        pveAuraSpellOptionsIsBossAura[1] = hasuitSpellFunction_AuraMainFunction
+        pveAuraSpellOptionsUnknownType[1] = hasuitSpellFunction_AuraMainFunctionPveUnknown
         
         danCommonPveCleuINC["controller"] = hasuitController_TopRight_TopRight
         pveCleuINCSpellOptions[1] = hasuitSpellFunction_CleuINC
@@ -349,14 +349,14 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                 ccBreakBar.unit = unit
                 ccBreakOnEvent(ccBreakBar, "UNIT_HEALTH", unit)
                 ccBreakOnEvent(ccBreakBar, "UNIT_ABSORB_AMOUNT_CHANGED", unit)
-                ccBreakOnEvent(ccBreakBar, "UNIT_MAXHEALTH", unit)
+                -- ccBreakOnEvent(ccBreakBar, "UNIT_MAXHEALTH", unit)
                 ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
                 ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
                 ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
             end
         end
     end
-    function hasuitSpecialAuraFunction_AuraCcBreakThreshold()
+    function hasuitSpecialAuraFunction_CcBreakThreshold()
         local danCurrentEvent = danCurrentEvent
         if danCurrentEvent=="recycled" then
             local ccBreakBar = danCurrentIcon.ccBreakBar
@@ -1554,7 +1554,7 @@ do
     end
     
     -- hasuitFramesCenterSetEventType("aura")
-    hasuitSpellFunction_MainAuraFunction = addMultiFunction(function()
+    hasuitSpellFunction_AuraMainFunction = addMultiFunction(function()
         danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
         if not danCurrentSpellOptionsCommon then
             return
@@ -1600,10 +1600,10 @@ do
             specialFunction()
         end
     end)
-    danMainAuraFunction = hasuitSpellFunction_MainAuraFunction
+    danMainAuraFunction = hasuitSpellFunction_AuraMainFunction
 end
 
-function hasuitSpellFunction_MainAuraFunctionPveUnknown()
+function hasuitSpellFunction_AuraMainFunctionPveUnknown()
     local spellId = danCurrentAura["spellId"]
     if danCurrentAura["isBossAura"] then
         hasuitUnitAuraFunctions[spellId][#hasuitUnitAuraFunctions[spellId]] = pveAuraSpellOptionsIsBossAura --don't need something like pveIsBossAuraTemporaryIndexTracking[d12anCleuSpellId] = #hasuitUnitAuraFunctions[d12anCleuSpellId] for the cleu. only one spellid per subevent gets tracked anyway and then future ones get ignored in the tracking part of pve cleu
@@ -3389,7 +3389,7 @@ do
             -- local sourceUnit = danCurrentAura["sourceUnit"]
             -- local unitGUID = sourceUnit and UnitGUID(sourceUnit)
             -- if unitGUID and danTreants[unitGUID] then
-                -- hasuitSpellFunction_MainAuraFunction()
+                -- hasuitSpellFunction_AuraMainFunction()
             -- end
         -- end
     end
@@ -3601,7 +3601,7 @@ end
 do
     local lastEventId
     local GetArenaCrowdControlInfo = C_PvP.GetArenaCrowdControlInfo
-    local arenaCrowdControlSpellUpdateFrame = CreateFrame("Frame") --events registered in hasuitCooldownDisplayLoadOn
+    local arenaCrowdControlSpellUpdateFrame = CreateFrame("Frame") --events registered in hasuitLoadOn_PartySize
     hasuitArenaCrowdControlSpellUpdateFrame = arenaCrowdControlSpellUpdateFrame
     arenaCrowdControlSpellUpdateFrame:SetScript("OnEvent", function(_, event, unit, spellId) --bored todo: register and unregister selectively, game fires these a lot for no reason. real todo: arena3 (mage) got their first ARENA_CROWD_CONTROL_SPELL_UPDATE like 10 seconds after coming out of stealth. it didn't show trinket icon on blizzard arena frames until then either. and the mage definitely pressed trinket later in the match. was also already in combat for a while at the time so it wasn't some weird thing where they equipped it after skirmish started. also seems like GetArenaCrowdControlInfo doesn't work outside of reacting to an event even if the relevant event has already happened and trinket has already been shown so maybe change this to assume they have trinket until game says spellid==0. is it possible it didn't show because it was on cd from them equipping it and having the 30s timer? if so could do something with that
         local currentEventId = GetCurrentEventID()

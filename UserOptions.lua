@@ -64,7 +64,6 @@ local createOptionsPages = {
 }
 
 
-local usePixelPerfectModifier
 local activeScaleMultiplier
 
 local savedUserOptions
@@ -112,7 +111,7 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
     end
     
     
-    local scaleChange
+    local scaleChangeFunction
     local width, height = GetPhysicalScreenSize() --idk what i'm doing here but maybe this is ok
     screenHeight = height
     local usePixelPerfectModifier
@@ -127,13 +126,13 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
         userOptionsOnChanged["usePixelPerfectModifier"] = function()
             usePixelPerfectModifier = savedUserOptions["usePixelPerfectModifier"]
             activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111111111111 --GetDefaultScale?
-            scaleChange()
+            scaleChangeFunction()
         end
     end
     
     local pixelWarningMessage = "changing the scale from 1 could make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually"
     hasuitFramesParent:SetScale(savedUserOptions["scale"]*activeScaleMultiplier)
-    function scaleChange()
+    function scaleChangeFunction()
         local scale = savedUserOptions["scale"]
         if pixelWarningMessage and usePixelPerfectModifier and scale~=1 then
             print(pixelWarningMessage)
@@ -141,7 +140,7 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
         end
         hasuitFramesParent:SetScale(scale*activeScaleMultiplier)
     end
-    userOptionsOnChanged["scale"] = scaleChange
+    userOptionsOnChanged["scale"] = scaleChangeFunction
 end)
 
 
@@ -378,6 +377,7 @@ local function openMainOptions()
 end
 local function openMainOptionsFirst()
     userOptionsShown = true
+    userOptionsFrame:SetClampedToScreen(true) --Frame:SetClampRectInsets(left, right, top, bottom)
     userOptionsFrame:SetIgnoreParentScale(true)
     userOptionsFrame:SetScale(0.71111111111111)
     userOptionsFrame:SetBackdrop(danBackdrop)
