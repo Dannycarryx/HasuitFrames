@@ -15,6 +15,7 @@ local hasuitDoThisGroupUnitUpdate_Positions = hasuitDoThisGroupUnitUpdate_Positi
 local hasuitDoThisGroupUnitUpdate_Positions_after = hasuitDoThisGroupUnitUpdate_Positions_after
 local repositioningFunctionIsActive
 local tinsert = tinsert
+local floor = floor
 -- local C_Timer_After = C_Timer.After
 
 
@@ -25,30 +26,26 @@ hasuitController_Middle_Middle.customControllerSetupFunction = function(controll
 end --might want to just give every controller a .unitFrame?
 
 
-local function customUpdateGroupUnitFrameFunction(unitFrame)
+local function customUpdateGroupUnitFrameFunction(unitFrame) --will update when frames actually change size if they were waiting on combat
     local middleController = unitFrame.middleController
     if middleController then
-        -- if middleController.frames[1] then --middleIcon
-            -- C_Timer_After(0, function() --needs to wait for unitFrame (setPointOn here) to actually change .size in danUpdateGroupPositionsButtons, --made hasuitDoThisGroupUnitUpdate_Positions to not have to do this, better because this will update when frames actually change size if they were waiting on combat
-                local middleIcon = middleController.frames[1]
-                if middleIcon then
-                    local setPointOn = middleController.setPointOn
-                    middleIcon:SetPoint("TOPLEFT", setPointOn, "TOPLEFT", floor(setPointOn.width/2)-floor(middleIcon.size/2), -floor(setPointOn.height/2)+floor(middleIcon.size/2)) --.height instead of hasuitRaidFrameHeight because of mana bar
-                end
-            -- end)
-        -- end
+        local middleIcon = middleController.frames[1]
+        if middleIcon then
+            local setPointOn = middleController.setPointOn
+            middleIcon:SetPoint("TOPLEFT", setPointOn, "TOPLEFT", floor(setPointOn.width/2-middleIcon.size/2), -floor(setPointOn.height/2+middleIcon.size/2)) --.height instead of hasuitRaidFrameHeight because of mana bar
+        end
     end
 end
-local function removeAfter() --for i=1,# is a lot faster than for asd in pairs()
+local function removeAfter()
     danRemoveFunctionFromArray(hasuitDoThisGroupUnitUpdate_Positions, customUpdateGroupUnitFrameFunction) --this makes it only happen once when unitframe size changes and not spam future group updates
     repositioningFunctionIsActive = false
 end
 local function ifUnitFramesSizeChangesFunction()
-    if not repositioningFunctionIsActive then
+    if hasuitInstanceType=="pvp" and not repositioningFunctionIsActive then --middle icon can only be active in bgs atm
         repositioningFunctionIsActive = true
         tinsert(hasuitDoThisGroupUnitUpdate_Positions, customUpdateGroupUnitFrameFunction)
         tinsert(hasuitDoThisGroupUnitUpdate_Positions_after, removeAfter)
     end
 end
-tinsert(hasuitDoThisGroup_Roster_UpdateWidthChanged.functions, ifUnitFramesSizeChangesFunction) --should wait to check useroptions/screen size for usePixelPerfectModifier, but that would make this harder as an example, todo do this after making guide
+tinsert(hasuitDoThisGroup_Roster_UpdateWidthChanged.functions, ifUnitFramesSizeChangesFunction) --could check pixel perfect mode and prevent this/change middle grow function to setpoint on center instead of topleft because it'll do nothing useful if pixel perfect mode is off
 tinsert(hasuitDoThisGroup_Roster_UpdateHeightChanged.functions, ifUnitFramesSizeChangesFunction)
