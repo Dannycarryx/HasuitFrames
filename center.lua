@@ -71,22 +71,23 @@ hasuitSavedVariables = {} --for things in the future like keeping track of how l
 
 
 
-hasuitDoThisAddon_Loaded = {}
+hasuitDoThisAddon_Loaded = {} --not accessible from external addons
 hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {} --can sync any addons together here, give them these or other functions/run things in certain orders, other addon should do the same thing with hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {} so that it doesn't matter which addon loads first
 hasuitDoThisPlayer_Entering_WorldFirstOnly = {}
 hasuitDoThisPlayer_Entering_WorldSkipsFirst = {}
 
 hasuitDoThisGroup_Roster_UpdateAlways = {}
 hasuitDoThisGroup_Roster_UpdateGroupSizeChanged = {}
--- hasuitDoThisGroup_Roster_UpdateWidthChanged
--- hasuitDoThisGroup_Roster_UpdateHeightChanged
--- hasuitDoThisGroup_Roster_UpdateColumnsChanged
--- hasuitDoThisGroup_Roster_UpdateGroupSize_5
--- hasuitDoThisGroup_Roster_UpdateGroupSize_5_8
+-- hasuitDoThisGroup_Roster_UpdateWidthChanged --tinsert into .functions
+-- hasuitDoThisGroup_Roster_UpdateHeightChanged --tinsert into .functions
+-- hasuitDoThisGroup_Roster_UpdateColumnsChanged --tinsert into .functions
+-- hasuitDoThisGroup_Roster_UpdateGroupSize_5 --tinsert into .functions
+-- hasuitDoThisGroup_Roster_UpdateGroupSize_5_8 --tinsert into .functions
+
 
 hasuitDoThisPlayer_Target_Changed = {}
 
-hasuitDoThisUserOptionsLoaded = {} --happens early on addon_loaded
+hasuitDoThisUserOptionsLoaded = {} --not accessible from external addons, happens early on addon_loaded
 
 -- hasuitDoThisOnUpdate(func)
 -- hasuitDoThisOnUpdatePosition1(func)
@@ -98,8 +99,17 @@ hasuitDoThisUserOptionsLoaded = {} --happens early on addon_loaded
 
 
 
+-- hasuitDoThisGroupUnitUpdate_before = {} --normal
+-- hasuitDoThisGroupUnitUpdate = {} --gives unitFrame as arg1
+-- hasuitDoThisGroupUnitUpdate_after = {} --wipes at the end if it did anything
+--these are for efficiently running functions on every group unitFrame every time there's a group update (usually group_roster_update but the function can come from unit_aura guid not matching or arena update stealing a group frame(s), or player_login
+--the way it's set up allows for only running a function on every unitframe based on one condition changing and then not repeating the function on future group updates, until the condition you care about changes again
+--example for properly using in testingExternalAddon.lua, will make a guide some time
 
 
+-- hasuitDoThisGroupUnitUpdate_Positions_before = {} --normal, these wait for combat to drop
+hasuitDoThisGroupUnitUpdate_Positions = {} --gives unitFrame as arg1
+hasuitDoThisGroupUnitUpdate_Positions_after = {} --wipes at the end if it did anything
 
 
 
@@ -898,5 +908,8 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
         hasuitUserOptionsOnChanged = nil
         hasuitMakeTestGroupFrames = nil
         hasuitMakeTestArenaFrames = nil
+        
+        hasuitRemoveUnitHealthControlNotSafe = nil
+        hasuitRemoveUnitHealthControlSafe = nil
     end)
 end)

@@ -25,3 +25,4 @@ cooldowns.lua
 UnitFrames2.lua
 UserOptions.lua
 disableSomeBlizzardFrames.lua
+testingExternalAddon.lua

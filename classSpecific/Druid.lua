@@ -108,13 +108,13 @@ initialize(391889) --Adaptive Swarm dot
 local normalGrow = hasuitNormalGrow
 local danSort = hasuitSort
 
-local danController_BottomRight_BottomRightHots1 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=  0,["yOffset"]= 0, ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,} --todo combine these controllers and change how it grows instead?
-local danController_BottomRight_BottomRightHots2 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-16,["yOffset"]= 0, ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,}
-local danController_BottomRight_BottomRightHots3 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=2, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=1,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-32,["yOffset"]= 0, ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=hasuitSortExpirationTime,}
-local danController_BottomRight_BottomRightHots4 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=0, ["yMinimum"]=0, ["xLimit"]=1,   ["yLimit"]=0.45,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-57,["yOffset"]= 0, ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,}
+local danController_BottomRight_BottomRightHots1 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=  0,["yOffset"]= 0, ["frameLevel"]=21,  ["sort"]=danSort,   ["grow"]=normalGrow} --todo combine these controllers and change how it grows instead?
+local danController_BottomRight_BottomRightHots2 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-16,["yOffset"]= 0, ["frameLevel"]=21,  ["sort"]=danSort,   ["grow"]=normalGrow}
+local danController_BottomRight_BottomRightHots3 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=2, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=1,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-32,["yOffset"]= 0, ["frameLevel"]=21,  ["sort"]=hasuitSortExpirationTime,["grow"]=normalGrow}
+local danController_BottomRight_BottomRightHots4 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=0, ["yMinimum"]=0, ["xLimit"]=1,   ["yLimit"]=0.45,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-57,["yOffset"]= 0, ["frameLevel"]=21,  ["sort"]=danSort,   ["grow"]=normalGrow}
 
-local danController_BottomRight_BottomRightHots5 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=1,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=  0,["yOffset"]= 16,["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,}
--- local danController_BottomRight_BottomRightHots6 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-16,["yOffset"]= 16,["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=danSort,}
+local danController_BottomRight_BottomRightHots5 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=1,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=  0,["yOffset"]= 16,["frameLevel"]=21,  ["sort"]=danSort,   ["grow"]=normalGrow}
+-- local danController_BottomRight_BottomRightHots6 =  {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-16,["yOffset"]= 16,["frameLevel"]=21,  ["sort"]=danSort,   ["grow"]=normalGrow}
 
 danController_BottomRight_BottomRightHots3["controlsOther"]=danController_BottomRight_BottomRightHots4
 
@@ -152,18 +152,18 @@ initialize(290754) --Lifebloom from Full Bloom (early spring)
 
 local danCommon = {["controller"]=danController_BottomRight_BottomRightHots4, ["size"]=13, ["alpha"]=1,    ["hideCooldownText"]=true,  }
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=5,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommon,   }
-initialize("Grove Tending")
+initialize(383193) --Grove Tending
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=6,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommon,   }
 local danCommon = {["controller"]=danController_BottomRight_BottomRightHots4, ["size"]=13, ["alpha"]=1,    ["hideCooldownText"]=true,  }
 -- initialize("Cultivation")
 -- initialize("Spring Blossoms")
 local danCommon = {["controller"]=danController_BottomRight_BottomRightHots4, ["size"]=12, ["alpha"]=1,    ["hideCooldownText"]=true,  }
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=7,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommon,   }
-initialize("Tranquility")
+initialize(157982) --Tranquility
 
 -- local danCommon = {["controller"]=danController_BottomRight_BottomRightHots4, ["size"]=12, ["alpha"]=1,  ["hideCooldownText"]=true,  }
 -- hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=7,                             ["group"]=danCommon,}
--- initialize("Tranquility") --todo hide stacks
+-- initialize(157982) --todo hide stacks
 
 
 

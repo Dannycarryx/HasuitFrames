@@ -26,7 +26,7 @@ initialize(411038) --Sphere of Despair
 local normalGrow = hasuitNormalGrow
 
 hasuitFramesSpellOptionsClassSpecificHelpful = nil
-hasuitController_BottomRight_BottomRight    =       {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=hasuitSortPriorityExpirationTime}
+hasuitController_BottomRight_BottomRight    =       {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
 
 local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=18, ["hideCooldownText"]=false, ["alpha"]=1}
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=-1,    ["group"]=danCommonHelpful, ["specialAuraFunction"]=hasuitSpecialAuraFunction_RedLifebloom} hasuitUsedRedLifebloom = true
@@ -42,7 +42,7 @@ initialize(115175) --Soothing Mist
 
 
 
-local hasuitController_BottomRight_BottomRight2   = {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=19, ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=hasuitSortPriorityExpirationTime}
+local hasuitController_BottomRight_BottomRight2   = {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=19, ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
 local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight2,["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1}
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=1,     ["group"]=danCommonHelpful}
 initialize("Chi Harmony") --Chi Harmony

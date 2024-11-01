@@ -12,6 +12,7 @@ display for purgable buffs for people that have purge
 pet frames
 way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
 make party interrupt display for m+
+interrupt duration modifiers from buffs that reduce them, are there passives like a talent that reduces by 10%?
 
 less important:
 audio warnings for things or some way of knowing when offensive cds get pressed at least without needing to rely on another addon
@@ -63,6 +64,11 @@ fix occasional green background showing through low opacity frames, probably bec
 improve overridesSame to be able to override based on more than just its own priority? don't want a dispellable stun to override an unbreakable stun but also want to sort the newer stun ahead of older stun, or that should probably be based on duration if it isn't already
 
 clean up cooldowns.lua
+
+get rid of some redundant hasuitInstanceType=="arena" checks with new hasuitDoThisGroupUnitUpdate system?
+
+
+
 
 
 

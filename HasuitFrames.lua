@@ -324,15 +324,15 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                 ccBreakBar.ccBreakThresholdValue = newValue
                 ccBreakBar:SetValue(newValue)
             end
-        elseif event=="UNIT_MAXHEALTH" then --try to cancel out health changes from max health events assuming unit_health will fire too with a changed health that didn't come from damage taken, never tested this and not sure exactly how maxhealth events happen now
-            local currentHealth = UnitHealth(unit)
-            local healthChange = -(currentHealth - ccBreakBar.ccBreakHealthValue)
-            ccBreakBar.ccBreakHealthValue = currentHealth
-            if healthChange>0 then
-                local newValue = ccBreakBar.ccBreakThresholdValue+healthChange
-                ccBreakBar.ccBreakThresholdValue = newValue
-                ccBreakBar:SetValue(newValue)
-            end
+        -- elseif event=="UNIT_MAXHEALTH" then --try to cancel out health changes from max health events assuming unit_health will fire too with a changed health that didn't come from damage taken, never tested this and not sure exactly how maxhealth events happen now
+            -- local currentHealth = UnitHealth(unit)
+            -- local healthChange = -(currentHealth - ccBreakBar.ccBreakHealthValue)
+            -- ccBreakBar.ccBreakHealthValue = currentHealth
+            -- if healthChange>0 then
+                -- local newValue = ccBreakBar.ccBreakThresholdValue+healthChange
+                -- ccBreakBar.ccBreakThresholdValue = newValue
+                -- ccBreakBar:SetValue(newValue)
+            -- end
         end
     end
     hasuitCcBreakOnEvent = ccBreakOnEvent
@@ -349,10 +349,10 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                 ccBreakBar.unit = unit
                 ccBreakOnEvent(ccBreakBar, "UNIT_HEALTH", unit)
                 ccBreakOnEvent(ccBreakBar, "UNIT_ABSORB_AMOUNT_CHANGED", unit)
-                -- ccBreakOnEvent(ccBreakBar, "UNIT_MAXHEALTH", unit)
+                -- -- ccBreakOnEvent(ccBreakBar, "UNIT_MAXHEALTH", unit)
                 ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
                 ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
-                ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
+                -- ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
             end
         end
     end
@@ -450,7 +450,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                 end
                 ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
                 ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
-                ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
+                -- ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
                 ccBreakBar.unit = unit
                 ccBreakBar.ccBreakSpellName = danCurrentAura["name"]
                 ccBreakBar.frame = danCurrentFrame
@@ -1322,6 +1322,10 @@ local function initializeController(controllerOptions)
     controller.setPointOn = controllerOptions["setPointOnBorder"] and danCurrentFrame.border or danCurrentFrame
     controller.frames = {}
     
+    if controllerOptions.customControllerSetupFunction then
+        controllerOptions.customControllerSetupFunction(controller)
+    end
+    
     if controllerOptions["controlsOther"] then
         local controller2 = danCurrentFrame.controllersPairs[controllerOptions["controlsOther"]]
         if not controller2 then
@@ -1513,6 +1517,20 @@ do
             else
                 controller2.grow(controller2)
             end
+        end
+    end
+    
+    local floor = floor
+    function hasuitMiddleGrow(controller) --bored todo add check in ifUnitFramesSizeChangesFunction based on there being at least 1 middle icon active on any frame, (the condition to add a check for repositioning this that adds to hasuitDoThisGroupUnitUpdate)
+        local frames = controller.frames
+        sort(frames, controller.options["sort"])
+        local middleIcon = frames[1]
+        if middleIcon then
+            local setPointOn = controller.setPointOn
+            middleIcon:SetPoint("TOPLEFT", setPointOn, "TOPLEFT", floor(setPointOn.width/2)-floor(middleIcon.size/2), -floor(setPointOn.height/2)+floor(middleIcon.size/2))
+        end
+        for i=2, #frames do --i think this could go in the if statement above but not 100% sure
+            frames[i]:SetAlpha(0)
         end
     end
 end
@@ -2970,8 +2988,6 @@ do
     tinsert(hasuitDoThisAddon_Loaded, function()
         danRemoveUnitHealthControlSafe = hasuitRemoveUnitHealthControlSafe
         danRemoveUnitHealthControlNotSafe = hasuitRemoveUnitHealthControlNotSafe
-        hasuitRemoveUnitHealthControlSafe = nil
-        hasuitRemoveUnitHealthControlNotSafe = nil
     end)
     
     local function notDead(frame)

@@ -355,7 +355,7 @@ do
         }
         
         
-        trinketCooldowns["general"]={
+        trinketCooldowns["general"]={ --tables like this are used to create cooldown icons in UnitFrames2.lua with danAddSpecializationCooldowns based on class/spec/race or general goes on everything regardless. each table within also acts as a hasuitSetupSpellOptions and gets initialized at the bottom of the file according to ["spellId"], similar to how things are done in general.lua
             {cdCleT,["spellId"]=336126, ["priority"]=-10,   ["duration"]=120,--Gladiator's Medallion
                 ["pvpTrinket"]=true, ["sharedCd"]=sharedTrinketCooldowns},
             {cdCleT,["spellId"]=42292,  ["priority"]=-10,   ["duration"]=120,--PvP Trinket, oh 283167 is from hunter pets probably? don't think i let comp stomp data in
@@ -700,7 +700,7 @@ do
         do
             hasuitVanish120 = {cleAura,["spellId"]=11327,   ["priority"]=22,    ["duration"]=120, --Vanish 120
                 ["charges"]=2}
-            hasuitVanish96 = {cleAura,["spellId"]=11327,    ["priority"]=22,    ["duration"]=96, --Vanish 96
+            hasuitVanish96 = {cleAura,["spellId"]=11327,    ["priority"]=22,    ["duration"]=96, --Vanish 96, switches to this if Thief's Bargain seen from the rogue
                 ["charges"]=2}
                 
                 
@@ -782,6 +782,7 @@ do
                 {cdCle2,["spellId"]=642,    ["priority"]=22,    ["duration"]=210, --Divine Shield, base 300
                     ["isPrimary"]=true},
                 {cdCle2,["spellId"]=633,    ["priority"]=23,    ["duration"]=420},--Lay on Hands, base 600, todo cd based on missing health healing hands
+                {cdCle2,["spellId"]=471195, ["priority"]=23,    ["duration"]=420},--Lay on Hands, less common, not sure what the difference is. really should switch to spellnames if the setup will work right in other languages
             }
             defensiveCooldowns[65]={--Holy
                 {cdCle2,["spellId"]=498,    ["priority"]=20,    ["duration"]=42},--Divine Protection, base 60, holy
@@ -1452,7 +1453,7 @@ do
     
     if #vanishAffectedSpells>0 then
         hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReductionSpec,["CDr"]=22.5,["affectedSpells"]=vanishAffectedSpells,["specId"]=261,["loadOn"]=hasuitLoadOn_CooldownDisplay}
-        initialize(1856) --Vanish for sub rogue --different for pvp?.. 22.5 instead of 30 but can i trust the tooltip? todo find other pvp only durations
+        initialize(1856) --Vanish for sub rogue --different for pvp?.. 22.5 instead of 30 but can i trust the tooltip? todo find other pvp only durations --todo switch to 30 in pve
     end
     
     

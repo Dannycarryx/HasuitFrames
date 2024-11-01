@@ -97,21 +97,20 @@ local normalGrow = hasuitNormalGrow
 local danSort = hasuitSort
 
 
-hasuitController_TopRight_TopRight           =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0.49,["yLimit"]=0.45,["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPRIGHT",     ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["grow"]=normalGrow,    ["sort"]=danSort}
-hasuitController_TopLeft_TopLeft             =      {["xDirection"]=1,  ["yDirection"]= -1, ["xMinimum"]=2, ["yMinimum"]=2, ["xLimit"]=0.49,["yLimit"]=0.45,["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["grow"]=normalGrow,    ["sort"]=danSort}
+hasuitController_TopRight_TopRight           =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0.49,["yLimit"]=0.45,["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPRIGHT",     ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow}
+hasuitController_TopLeft_TopLeft             =      {["xDirection"]=1,  ["yDirection"]= -1, ["xMinimum"]=2, ["yMinimum"]=2, ["xLimit"]=0.49,["yLimit"]=0.45,["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow}
 
 -- hasuitController_BottomRight_BottomRight at the bottom of file
 -- hasuitController_BottomLeft_BottomLeft ^
 
-hasuitController_TopLeft_TopRight            =      {["xDirection"]=1,  ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT",     ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["grow"]=normalGrow,    ["sort"]=danSort,   ["setPointOnBorder"]=true}
-hasuitController_BottomLeft_BottomRight      =      {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["grow"]=normalGrow,    ["sort"]=danSort,   ["setPointOnBorder"]=true}
+hasuitController_TopLeft_TopRight            =      {["xDirection"]=1,  ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT",     ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
+hasuitController_BottomLeft_BottomRight      =      {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
 
-hasuitController_TopRight_TopLeft            =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["grow"]=normalGrow,    ["sort"]=danSort,   ["setPointOnBorder"]=true}
-hasuitController_BottomRight_BottomLeft      =      {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["grow"]=normalGrow,    ["sort"]=danSort,   ["setPointOnBorder"]=true}
+hasuitController_TopRight_TopLeft            =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
+hasuitController_BottomRight_BottomLeft      =      {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
 
 
-hasuitController_Middle_Middle               =      {["xDirection"]=0,  ["yDirection"]= 0,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="CENTER",      ["targetPoint"]="CENTER",       ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=22,  ["grow"]=normalGrow,    ["sort"]=danSort}
-
+hasuitController_Middle_Middle               =      {                                                                                                                                                                                                   ["frameLevel"]=22,  ["sort"]=danSort,   ["grow"]=hasuitMiddleGrow} --limited to 1 icon showing in the middle
 
 
 
@@ -538,7 +537,7 @@ initialize(394119) --Blackjack (30%)
 initialize(410598) --Soul Rip (25%)
 initialize(77606) --Dark Simulacrum stealing next
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-24,                       ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7],["specialAuraFunction"]=hasuitSpecialAuraFunction_DarkSimShowingWhatGotStolen,["specialIconType"]="greenBorder"}
-initialize(77616) --Dark Simulacrum has something stolen, untested, not sure exactly where to show this, should probably just make a controller for stuff to show in the middle of the screen? and probably not care about friendly stolen, but this for now, todo
+initialize(77616) --Dark Simulacrum has something stolen, untested, not sure exactly where to show this, should probably just make a controller for stuff to show in the mi ddle of the screen? and probably not care about friendly stolen, but this for now, todo
 
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=257,                       ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7],} --todo
@@ -959,7 +958,8 @@ initialize(24450) --pet Prowl
 
 local danCommonMiddleImportantMisc      =   {["controller"]=hasuitController_Middle_Middle,                ["size"]=21, ["hideCooldownText"]=true,  ["alpha"]=1,    }
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=150,["loadOn"]=loadOnBgOnly,["group"]=danCommonMiddleImportantMisc,        ["specialAuraFunction"]=hasuitSpecialAuraFunction_FlagDebuffBg, ["textKey"]="danFontOrbOfPower", ["actualText"]=""} --textkey stuff to prevent it from getting stack text normally --this doesn't prevent anything? but oh well
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=150,["loadOn"]=loadOnBgOnly,["group"]=danCommonMiddleImportantMisc,        ["specialAuraFunction"]=hasuitSpecialAuraFunction_FlagDebuffBg, ["textKey"]="danFontOrbOfPower", ["actualText"]=""} --textkey stuff to prevent it from getting stack text normally --idk what this comment really means anymore but it works fine, something with normal stack text getting ignored when stacks change if textKey is set probably. should be set up differently in main aura function to allow stacks and custom text probably but can't think of anything specific that needs that
 initialize(46392)--Focused Assault
 initialize(46393) --Brutal Assault
 
@@ -1192,33 +1192,34 @@ initializeMulti(357211, 1) --pyre spell_cast_success
 hasuitSetupSpellOptions = {hasuitSpellFunction_CleuINC,                 ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  ["duration"]=2.5,   ["spellINCType"]="aura",}
 initialize(212431) --Explosive Shot
 
-initializeMulti(386997, 2) --Soul Rot --priority_2 cast-only
-initializeMulti(34914, 2) --Vampiric Touch
-initializeMulti(391109, 2) --Dark Ascension, this makes void volleys fly around and cc people? also buffs non-periodic by 20% and generates 30 insanity should do something to show friendly cc casts more clearly, or audio for it. enemy cc spellcasts are going to show in middle cast bars i think
-initializeMulti(376103, 2) --Radiant Spark
-initializeMulti(375901, 2) --Mindgames
-initializeMulti(214621, 2) --Schism
-initializeMulti(348, 2) --Immolate cast/direct damage
-initializeMulti(407466, 2)--Mind Spike: Insanity
-initializeMulti(73510, 2) --Mind Spike
-initializeMulti(194153, 2) --Starfire
-initializeMulti(202347, 2) --Stellar Flare
-initializeMulti(390612, 2) --Frost Bomb
-initializeMulti(5143, 2) --Arcane Missiles
-initializeMulti(395160, 2) --Eruption
-initializeMulti(198013, 2) --Eye Beam --todo eye beam causes 2 channel start events on the same frame and no cleu cast event. will need a significant change to the setup to get this to not show 2
-initializeMulti(212084, 2) --Fel Devastation, channel
-initializeMulti(436358, 2) --Demolish, channel
-initializeMulti(353082, 2) --Ring of Fire
-initializeMulti(113656, 2) --Fists of Fury, channel --todo track Heavy-Handed Strikes 100% parry buff
-initializeMulti("Rune of Power", 2) --?, Rune of Power, don't think this exists anymore?
-initializeMulti(191634, 2) --Stormkeeper
-initializeMulti(353128, 2) --?, Arcanosphere, channel
-initializeMulti(365350, 2) --Arcane Surge
-initializeMulti(324536, 2) --Malefic Rapture, todo proper targets inc icon
-initializeMulti(368847, 2) --?, Firestorm
-initializeMulti(278350, 2) --Vile Taint --30 sec cd aoe dot affliction?
 hasuitFramesCenterSetEventType("unitCasting")
+hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[2]
+initialize(386997) --Soul Rot --priority_2 cast-only
+initialize(34914) --Vampiric Touch
+initialize(391109) --Dark Ascension, this makes void volleys fly around and cc people? also buffs non-periodic by 20% and generates 30 insanity should do something to show friendly cc casts more clearly, or audio for it. enemy cc spellcasts are going to show in middle cast bars i think
+initialize(376103) --Radiant Spark
+initialize(375901) --Mindgames
+initialize(214621) --Schism
+initialize(348) --Immolate cast/direct damage
+initialize(407466)--Mind Spike: Insanity
+initialize(73510) --Mind Spike
+initialize(194153) --Starfire
+initialize(202347) --Stellar Flare
+initialize(390612) --Frost Bomb
+initialize(5143) --Arcane Missiles
+initialize(395160) --Eruption
+initialize(198013) --Eye Beam --todo eye beam causes 2 channel start events on the same frame and no cleu cast event. will need a significant change to the setup to get this to not show 2
+initialize(212084) --Fel Devastation, channel
+initialize(436358) --Demolish, channel, todo gets 2 casts like eye beam
+initialize(353082) --Ring of Fire
+initialize(113656) --Fists of Fury, channel --todo track Heavy-Handed Strikes 100% parry buff
+initialize("Rune of Power") --?, Rune of Power, don't think this exists anymore?
+initialize(191634) --Stormkeeper
+initialize(353128) --?, Arcanosphere, channel
+initialize(365350) --Arcane Surge
+initialize(324536) --Malefic Rapture, todo proper targets inc icon
+initialize(368847) --?, Firestorm
+initialize(278350) --Vile Taint --30 sec cd aoe dot affliction?
 hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCasting,             ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  ["ignoreSameUnitType"]=true,}
 initialize(361469) --Living Flame, there's a guardian (did i mean pres? ah no the unit type is guardian, not the spec) version of this 401382
 initialize(431443) --Chrono Flames
@@ -1519,12 +1520,12 @@ initialize(GetSpellName(8326)) --Ghost, todo bigger/15 sec timer in rbgs?
 hasuitFramesCenterSetEventType("aura")
 
 
-hasuitController_BottomLeft_BottomLeft      =       {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=2, ["yMinimum"]=3, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=hasuitSortPriorityExpirationTime}
+hasuitController_BottomLeft_BottomLeft      =       {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=2, ["yMinimum"]=3, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
 local danCommonHarmful = {["controller"]=hasuitController_BottomLeft_BottomLeft,["size"]=15,   ["hideCooldownText"]=true,  ["alpha"]=1}
 hasuitFramesSpellOptionsClassSpecificHarmful = {hasuitSpellFunction_AuraSourceIsPlayer,["priority"]=1, ["arena"]=danCommonHarmful, ["loadOn"]=loadOnArenaOnly} --i'm thinking about not showing debuffs bottom left at all and doing something different/using that space to show another dr like typhoon, so this is subject to change
 
 
-hasuitController_BottomRight_BottomRight    =       {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["grow"]=normalGrow,    ["sort"]=hasuitSortPriorityExpirationTime}
+hasuitController_BottomRight_BottomRight    =       {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
 local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,["alpha"]=1}
 hasuitFramesSpellOptionsClassSpecificHelpful = {hasuitSpellFunction_AuraSourceIsPlayer,["priority"]=1, ["group"]=danCommonHelpful} --pretty awful for any healer i think, a specific setup per class/spec is preferred. might make something new to show hots with fixed position based on spellid but only need 1 controller, although maybe the current setup like i use on druid is fine
 

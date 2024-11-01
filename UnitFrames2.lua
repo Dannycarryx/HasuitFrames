@@ -174,7 +174,7 @@ local floor = math.floor
 local pairs = pairs
 local select = select
 local format = string.format
-local wipe = table.wipe
+local wipe = wipe
 local C_Timer_After = C_Timer.After
 local CreateFrame = CreateFrame
 local IsInInstance = IsInInstance
@@ -1924,7 +1924,7 @@ do
         for i=actualGroupSize+1,number do
             
             local unit
-            if targetGUID then
+            if targetGUID or #groupUnitFrames>1 then --think this caused a problem when i ran test function in a bg instead of solo before adding #groupUnitFrames>1
                 unit = "raid"..i
             else
                 unit = "target"
@@ -2476,7 +2476,7 @@ danUpdateUnitSpecial["group"] = function()
 end
 
 
-local hasuitFramesInitialize = hasuitFramesInitialize
+local initialize = hasuitFramesInitialize
 local hasuitSpellFunction_CleuDiminish = hasuitSpellFunction_CleuDiminish
 local trackedDiminishSpells = hasuitTrackedDiminishSpells
 tinsert(hasuitDoThisAddon_Loaded, function()
@@ -2507,7 +2507,7 @@ tinsert(hasuitDoThisAddon_Loaded, function()
         hasuitSetupSpellOptions = spellOptions
         local drSpellTable = trackedDiminishSpells[drType]
         for i=1,#drSpellTable do
-            hasuitFramesInitialize(drSpellTable[i])
+            initialize(drSpellTable[i])
         end
     end
     numberOfTrackedDrs = #arenaDiminishTextures
@@ -3070,12 +3070,14 @@ do
 end
 hasuitFramesCenterSetEventType("unitCastSucceeded")
 hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCastSucceededChangedTalents}
-hasuitFramesInitialize(200749) --Activating Specialization, maybe not needed now that spec change event is being tracked, todo?
-hasuitFramesInitialize(384255) --Changing Talents
+initialize(200749) --Activating Specialization, maybe not needed now that spec change event is being tracked, todo?
+initialize(384255) --Changing Talents
 
 
 
-
+-- local hasuitDoThisGroupUnitUpdate_before = hasuitDoThisGroupUnitUpdate_before
+-- local hasuitDoThisGroupUnitUpdate = hasuitDoThisGroupUnitUpdate
+-- local hasuitDoThisGroupUnitUpdate_after = hasuitDoThisGroupUnitUpdate_after
 local lastRaidSize = 0
 local lastPartySize = 0
 function danUpdateGroupUnits(groupType, number, lastNumber)
@@ -3084,6 +3086,10 @@ function danUpdateGroupUnits(groupType, number, lastNumber)
     end
     local updateCount = hasuitFrameTypeUpdateCount[danCurrentUnitType]+1
     hasuitFrameTypeUpdateCount[danCurrentUnitType] = updateCount
+    
+    -- for i=1,#hasuitDoThisGroupUnitUpdate_before do
+        -- hasuitDoThisGroupUnitUpdate_before[i]() --not sure if this should exist or not, probably should if committing to the custom uniframes functions idea
+    -- end
     for i=1, number do
         danCurrentUnit = groupType..i
         if UnitExists(danCurrentUnit) then --could use unitguid as a proxy for this? not sure about that actually since player can not exist but give a guid on login sometimes, might be better to do that though
@@ -3111,10 +3117,23 @@ function danUpdateGroupUnits(groupType, number, lastNumber)
                 end
             end
             danCurrentFrame.updated = updateCount
+            
+            -- for j=1,#hasuitDoThisGroupUnitUpdate do --won't work from test function if solo because number (party size) is 0 and the test function cheats to make frames, it just makes them directly and gives them fake .updated so they don't hide
+                -- print("asd")
+                -- hasuitDoThisGroupUnitUpdate[j](danCurrentFrame)
+            -- end
+            
         else
             hasuitUnitFrameForUnit[danCurrentUnit] = nil
         end
     end
+    -- if #hasuitDoThisGroupUnitUpdate_after>0 then
+        -- for i=1,#hasuitDoThisGroupUnitUpdate_after do
+            -- hasuitDoThisGroupUnitUpdate_after[i]()
+        -- end
+        -- wipe(hasuitDoThisGroupUnitUpdate_after)
+    -- end
+    
     danUpdatingRole = false
 end
 
@@ -3329,10 +3348,19 @@ end
 
 
 do
+    -- local hasuitDoThisGroupUnitUpdate_Positions_before = hasuitDoThisGroupUnitUpdate_Positions_before
+    local hasuitDoThisGroupUnitUpdate_Positions = hasuitDoThisGroupUnitUpdate_Positions
+    local hasuitDoThisGroupUnitUpdate_Positions_after = hasuitDoThisGroupUnitUpdate_Positions_after
     local partyWasBroken
     local lastRaidSize2 = 0
     function danUpdateGroupPositionsButtons() --should handle people leaving well? but not joining, todo? can look broken if group size changes size/columns in combat atm but probably rare. should never make game unplayable even when that happens?
         updatingGroupPositions = false
+        
+        
+        -- for i=1,#hasuitDoThisGroupUnitUpdate_Positions_before do
+            -- hasuitDoThisGroupUnitUpdate_Positions_before[i](danCurrentFrame)
+        -- end
+        
         if danCurrentGroupSize<=5 then
             for i=1, #groupUnitFrames do
                 danCurrentFrame = groupUnitFrames[i]
@@ -3346,6 +3374,11 @@ do
                 if macroTargetFrame then
                     macroTargetFrame:SetAttribute("unit", danCurrentFrame.unit)
                 end
+                
+                for j=1,#hasuitDoThisGroupUnitUpdate_Positions do
+                    hasuitDoThisGroupUnitUpdate_Positions[j](danCurrentFrame)
+                end
+                
             end
             if partyBroken then
                 for i=#groupUnitFrames+1,lastRaidSize2 do --maybe should just make it so if group is broken it disregards party units, problem is i want people to be able to use the built in binds for targeting party if size<6 for whatever party units exist
@@ -3388,7 +3421,6 @@ do
                 for column=0, maxColumnsMinus1 do
                     danCurrentFrame = groupUnitFrames[i]
                     if danCurrentFrame then
-                        i = i + 1
                         danSetSize()
                         local y=raidY-danCurrentUnitFrameHeightPlus3*row
                         local x=startX+danCurrentUnitFrameWidthPlus3*column
@@ -3401,6 +3433,11 @@ do
                         if macroTargetFrame then
                             macroTargetFrame:SetAttribute("unit", danCurrentFrame.unit)
                         end
+                        
+                        for j=1,#hasuitDoThisGroupUnitUpdate_Positions do
+                            hasuitDoThisGroupUnitUpdate_Positions[j](danCurrentFrame)
+                        end
+                        i = i + 1
                         
                     else
                         break
@@ -3419,6 +3456,14 @@ do
             lastRaidSize2 = danCurrentGroupSize
             
             partyWasBroken = nil
+            
+        end
+        
+        if #hasuitDoThisGroupUnitUpdate_Positions_after>0 then
+            for j=1,#hasuitDoThisGroupUnitUpdate_Positions_after do
+                hasuitDoThisGroupUnitUpdate_Positions_after[j]()
+            end
+            wipe(hasuitDoThisGroupUnitUpdate_Positions_after)
         end
     end
 end
