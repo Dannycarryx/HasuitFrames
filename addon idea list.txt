@@ -2,17 +2,24 @@
 
 
 biggest thing right now:
-enabling people to track their own abilities? might be the last thing before a release, maybe middle cast bars too
+enabling people to track their own abilities? might be the last thing before a release
+ability to disable some or all class specific abilities tracked for player to let people make their own setup easily
+clean this file up
+adjust new middle cast bars position a bit, probably finish making them good for people with ranged kicks at least
 
 
 other important:
-middle cast bars
-display for spellcasts and who they're from for people with ranged kicks like shaman
+clean up the rest of the globals that might have been missed. Make function that compares _G before and after loading the addon and then check after most stuff gets deleted for what's missing
+display for spellcasts and who they're from for people with ranged kicks like shaman, (modify middlecastbars for people with ranged kicks to show more and whether interruptible, and give the arena number casting each one/align them on the right? with distinct heights to make it obvious to be able to kick the right target)
 display for purgable buffs for people that have purge
 pet frames
 way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
 make party interrupt display for m+
 interrupt duration modifiers from buffs that reduce them, are there passives like a talent that reduces by 10%?
+skip yellow text on target counts
+improve cleuINC to be the same way as how bossauras get decided, maybe that could make it good in pve and not need as much specific tracking in pvp?
+eternity surge/upheaval middle castbars
+option to show fewer abilities. Playing with the addon for the first bit might be overwhelming, and some people might prefer to just keep the option for showing less enabled permanently
 
 less important:
 audio warnings for things or some way of knowing when offensive cds get pressed at least without needing to rely on another addon
@@ -40,12 +47,12 @@ figure out why arena spec icons break and don't show up sometimes
 Restitution
 Seasoned Winds
 unit_in_range onevents now that it's registered to each unitframe anyway
-make more unit events instead of registering them for all units?
+make more unit events instead of registering them for all units? --maybe just commit even harder to the old/current system and check UnitGUID in each unit event so that there can never possibly be any gaps and there's no need to worry as much about order of things related to updating unitFrames? Idk what the better approach is, but not in the middle. Kind of bored todo until it's not
 not 100% sure how the game expects things to be handled if like a maxhealth event happens for a unit and rosterupdate happens at the same time. like what order does that happen in? because roster update is limited to one per gettime and i thought it happened toward the end of events for the gettime
 go through stuff and make everything make sense with unittype update functions being delayed by onupdate(except for the first button positions on login to avoid combat)
 might be good to remove the delay if unittype update event is triggered from a unitaura fullupdate guid not matching? idk. need to figure out the best system for keeping track of correct .unit on a unitframe without leaving anything open to gaps. unit_aura could be a good way but need to look at order of events stuff again with this in mind
 
-dr system should be remade to be less awful to work with and made more similar to other icons, probably not given their own dedicated spots for an entire arena but not sure
+dr system should be remade to be less awful to work with and made more similar to other icons, probably not given their own dedicated spots for an entire arena but not sure, would be nice to just use with multiinitialize too and be less confusing for people. probably combine everything into one function and maybe get rid of all hasuitFramesCenterSetEventType. make special simpler function for pve updating stuff over time
 could improve drs to be more accurate too and not give incorrect border color sometimes if cc hits right on the edge of dr timer like at 18.6 sec, drs are rng for a small window there (i think) and current system doesn't consider that. should also test how that works in tww, might not even be rng anymore who knows
 whole loading sequence should be looked at. initialize should just put stuff into unloaded table? then run all loadon checks/class specific checks and decide whether to load or even just remove completely during playerlogin, also decide whether options[1] function should care about ignoring player or not based on player's class. can save a little bit of performance skipping the is or is not player checks for spells that player can't cast anyway
 
@@ -66,6 +73,10 @@ improve overridesSame to be able to override based on more than just its own pri
 clean up cooldowns.lua
 
 get rid of some redundant hasuitInstanceType=="arena" checks with new hasuitDoThisGroupUnitUpdate system?
+
+split up the big grow function
+
+clean up some more naming to make things that are global obvious? or actually that's kind of pointless and the thing that will matter is the explanations/examples from guides
 
 
 

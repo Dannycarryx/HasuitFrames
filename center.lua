@@ -1,7 +1,7 @@
 
 
 
-
+local CreateFrame = CreateFrame
 local hasuitFramesParent = CreateFrame("Frame", "hasuitFramesParent", UIParent)
 hasuitFramesParent:SetIgnoreParentScale(true)
 hasuitFramesParent:SetSize(1,1)
@@ -57,6 +57,7 @@ hasuitUnitFramesForUnitType = {
     ["pet"] = {},
     ["arena"] = {},
 }
+hasuitUpdateAllUnitsForUnitType = {}
 
 hasuitFramesCenterNamePlateGUIDs = {}
 
@@ -154,7 +155,6 @@ do
             end
             mainLoadOnFunctionSpammable() --not really necessary since every groupsize loadon will also call this initially but oh well
             local danDoThisEnteringWorld = hasuitDoThisPlayer_Entering_WorldSkipsFirst
-            hasuitDoThisPlayer_Entering_WorldSkipsFirst = nil
             danFrame:SetScript("OnEvent", function()
                 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
                 hasuitInstanceId = instanceId
@@ -184,7 +184,7 @@ do --hasuitDoThisOnUpdate, hasuitDoThisOnUpdatePosition1
         local temp = danDoThis
         danDoThis = nil
         for i=1,#temp do
-            temp[i]() --kind of catastrophic if an error happens here
+            temp[i]() --kind of catastrophic if an error happens here, pcall if quick fix is needed in the future, or setscript nil above at least, could maybe be fine to do that anyway and get rid of if not danDoThis
         end
         if not danDoThis then
             danFrame:SetScript("OnUpdate", nil) --is there a good way to not have to setscript onupdate an extra time if adding to the table mid-onupdate?
@@ -632,8 +632,8 @@ function hasuitFramesInitialize(spellId) --not necessarily a spellId, todo shoul
     end
 end
 
-function hasuitFramesInitializeMulti(spellId, doForOne) --not necessarily a spellId
-    for i=doForOne or 1, doForOne or #hasuitSetupSpellOptionsMulti do
+function hasuitFramesInitializeMulti(spellId, startI) --not necessarily a spellId
+    for i=startI or 1, #hasuitSetupSpellOptionsMulti do
         local spellOptions = hasuitSetupSpellOptionsMulti[i]
         local unloadedTable = functionsTableUnloaded[spellOptions[1]]
         
@@ -684,7 +684,7 @@ do
                 texture = GetSpellTexture(texture)
                 if not texture then
                     if tonumber(pre) then
-                        print("|cffff2222HasuitFrames error no texture for \""..pre.."\"|r. This looks like you need to remove the \"'s") --todo how to show which file/line this is coming from? Without needing people to add something to their private addon just for this. maybe something with debug
+                        print("|cffff2222HasuitFrames error no texture for \""..pre.."\"|r. This looks like you need to remove the \"'s") --todo how to show which file/line this is coming from? Without needing people to add something to their private addon just for this. maybe something with debug --debugstack?
                     else
                         print("|cffff2222HasuitFrames error no texture for", pre, "|r. spell names have to be in current spellbook to get a texture from them. if you can't get a spell name to work try looking up the spell texture on wowhead. Click the icon there and the texture is the number to the right of ID:  , alternatively you can use /run print(C_Spell.GetSpellTexture(spell))")
                     end
@@ -769,8 +769,8 @@ end
 
 
 
-local hasuitFramesCenterNamePlateGUIDs = hasuitFramesCenterNamePlateGUIDs
-local hasuitUnitFrameForUnit = hasuitUnitFrameForUnit
+local namePlateGUIDs = hasuitFramesCenterNamePlateGUIDs
+local danUnitFrameForUnit = hasuitUnitFrameForUnit
 local UnitGUID = UnitGUID
 
 local hasuitFramesCenterGUIDTrackerNameplateAdded = CreateFrame("Frame")
@@ -778,16 +778,16 @@ hasuitFramesCenterGUIDTrackerNameplateAdded:RegisterEvent("NAME_PLATE_UNIT_ADDED
 hasuitFramesCenterGUIDTrackerNameplateAdded:RegisterEvent("FORBIDDEN_NAME_PLATE_UNIT_ADDED")
 hasuitFramesCenterGUIDTrackerNameplateAdded:SetScript("OnEvent", function(_, _, unit)
     local unitGUID = UnitGUID(unit)
-    hasuitFramesCenterNamePlateGUIDs[unitGUID] = unit
-    hasuitUnitFrameForUnit[unit] = hasuitUnitFrameForUnit[unitGUID]
+    namePlateGUIDs[unitGUID] = unit
+    danUnitFrameForUnit[unit] = danUnitFrameForUnit[unitGUID]
 end)
 
 local hasuitFramesCenterGUIDTrackerNameplateRemoved = CreateFrame("Frame")
 hasuitFramesCenterGUIDTrackerNameplateRemoved:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
 hasuitFramesCenterGUIDTrackerNameplateRemoved:RegisterEvent("FORBIDDEN_NAME_PLATE_UNIT_REMOVED")
 hasuitFramesCenterGUIDTrackerNameplateRemoved:SetScript("OnEvent", function(_, _, unit)
-    hasuitFramesCenterNamePlateGUIDs[UnitGUID(unit)] = nil
-    hasuitUnitFrameForUnit[unit] = nil
+    namePlateGUIDs[UnitGUID(unit)] = nil
+    danUnitFrameForUnit[unit] = nil
 end)
 
 
@@ -798,9 +798,9 @@ do
     danFrame:SetScript("OnEvent", function()
         local unitGUID = UnitGUID("target")
         if unitGUID then
-            hasuitUnitFrameForUnit["target"] = hasuitUnitFrameForUnit[unitGUID]
+            danUnitFrameForUnit["target"] = danUnitFrameForUnit[unitGUID]
         else
-            hasuitUnitFrameForUnit["target"] = nil
+            danUnitFrameForUnit["target"] = nil
         end
         for i=1,#danDoThis do
             danDoThis[i]()
@@ -813,9 +813,9 @@ hasuitFramesCenterGUIDTrackerFocusChanged:RegisterEvent("PLAYER_FOCUS_CHANGED")
 hasuitFramesCenterGUIDTrackerFocusChanged:SetScript("OnEvent", function()
     local unitGUID = UnitGUID("focus")
     if unitGUID then
-        hasuitUnitFrameForUnit["focus"] = hasuitUnitFrameForUnit[unitGUID]
+        danUnitFrameForUnit["focus"] = danUnitFrameForUnit[unitGUID]
     else
-        hasuitUnitFrameForUnit["focus"] = nil
+        danUnitFrameForUnit["focus"] = nil
     end
 end)
 
@@ -824,9 +824,9 @@ hasuitFramesCenterGUIDTrackerMouseoverChanged:RegisterEvent("UPDATE_MOUSEOVER_UN
 hasuitFramesCenterGUIDTrackerMouseoverChanged:SetScript("OnEvent", function()
     local unitGUID = UnitGUID("mouseover")
     if unitGUID then
-        hasuitUnitFrameForUnit["mouseover"] = hasuitUnitFrameForUnit[unitGUID]
+        danUnitFrameForUnit["mouseover"] = danUnitFrameForUnit[unitGUID]
     else
-        hasuitUnitFrameForUnit["mouseover"] = nil
+        danUnitFrameForUnit["mouseover"] = nil
     end
 end)
 
@@ -835,9 +835,9 @@ hasuitFramesCenterGUIDTrackerSoftFriendChanged:RegisterEvent("PLAYER_SOFT_FRIEND
 hasuitFramesCenterGUIDTrackerSoftFriendChanged:SetScript("OnEvent", function()
     local unitGUID = UnitGUID("softfriend")
     if unitGUID then
-        hasuitUnitFrameForUnit["softfriend"] = hasuitUnitFrameForUnit[unitGUID]
+        danUnitFrameForUnit["softfriend"] = danUnitFrameForUnit[unitGUID]
     else
-        hasuitUnitFrameForUnit["softfriend"] = nil
+        danUnitFrameForUnit["softfriend"] = nil
     end
 end)
 
@@ -846,20 +846,20 @@ hasuitFramesCenterGUIDTrackerSoftEnemyChanged:RegisterEvent("PLAYER_SOFT_ENEMY_C
 hasuitFramesCenterGUIDTrackerSoftEnemyChanged:SetScript("OnEvent", function()
     local unitGUID = UnitGUID("softenemy")
     if unitGUID then
-        hasuitUnitFrameForUnit["softenemy"] = hasuitUnitFrameForUnit[unitGUID]
+        danUnitFrameForUnit["softenemy"] = danUnitFrameForUnit[unitGUID]
     else
-        hasuitUnitFrameForUnit["softenemy"] = nil
+        danUnitFrameForUnit["softenemy"] = nil
     end
 end)
 
 
 
-
-tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of all things that should self destruct instead of keeping track of everything individually to set nil here?
-    C_Timer.After(0, function()
+tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --a list, semi enforced naturally. todo add things that stay global and don't get set to nil as comments. This should hopefully be a comprehensive list of things that can be accessed from outside of the addon, not a full list of internal functions
+    C_Timer.After(0, function() --hasuitSetupSpellOptions
         hasuitDoThisAddon_Loaded = nil
         hasuitDoThisPlayer_Login = nil
         hasuitDoThisPlayer_Entering_WorldFirstOnly = nil
+        hasuitDoThisPlayer_Entering_WorldSkipsFirst = nil
         
         hasuitDoThisGroup_Roster_UpdateAlways = nil
         hasuitDoThisGroup_Roster_UpdateGroupSizeChanged = nil
@@ -870,21 +870,39 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
         hasuitDoThisGroup_Roster_UpdateGroupSize_5_8 = nil
         hasuitDoThisRelevantSizes = nil
         
+        -- hasuitDoThisGroupUnitUpdate_before = nil
+        -- hasuitDoThisGroupUnitUpdate = nil
+        -- hasuitDoThisGroupUnitUpdate_after = nil
+        -- hasuitDoThisGroupUnitUpdate_Positions_before = nil
+        hasuitDoThisGroupUnitUpdate_Positions = nil
+        hasuitDoThisGroupUnitUpdate_Positions_after = nil
+        
         hasuitDoThisOnUpdate = nil
         hasuitDoThisOnUpdatePosition1 = nil
         hasuitDoThisPlayerTargetChanged = nil
         hasuitDoThisAfterCombat = nil
         
+        hasuitDoThisPlayer_Target_Changed = nil
+        hasuitDoThisUserOptionsLoaded = nil
+        hasuitUserOptionsOnChanged = nil
         
+        hasuitRaidFrameWidthForGroupSize = nil
+        hasuitRaidFrameHeightForGroupSize = nil
+        hasuitRaidFrameColumnsForGroupSize = nil
+        
+        hasuitUnitFrameForUnit = nil
+        hasuitUpdateAllUnitsForUnitType = nil
+        hasuitTrackedRaceCooldowns = nil
+        hasuitFramesCenterNamePlateGUIDs = nil
+        
+        hasuitFramesInitialize = nil
         hasuitFramesInitializeMulti = nil
         hasuitFramesInitializeMultiPlusDiminish = nil
         hasuitSetupSpellOptionsMulti = nil
         hasuitFramesCenterAddMultiFunction = nil
-        functionsTableLoaded = nil
-        functionsTableUnloaded = nil
         hasuitFramesCenterSetEventTypeFromFunction = nil
         hasuitFramesCenterAddToAllTable = nil
-        -- hasuitFramesCenterSetEventType = nil
+        hasuitFramesCenterSetEventType = nil
         
         hasuitDiminishSpellOptionsTable = nil
         hasuitTrackedDiminishSpells = nil
@@ -894,7 +912,85 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
         
         hasuitFramesSpellOptionsClassSpecificHarmful = nil
         hasuitFramesSpellOptionsClassSpecificHelpful = nil
-        -- hasuitController_BottomRight_BottomRight = nil
+        
+        hasuitLoadOn_EnablePve = nil
+        hasuitLoadOn_InstanceTypeNone = nil
+        hasuitLoadOn_BgOnly = nil
+        hasuitLoadOn_NotArenaOnly = nil
+        hasuitLoadOn_ArenaOnly = nil
+        hasuitLoadOn_RootCleuBreakable = nil
+        hasuitLoadOn_PartySize = nil
+        hasuitLoadOn_CooldownDisplay = nil
+        
+        
+        hasuitSpellFunction_CleuCcBreakThreshold = nil
+        hasuitSpellFunction_CleuInterrupted = nil
+        hasuitSpellFunction_CleuINC = nil
+        hasuitSpellFunction_CleuDiminish = nil
+        hasuitSpellFunction_CleuSpellSummon = nil
+        hasuitSpellFunction_CleuSuccessCooldownReduction = nil
+        hasuitSpellFunction_CleuInterruptCooldownReduction = nil
+        hasuitSpellFunction_CleuHealCooldownReduction = nil
+        hasuitSpellFunction_CleuEnergizeCooldownReduction = nil
+        hasuitSpellFunction_CleuAppliedCooldownReduction = nil
+        hasuitSpellFunction_CleuSpellEmpowerInterruptCooldownReduction = nil
+        hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest = nil
+        hasuitSpellFunction_CleuSuccessCooldownReductionSpec = nil
+        hasuitSpellFunction_CleuInterruptCooldownReductionSolarBeam = nil
+        hasuitSpellFunction_CleuAppliedCooldownReductionThiefsBargain354827 = nil
+        hasuitSpellFunction_CleuSuccessCooldownStart1 = nil
+        hasuitSpellFunction_CleuSuccessCooldownStart2 = nil
+        hasuitSpellFunction_CleuHealCooldownStart = nil
+        hasuitSpellFunction_CleuHealCooldownStart = nil
+        hasuitSpellFunction_CleuSpellEmpowerStartCooldownStart2 = nil
+        hasuitSpellFunction_CleuAppliedCooldownStart = nil
+        hasuitSpellFunction_CleuRemovedCooldownStart = nil
+        hasuitSpellFunction_CleuAppliedCooldownStartPreventMultiple = nil
+        hasuitSpellFunction_CleuSuccessCooldownStartSolarBeam = nil
+        hasuitSpellFunction_CleuSuccessCooldownStartPvPTrinket = nil
+        hasuitSpellFunction_CleuAppliedCooldownStartRacial = nil
+        hasuitSpellFunction_CleuAppliedRacialNotTrackedAffectingPvpTrinket = nil
+        hasuitSpellFunction_Cleu378441TimeStop = nil
+        hasuitSpellFunction_CleuCooldownStartPet = nil
+        hasuitSpellFunction_CleuCasting = nil
+        
+        hasuitSpellFunction_UnitCastSucceededCooldownStart = nil
+        hasuitSpellFunction_UnitCastSucceededChangedTalents = nil
+        
+        hasuitSpellFunction_UnitCastingMiddleCastBars = nil
+        hasuitSpellFunction_UnitCasting = nil
+        
+        hasuitSpellFunction_AuraMainFunction = nil
+        hasuitSpellFunction_AuraMainFunctionPveUnknown = nil
+        hasuitSpellFunction_AuraSourceIsPlayer = nil
+        hasuitSpellFunction_AuraSourceIsNotPlayer = nil
+        hasuitSpellFunction_AuraPoints1Required = nil
+        hasuitSpellFunction_AuraPoints2Required = nil
+        hasuitSpellFunction_AuraHypoCooldownFunction = nil
+        hasuitSpellFunction_AuraPoints1CooldownReduction = nil
+        hasuitSpellFunction_AuraPoints2CooldownReduction = nil
+        hasuitSpellFunction_AuraPoints2CooldownReductionExternal = nil
+        hasuitSpellFunction_AuraPoints1HidesOther = nil
+        hasuitSpellFunction_AuraDurationCooldownReduction = nil
+        
+        hasuitSpecialAuraFunction_CcBreakThreshold = nil
+        hasuitSpecialAuraFunction_SmokeBombFunctionForArenaFrames = nil
+        hasuitSpecialAuraFunction_SmokeBombForPlayer = nil
+        hasuitSpecialAuraFunction_ShadowyDuel = nil
+        hasuitSpecialAuraFunction_FeignDeath = nil
+        hasuitSpecialAuraFunction_DarkSimShowingWhatGotStolen = nil
+        hasuitSpecialAuraFunction_OrbOfPower = nil
+        hasuitSpecialAuraFunction_FlagDebuffBg = nil
+        hasuitSpecialAuraFunction_SoulOfTheForest = nil
+        hasuitSpecialAuraFunction_SoulHots = nil
+        hasuitSpecialAuraFunction_RedLifebloom = nil
+        hasuitSpecialAuraFunction_CanChangeTexture = nil
+        hasuitSpecialAuraFunction_BlessingOfAutumn = nil
+        hasuitBlessingOfAutumnIgnoreList = nil
+        
+        
+        hasuitGetIcon = nil
+        hasuitGetCastBar = nil
         
         hasuitOutOfRangeAlpha = nil
         
@@ -904,12 +1000,87 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --make a table of
         
         hasuitRestoreCooldowns = nil
         
-        hasuitDoThisUserOptionsLoaded = nil
-        hasuitUserOptionsOnChanged = nil
         hasuitMakeTestGroupFrames = nil
         hasuitMakeTestArenaFrames = nil
         
         hasuitRemoveUnitHealthControlNotSafe = nil
         hasuitRemoveUnitHealthControlSafe = nil
+        
+        hasuitSort = nil
+        hasuitSortExpirationTime = nil
+        hasuitSortPriorityExpirationTime = nil
+        
+        hasuitNormalGrow = nil
+        hasuitMiddleGrow = nil
+        hasuitMiddleCastBarsGrow = nil
+        
+        hasuitTrinketCooldowns = nil
+        hasuitDefensiveCooldowns = nil
+        hasuitInterruptCooldowns = nil
+        hasuitCrowdControlCooldowns = nil
+        
+        -- hasuitInitializeSeparateController = nil
+        hasuitCleanController = nil
+        hasuitInitializeController = nil
+        hasuitSortController = nil
+        -- hasuitAddToSeparateController = nil
+        
+        hasuitController_TopRight_TopRight = nil
+        hasuitController_TopLeft_TopLeft = nil
+        hasuitController_TopLeft_TopRight = nil
+        hasuitController_BottomLeft_BottomRight = nil
+        hasuitController_TopRight_TopLeft = nil
+        hasuitController_BottomRight_BottomLeft = nil
+        hasuitController_Middle_Middle = nil
+        
+        hasuitController_BottomRight_BottomRight = nil
+        hasuitController_BottomLeft_BottomLeft = nil
+        
+        hasuitController_Separate_UpperScreenCastBars = nil
+        hasuitController_CooldownsControllers = nil
+        
+        danCommonMiddleCastBars1 = nil
+        danCommonMiddleCastBars2 = nil
+        danCommonMiddleCastBars3 = nil
+        danCommonMiddleCastBars4 = nil
+        danCommonMiddleCastBars5 = nil
+        hasuitBigRedMiddleCastBarsSpellOptions =    nil
+        hasuitBigGreenMiddleCastBarsSpellOptions =  nil
+        hasuitYellowMiddleCastBarsSpellOptions =    nil
+        hasuitRootMiddleCastBarsSpellOptions =      nil
+        hasuitMiscMiddleCastBarsSpellOptions = nil
+        hasuitCastBarFont20 = nil
+        hasuitCastBarFont18 = nil
+        hasuitCastBarFont15 = nil
+        hasuitCastBar1Font = nil
+        hasuitLocal1 = nil
+        hasuitLocal2 = nil
+        hasuitLocal3 = nil
+        hasuitLocal4 = nil
+        hasuitLocal5 = nil
+        hasuitLocal6 = nil
+        hasuitUnusedCastBars = nil
+        
+        hasuitResetCooldowns = nil
+        hasuitSetIconText = nil
+        hasuitUnusedTextFrames = nil
+        hasuitCcBreakHealthThreshold = nil
+        hasuitCcBreakHealthThresholdPve = nil
+        hasuitClassColorsHexList = nil
+        hasuitPlayerGUID = nil
+        hasuitPlayerClass = nil
+        hasuitSpecIsHealerTable = nil
+        hasuitFrameTypeUpdateCount = nil
+        hasuitUnitFramesForUnitType = nil
+        hasuitStartCooldownTimerText = nil
+        hasuitVanish96 = nil
+        hasuitVanish120 = nil
+        hasuitNpcIds = nil
+        hasuitMainLoadOnFunctionSpammable = nil
+        hasuitUnitAuraIsFullUpdate = nil
+        
+        hasuitCooldownTextFonts = nil
+        
     end)
 end)
+

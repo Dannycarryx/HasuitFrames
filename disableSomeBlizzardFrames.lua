@@ -4,7 +4,7 @@
 
 
 
-
+local tinsert = tinsert
 tinsert(hasuitDoThisPlayer_Login, function()
     local savedUserOptions = hasuitSavedUserOptions
     local userOptionsOnChanged = hasuitUserOptionsOnChanged
@@ -37,22 +37,19 @@ tinsert(hasuitDoThisPlayer_Login, function()
         
         
         local type = type
-        local danDisableBlizzardUnitFrame2
         local ignoredFramesList = {}
-        do
-            local hiddenFrame = CreateFrame("Frame")
-            hiddenFrame:Hide()
-            local function hookScriptFunction(frame)
-                frame:UnregisterAllEvents()
-            end
-            function danDisableBlizzardUnitFrame2(frame)
-                if type(frame)=="table" then
-                    if not frame.danSeen then
-                        frame.danSeen = true
-                        tinsert(ignoredFramesList, frame)
-                        frame:HookScript("OnEvent", hookScriptFunction)
-                        frame:SetParent(hiddenFrame)
-                    end
+        local hiddenFrame = CreateFrame("Frame")
+        hiddenFrame:Hide()
+        local function hookScriptFunction(frame)
+            frame:UnregisterAllEvents()
+        end
+        local function danDisableBlizzardUnitFrame2(frame)
+            if type(frame)=="table" then
+                if not frame.danSeen then
+                    frame.danSeen = true
+                    tinsert(ignoredFramesList, frame)
+                    frame:HookScript("OnEvent", hookScriptFunction)
+                    frame:SetParent(hiddenFrame)
                 end
             end
         end
@@ -74,8 +71,8 @@ tinsert(hasuitDoThisPlayer_Login, function()
         end
         
         if hideBlizzardArena then
-            local CompactArenaFrame = CompactArenaFrame
-            if type(CompactArenaFrame)=="table" then
+            local CompactArenaFrame = CompactArenaFrame --do not disable this frame. Some arena events stop working and there's no fix for it other than to leave this frame untouched. You can't even try to unregister events and then reregister the specific ones that break
+            if type(CompactArenaFrame)=="table" then --todo check to see if some frames are still getting events here, like debuff frames/castbars etc, maybe slight performance gain available
                 danDisableBlizzardUnitFrame2(CompactArenaFrameMember1)
                 danDisableBlizzardUnitFrame2(CompactArenaFrameMember2)
                 danDisableBlizzardUnitFrame2(CompactArenaFrameMember3)
@@ -143,7 +140,7 @@ tinsert(hasuitDoThisPlayer_Login, function()
             end
         end
         for i=1,#ignoredFramesList do
-            ignoredFramesList[i].danSeen = nil
+            ignoredFramesList[i].danSeen = nil --.danSeen probably does nothing
         end
     end
 end) --ps no frame for arenapet15?

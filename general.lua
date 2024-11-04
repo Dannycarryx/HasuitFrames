@@ -109,16 +109,30 @@ hasuitController_BottomLeft_BottomRight      =      {["xDirection"]=1,  ["yDirec
 hasuitController_TopRight_TopLeft            =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
 hasuitController_BottomRight_BottomLeft      =      {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
 
-
 hasuitController_Middle_Middle               =      {                                                                                                                                                                                                   ["frameLevel"]=22,  ["sort"]=danSort,   ["grow"]=hasuitMiddleGrow} --limited to 1 icon showing in the middle
 
 
 
-local danCommonTopLeftGroup         =   {["controller"]=hasuitController_TopLeft_TopLeft,     ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=1,  }
-local danCommonTopLeftGroupAlpha40  =   {["controller"]=hasuitController_TopLeft_TopLeft,     ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=0.4,}
+local hasuitController_TopRight_TopRight = hasuitController_TopRight_TopRight
+local hasuitController_TopLeft_TopLeft = hasuitController_TopLeft_TopLeft
+local hasuitController_TopLeft_TopRight = hasuitController_TopLeft_TopRight
+local hasuitController_BottomLeft_BottomRight = hasuitController_BottomLeft_BottomRight
+local hasuitController_TopRight_TopLeft = hasuitController_TopRight_TopLeft
+local hasuitController_BottomRight_BottomLeft = hasuitController_BottomRight_BottomLeft
+local hasuitController_Middle_Middle = hasuitController_Middle_Middle
 
-local danCommonTopRightArena        =   {["controller"]=hasuitController_TopRight_TopRight,   ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=1,  }
-local danCommonTopRightArenaAlpha40 =   {["controller"]=hasuitController_TopRight_TopRight,   ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=0.4,}
+
+
+
+
+
+
+
+local danCommonTopLeftGroup         =   {["controllerOptions"]=hasuitController_TopLeft_TopLeft,     ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=1,  }
+local danCommonTopLeftGroupAlpha40  =   {["controllerOptions"]=hasuitController_TopLeft_TopLeft,     ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=0.4,}
+
+local danCommonTopRightArena        =   {["controllerOptions"]=hasuitController_TopRight_TopRight,   ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=1,  }
+local danCommonTopRightArenaAlpha40 =   {["controllerOptions"]=hasuitController_TopRight_TopRight,   ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=0.4,}
 
 
 
@@ -137,11 +151,11 @@ local danCommonBigGroupDebuffs = {}
 local danCommonBigBottomLeftArena = {}
 for i=1,3 do
     danCommonBigGroupDebuffs[i]    =    {["hideCooldownText"]=false,["alpha"]=1,}
-    danCommonBigBottomLeftArena[i] =    {["hideCooldownText"]=false,["alpha"]=1, ["controller"]=hasuitController_BottomRight_BottomLeft,    ["size"]=bigGroupDebuffsParty[i],}
+    danCommonBigBottomLeftArena[i] =    {["hideCooldownText"]=false,["alpha"]=1, ["controllerOptions"]=hasuitController_BottomRight_BottomLeft,    ["size"]=bigGroupDebuffsParty[i],}
 end
 for i=4,7 do
     danCommonBigGroupDebuffs[i]    =    {["hideCooldownText"]=true, ["alpha"]=1,}
-    danCommonBigBottomLeftArena[i] =    {["hideCooldownText"]=true, ["alpha"]=1, ["controller"]=hasuitController_BottomRight_BottomLeft,    ["size"]=bigGroupDebuffsParty[i],}
+    danCommonBigBottomLeftArena[i] =    {["hideCooldownText"]=true, ["alpha"]=1, ["controllerOptions"]=hasuitController_BottomRight_BottomLeft,    ["size"]=bigGroupDebuffsParty[i],}
 end
 
 
@@ -149,6 +163,7 @@ local rootAuraSpellOptionsBreak1  ={hasuitSpellFunction_AuraMainFunction,["prior
 local rootAuraSpellOptionsBreak175={hasuitSpellFunction_AuraMainFunction,["priority"]=-29,["overridesSame"]=true,   ["group"]=danCommonBigGroupDebuffs[6],  ["arena"]=danCommonBigBottomLeftArena[6],   ["actualText"]="root",  ["specialAuraFunction"]=hasuitSpecialAuraFunction_CcBreakThreshold,  ["specialIconType"]="ccBreak",  ["ccBreakHealthThresholdMultiplier"]=1.75}
 local rootAuraSpellOptions2       ={hasuitSpellFunction_AuraMainFunction,["priority"]=-29,["overridesSame"]=true,   ["group"]=danCommonBigGroupDebuffs[6],  ["arena"]=danCommonBigBottomLeftArena[6],   ["actualText"]="root",  } --roots no threshold, --text will be completely redone eventually, it sucks right now
 
+local mainLoadOnFunctionSpammable = hasuitMainLoadOnFunctionSpammable
 hasuitLoadOn_RootCleuBreakable = {}
 local rootCleuSpellOptionsBreakable1     =   {hasuitSpellFunction_CleuCcBreakThreshold,["loadOn"]=hasuitLoadOn_RootCleuBreakable,["ccBreakHealthThresholdMultiplier"]=1}
 local rootCleuSpellOptionsBreakable175   =   {hasuitSpellFunction_CleuCcBreakThreshold,["loadOn"]=hasuitLoadOn_RootCleuBreakable,["ccBreakHealthThresholdMultiplier"]=1.75}
@@ -160,7 +175,6 @@ do
     }
     local lastGroupSize = 0
     local sizeTable = hasuitDoThisGroup_Roster_UpdateGroupSize_5_8
-    local mainLoadOnFunctionSpammable = hasuitMainLoadOnFunctionSpammable
     local hasuitLoadOn_RootCleuBreakable = hasuitLoadOn_RootCleuBreakable
     local function danRbgFunction()
         local bigGroupDebuffsRaidForSize = bigGroupDebuffsRaid[sizeTable.activeRelevantSize]
@@ -172,7 +186,7 @@ do
             for i=1,#danCommonBigGroupDebuffs do
                 local danCommon = danCommonBigGroupDebuffs[i]
                 danCommon["size"]=bigGroupDebuffsRaidForSize[i]
-                danCommon["controller"]=hasuitController_TopRight_TopRight
+                danCommon["controllerOptions"]=hasuitController_TopRight_TopRight
             end
             if hasuitLoadOn_RootCleuBreakable.shouldLoad~=false then --check doesn't do anything yet
                 rootAuraSpellOptionsBreak1["specialIconType"] = nil
@@ -197,11 +211,11 @@ do
             hasuitKICKTextKey = "KICKArena"
             rootAuraSpellOptionsBreak1["textKey"] = "rootArena"
             rootAuraSpellOptionsBreak175["textKey"] = "rootArena"
-            rootAuraSpellOptions2["textKey"] = "rootArena"
+            rootAuraSpellOptions2["textKey"] = "cdProc" --same as rootArena but yoffset 1 instead of 6
             for i=1,#danCommonBigGroupDebuffs do
                 local danCommon = danCommonBigGroupDebuffs[i]
                 danCommon["size"]=bigGroupDebuffsParty[i]
-                danCommon["controller"]=hasuitController_BottomLeft_BottomRight
+                danCommon["controllerOptions"]=hasuitController_BottomLeft_BottomRight
             end
             lastGroupSize = 5
             if not hasuitLoadOn_RootCleuBreakable.shouldLoad then --todo instance type conditions
@@ -217,9 +231,9 @@ do
 end
 
 
-local danCommonBigBottomLeftArenaDefensivesSize35 = {["controller"]=hasuitController_BottomRight_BottomLeft, ["size"]=35,  ["hideCooldownText"]=true,  ["alpha"]=1,["specialIconType"]="greenBorder"}
-local danCommonBigBottomLeftArenaDefensivesSize30 = {["controller"]=hasuitController_BottomRight_BottomLeft, ["size"]=30,  ["hideCooldownText"]=true,  ["alpha"]=1,["specialIconType"]="greenBorder"}
-local danCommonBigBottomLeftArenaDefensivesSize25 = {["controller"]=hasuitController_BottomRight_BottomLeft, ["size"]=25,  ["hideCooldownText"]=true,  ["alpha"]=1,["specialIconType"]="greenBorder"}
+local danCommonBigBottomLeftArenaDefensivesSize35 = {["controllerOptions"]=hasuitController_BottomRight_BottomLeft, ["size"]=35,  ["hideCooldownText"]=true,  ["alpha"]=1,["specialIconType"]="greenBorder"}
+local danCommonBigBottomLeftArenaDefensivesSize30 = {["controllerOptions"]=hasuitController_BottomRight_BottomLeft, ["size"]=30,  ["hideCooldownText"]=true,  ["alpha"]=1,["specialIconType"]="greenBorder"}
+local danCommonBigBottomLeftArenaDefensivesSize25 = {["controllerOptions"]=hasuitController_BottomRight_BottomLeft, ["size"]=25,  ["hideCooldownText"]=true,  ["alpha"]=1,["specialIconType"]="greenBorder"}
 
 
 
@@ -235,12 +249,19 @@ local danCommonBigBottomLeftArenaDefensivesSize25 = {["controller"]=hasuitContro
 --anything else?
 
 
+
+
+
 hasuitFramesCenterSetEventType("aura")
 
 hasuitFramesCenterSetDrType("disorient") --fear
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-80,                           ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1]} --immune cc, BIG CC DEBUFFS ___
-initializePlusDiminish(33786) --Cyclone
-initializePlusDiminish(710) --Banish
+hasuitSetupSpellOptionsMulti = {
+                          {hasuitSpellFunction_AuraMainFunction,         ["priority"]=-80,                          ["group"]=danCommonBigGroupDebuffs[1],  ["arena"]=danCommonBigBottomLeftArena[1]}, --immune cc, BIG CC DEBUFFS ___
+                          hasuitBigRedMiddleCastBarsSpellOptions,
+}
+initializeMultiPlusDiminish(33786) --Cyclone
+initializeMultiPlusDiminish(710) --Banish
+
 
 hasuitFramesCenterSetDrType("incapacitate") --sheep
 initializePlusDiminish(221527) --imprison immune
@@ -284,6 +305,7 @@ initializePlusDiminish(89766) --axe toss stun
 initializePlusDiminish(30283) --Shadowfury
 -- initializePlusDiminish("Warpath") --?
 initializePlusDiminish(385954) --Shield Charge
+initializePlusDiminish(199085) --Warpath
 initializePlusDiminish(132168) --Shockwave
 initializePlusDiminish(132169) --Storm Bolt
 initializePlusDiminish(91800) --Gnaw
@@ -304,11 +326,12 @@ initializePlusDiminish(202346) --double barrel
 initializePlusDiminish(385149) --exorcism
 initializePlusDiminish(255941) --wake of ashes
 initializePlusDiminish(200200) --holy word: chastise, stun
-initializePlusDiminish(118905) --static charge
+initializePlusDiminish(118905) --static charge --todo cast non-tracked units
 initializePlusDiminish(77505 ) --earthquake
 initializePlusDiminish(117526) --binding shot
 initializePlusDiminish(171017) --Meteor Strike, haven't seen
 initializePlusDiminish(408544) --Seismic Slam, seen once in pre-season, evoker stun
+initializePlusDiminish(210141) --Reanimation, zombie stun, disease, 3 sec stun, rare
 initializePlusDiminish(19136) --Stormbolt, av?
 
 hasuitFramesCenterSetDrType("incapacitate") --sheep
@@ -320,7 +343,7 @@ initialize(22703) --Infernal Awakening --from summon infernal
 initialize(213688) --Fel Cleave
 initialize(213491) --demonic trample
 initialize(208645) --also demonic trample?
-initialize("Fel Charge") --?, check for dr? haven't seen
+-- initialize("Fel Charge") --?, check for dr? haven't seen
 initialize(22911 ) --charge, av, 2 sec stun
 initialize(19128) --Knockdown, Drek'Thar in av
 -- hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,         ["priority"]=-63,["overridesSame"]=true,["pet"]=danCommonBigGroupDebuffs[1]}
@@ -328,31 +351,44 @@ initialize(19128) --Knockdown, Drek'Thar in av
 
 
 hasuitFramesCenterSetDrType("stun")
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-60,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1]} --CC can break, channeled
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,         ["priority"]=-60,["overridesSame"]=true,   ["group"]=danCommonBigGroupDebuffs[1],  ["arena"]=danCommonBigBottomLeftArena[1]}, --CC can break, channeled
 initializePlusDiminish(305485) --Lightning Lasso
+initializePlusDiminish(205630) --illidan's grasp channel
+
 
 hasuitFramesCenterSetDrType("disorient") --fear
 initializePlusDiminish(605) --Mind Control
 
 
 hasuitSetupSpellOptionsMulti = { --CC can break threshold *1
-                          {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-57,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[2], ["arena"]=danCommonBigBottomLeftArena[2], ["specialAuraFunction"]=hasuitSpecialAuraFunction_CcBreakThreshold, ["specialIconType"]="ccBreak",["ccBreakHealthThresholdMultiplier"]=1},
+                          {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-57,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[2],  ["arena"]=danCommonBigBottomLeftArena[2], ["specialAuraFunction"]=hasuitSpecialAuraFunction_CcBreakThreshold, ["specialIconType"]="ccBreak",["ccBreakHealthThresholdMultiplier"]=1},
                           {hasuitSpellFunction_CleuCcBreakThreshold,["ccBreakHealthThresholdMultiplier"]=1},
+                          hasuitBigRedMiddleCastBarsSpellOptions,
 }
 initializeMultiPlusDiminish(360806) --Sleep Walk
-initializeMultiPlusDiminish(1513) --Scare Beast
-initializeMultiPlusDiminish(10326) --Turn Evil
+-- initializeMultiPlusDiminish("Mesmerize") --?
+initializeMultiPlusDiminish(6358) --Seduction, 119909 is cleu cast only and seen a lot. will seduction show up fine with uni tcast?
+initializeMultiPlusDiminish(1513) --Scare Beast --todo feral/in form only
+initializeMultiPlusDiminish(10326) --Turn Evil --todo can be feared only
+initializeMulti(5782, 3) --Fear, cast only
+hasuitSetupSpellOptionsMulti[3] = nil
+
+initializeMultiPlusDiminish(130616) --Fear, no cast, rare, tremble in place talent probably, shares a talent point with 60% increase to breaking so easy to track unless they just don't have either which will be true a lot of the time
 initializeMultiPlusDiminish(5246) --Intimidating Shout
 initializeMultiPlusDiminish(316595) --Intimidating Shout cower
 initializeMultiPlusDiminish(316593) --Intimidating Shout cower2, this one has points 5, 5, 0, the other one doesn't have points. one of these knocks back and the other doesn't, other than that identical i think
--- initializeMultiPlusDiminish("Mesmerize") --?
-initializeMultiPlusDiminish(6358) --Seduction
-initializeMultiPlusDiminish(130616) --Fear, rare, tremble in place talent probably, shares a talent point with 60% increase to breaking so easy to track unless they just don't have either which will be true a lot of the time
 -- initializeMultiPlusDiminish("Frightening Shout") --?
 initializeMultiPlusDiminish(207167) --blinding sleet
 initializeMultiPlusDiminish(207685) --sigil of misery
+initializeMultiPlusDiminish(202274) --Hot Trub?
 hasuitFramesCenterSetDrType("incapacitate") --sheep
-initializeMultiPlusDiminish(82691 ) --ring of frost
+initializeMultiPlusDiminish(82691) --Ring of Frost, no cast
+
+hasuitFramesCenterSetEventType("unitCasting")
+hasuitSetupSpellOptions = hasuitBigRedMiddleCastBarsSpellOptions
+initialize(113724) --Ring of Frost cast
+hasuitFramesCenterSetEventType("aura")
+
 initializeMultiPlusDiminish(GetSpellName(277784)) --Hex
 hasuitFramesCenterSetDrType("disorient") --fear
 initializeMulti(87204) --Sin and Punishment --no dr
@@ -379,20 +415,25 @@ initializeMultiPlusDiminish(5484) --Howl of Terror, nightmare?
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-57,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[2], ["arena"]=danCommonBigBottomLeftArena[2]} --CC can break any damage
 initializePlusDiminish(31661) --Dragon's Breath
-initializePlusDiminish(198909) --Song of Chi-Ji
 initializePlusDiminish(105421) --Blinding Light
 -- initializePlusDiminish("Dominate Mind") --?
 initializePlusDiminish(427773) --Blind
 initializePlusDiminish(2094) --Blind
+initializePlusDiminish(198909) --Song of Chi-Ji debuff
 
+hasuitSetupSpellOptionsMulti = {
+                          hasuitSetupSpellOptions,
+                          hasuitBigRedMiddleCastBarsSpellOptions,
+}
+initializeMultiPlusDiminish(198898, 2) --Song of Chi-Ji cast only
 
 hasuitFramesCenterSetDrType("incapacitate") --sheep
+initializeMultiPlusDiminish(GetSpellName(118)) --Polymorph
+initializeMultiPlusDiminish(GetSpellName(383121)) --Mass Polymorph, rare so not sure if there are other spellids
+initializeMultiPlusDiminish(20066) --Repentance
 initializePlusDiminish("Hibernate") --?
 initializePlusDiminish(213691) --Scatter Shot
-initializePlusDiminish(GetSpellName(118)) --Polymorph
-initializePlusDiminish(GetSpellName(383121)) --Mass Polymorph, rare so not sure if there are other spellids
 initializePlusDiminish(115078) --Paralysis
-initializePlusDiminish(20066) --Repentance
 initializePlusDiminish(1776) --Gouge
 initializePlusDiminish(6770) --Sap
 initializePlusDiminish(107079) --Quaking Palm
@@ -463,7 +504,7 @@ initialize(80240) --Havoc
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-42,                           ["group"]=danCommonBigGroupDebuffs[6], ["arena"]=danCommonBigBottomLeftArena[6],} --misc
 initialize(353293) --Shadow Rift
--- initialize("Spear of Bastion") --?
+initialize(376080) --Champion's Spear, new Spear of Bastion?
 
 
 
@@ -472,7 +513,6 @@ hasuitSetupSpellOptionsMulti = {
     rootAuraSpellOptionsBreak1, --roots with damage threshold, ["textKey"] = "rootArena" or "rootRbg" gets set in loading profile above
     rootCleuSpellOptionsBreakable1,
 }
-initializeMultiPlusDiminish(339) --Entangling Roots
 initializeMultiPlusDiminish(102359) --Mass Entanglement
 initializeMultiPlusDiminish(355689) --Landslide
 initializeMultiPlusDiminish(122) --Frost Nova
@@ -486,11 +526,17 @@ initializeMultiPlusDiminish(116706) --disable
 initializeMultiPlusDiminish(324382) --Clash
 initializeMultiPlusDiminish(285515) --surge of power
 initializeMultiPlusDiminish(233395) --Deathchill
+initializeMultiPlusDiminish(204085) --Deathchill, rare
 initializeMultiPlusDiminish(454787) --Ice Prison
-initializeMultiPlusDiminish(162480) --steel trap? might not exist anymore
+-- initializeMultiPlusDiminish(162480) --steel trap? might not exist anymore
 initializeMultiPlusDiminish(393456) --Entrapment
+
 initializeMulti(157997) --Ice Nova, self-dr? could add something to track this for mages or at least make an easy way for them to add stuff to track it themselves
 initializeMulti(91807) --Shambling Rush, no dr, breaks
+
+hasuitSetupSpellOptionsMulti[3] = hasuitRootMiddleCastBarsSpellOptions
+initializeMultiPlusDiminish(339) --Entangling Roots
+
 
 hasuitSetupSpellOptionsMulti = { --higher damage threshold
     rootAuraSpellOptionsBreak175,
@@ -508,6 +554,7 @@ initialize(190925) --Harpoon
 initialize(356356) --Warbringer
 initialize(45334) --Immobilized, from bear wild charge root, no dr and doesn't break to damage
 initialize(81210) --Net, from ashran?
+initialize(449700) --Gravity Lapse, tooltip: 3: Suspended in the air. --can't tell if this drs or what suspended in the air means. it might dr but haven't seen enough to tell for sure. can't break to damage?
 -- initialize(424752) --Piercing Howl, only a 70% slow now
 --todo Entangling Vortex
 
@@ -529,10 +576,12 @@ initializePlusDiminish(233759) --Grapple Weapon
 initializePlusDiminish(207777) --Dismantle
 initializePlusDiminish(236077) --Disarm
 initializePlusDiminish(325153)--exploding keg
+initializePlusDiminish(407031)--Sticky Tar Bomb it says disarmed in the tooltip
+initializePlusDiminish(407032)--Sticky Tar Bomb
 
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-24,                       ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7],}
-initialize("Duel") --?
+-- initialize("Duel") --?
 initialize(394119) --Blackjack (30%)
 initialize(410598) --Soul Rip (25%)
 initialize(77606) --Dark Simulacrum stealing next
@@ -548,11 +597,15 @@ initialize(117405) --binding shot, todo timer like solar beam, todo hide after s
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=258,                       ["group"]=danCommonBigGroupDebuffs[7],     }
 initialize(442804) --Curse of the Satyr
-initialize(2812) --Denounce, can't crit
+hasuitSetupSpellOptionsMulti = {
+    hasuitSetupSpellOptions,
+    hasuitMiscMiddleCastBarsSpellOptions,
+}
+initializeMulti(2812) --Denounce, can't crit
 -- initialize("Divine Plea")
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints1Required,     ["priority"]=258,   ["points1"]=-20,    ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7], ["textKey"]="pointsTextWeakness", ["actualText"]="20%"}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints1Required,     ["priority"]=258,   ["points1"]=-20,    ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7], ["textKey"]="KICKRbg", ["actualText"]="20%"}
 initialize(1714) --Curse of Tongues only 20% casting speed (ignore 10%) --todo improve dispellable debuffs display, stuff like tongues/wound/whatever that might not be worth to dispel alone but knowing multiple different things are there can change things. should make some kind of display for % healing reduction too
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints2Required,     ["priority"]=258,   ["points2"]=-100,   ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7], ["textKey"]="pointsTextWeakness", ["actualText"]="100%"}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints2Required,     ["priority"]=258,   ["points2"]=-100,   ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7], ["textKey"]="KICKRbg", ["actualText"]="100%"}
 initialize(702) --Curse of Weakness only 100% crit
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=259,                       ["group"]=danCommonBigGroupDebuffs[7],     }
@@ -649,7 +702,11 @@ initialize(213610) --Holy Ward
 initialize(446035) --Bladestorm
 initialize(227847) --Bladestorm
 initialize(389774) --Bladestorm
-initialize(421453) --Ultimate Penitence absorb(cc immunity?) todo improve this since basing this on the absorb buff isn't perfect
+hasuitSetupSpellOptionsMulti = {
+    hasuitSetupSpellOptions,
+    hasuitBigGreenMiddleCastBarsSpellOptions,
+}
+initializeMulti(421453) --Ultimate Penitence absorb(cc immunity?) todo improve this since basing this on the absorb buff isn't perfect
 -- initialize(436358) --Demolish, immune to stuns/knockbacks? todo there's no unit_aura for this. it gets cleu applied though for some reason, along with channel start and cast success
 -- initialize("Adaptation") --adapted is the debuff, todo maybe? no unitaura for this
 initialize(354610) --glimpse
@@ -888,7 +945,11 @@ hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priori
 initialize(381755) --earth elemental 15% bonus health
 -- initialize(386237) --Fade to Nothing, 10% damage reduction
 -- initialize(586) --Fade, todo tell if it's 10% or useless from points[1]
-initialize(20578) --Cannibalize
+hasuitSetupSpellOptionsMulti = {
+    hasuitSetupSpellOptions,
+    hasuitMiscMiddleCastBarsSpellOptions,
+}
+initializeMulti(20578) --Cannibalize
 
 
 
@@ -956,20 +1017,20 @@ initialize(24450) --pet Prowl
 
 
 
-local danCommonMiddleImportantMisc      =   {["controller"]=hasuitController_Middle_Middle,                ["size"]=21, ["hideCooldownText"]=true,  ["alpha"]=1,    }
+local danCommonMiddleMiddleFlag      =   {["controllerOptions"]=hasuitController_Middle_Middle,                ["size"]=21, ["hideCooldownText"]=true,  ["alpha"]=1,    }
 
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=150,["loadOn"]=loadOnBgOnly,["group"]=danCommonMiddleImportantMisc,        ["specialAuraFunction"]=hasuitSpecialAuraFunction_FlagDebuffBg, ["textKey"]="danFontOrbOfPower", ["actualText"]=""} --textkey stuff to prevent it from getting stack text normally --idk what this comment really means anymore but it works fine, something with normal stack text getting ignored when stacks change if textKey is set probably. should be set up differently in main aura function to allow stacks and custom text probably but can't think of anything specific that needs that
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=150,["loadOn"]=loadOnBgOnly,["group"]=danCommonMiddleMiddleFlag,        ["specialAuraFunction"]=hasuitSpecialAuraFunction_FlagDebuffBg, ["textKey"]="danFontOrbOfPower", ["actualText"]=""} --textkey stuff to prevent it from getting stack text normally --idk what this comment really means anymore but it works fine, something with normal stack text getting ignored when stacks change if textKey is set probably. should be set up differently in main aura function to allow stacks and custom text probably but can't think of anything specific that needs that
 initialize(46392)--Focused Assault
 initialize(46393) --Brutal Assault
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=153,["loadOn"]=loadOnBgOnly,["group"]=danCommonMiddleImportantMisc,        ["specialAuraFunction"]=hasuitSpecialAuraFunction_OrbOfPower} --debuff doesn't have stacks so can do it differently than wsg/twin peaks debuffs
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=153,["loadOn"]=loadOnBgOnly,["group"]=danCommonMiddleMiddleFlag,        ["specialAuraFunction"]=hasuitSpecialAuraFunction_OrbOfPower} --debuff doesn't have stacks so can do it differently than wsg/twin peaks debuffs
 initialize(121177) --Orb of Power
 initialize(121176) --Orb of Power
 initialize(121175) --Orb of Power
 initialize(121164) --Orb of Power
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=155,["loadOn"]=loadOnBgOnly,["group"]=danCommonMiddleImportantMisc,        } --BG DEBUFFS ___
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=155,["loadOn"]=loadOnBgOnly,["group"]=danCommonMiddleMiddleFlag,        } --BG DEBUFFS ___
 initialize(34976) --Netherstorm Flag
 initialize(156621) --Alliance Flag
 initialize(156618) --Horde Flag
@@ -1062,14 +1123,13 @@ local dotDebuffsRbg = {
 local danCommonTopRightGroupDebuffs = {}
 local danCommonTopLeftArenaDebuffs = {} --could set ["arena"] to nil
 for i=1,5 do
-    danCommonTopRightGroupDebuffs[i]    =   {["controller"]=hasuitController_TopRight_TopRight,  ["hideCooldownText"]=true,  ["alpha"]=1,    }
-    danCommonTopLeftArenaDebuffs[i]     =   {["controller"]=hasuitController_TopLeft_TopLeft,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
+    danCommonTopRightGroupDebuffs[i]    =   {["controllerOptions"]=hasuitController_TopRight_TopRight,  ["hideCooldownText"]=true,  ["alpha"]=1,    }
+    danCommonTopLeftArenaDebuffs[i]     =   {["controllerOptions"]=hasuitController_TopLeft_TopLeft,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
 end
 
 
 do --groupSize 5 or less
     local loadOn = {}
-    local mainLoadOnFunctionSpammable = hasuitMainLoadOnFunctionSpammable
     local function loadOnCondition()
         if hasuitGroupSize<=5 then --should load
             if not loadOn.shouldLoad then
@@ -1115,6 +1175,7 @@ initialize(213691) --Scatter Shot
 hasuitSetupSpellOptionsMulti = { --priority_1
                           {hasuitSpellFunction_CleuINC,                 ["priority"]=186,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  ["duration"]=2.5,},
                           {hasuitSpellFunction_UnitCasting,             ["priority"]=186,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  },
+                          hasuitYellowMiddleCastBarsSpellOptions,
 }
 initializeMulti(203286) --Greater Pyroblast cast/success/damage, what's 450421 from? damage only but from npc once/guardian 7x and never from a player, 203286 has 8 spell damage total too all from a player
 initializeMulti(203155) --Sniper Shot
@@ -1123,10 +1184,11 @@ initializeMulti(274283) --Full Moon
 initializeMulti(199786) --Glacial Spike cast
 initializeMulti(116858) --Chaos Bolt
 initializeMulti(370965) --The Hunt
-initializeMulti(410126, 2) --Searing Glare cast --todo --__priority_1 cast-only
+initializeMulti(410126, 2) --Searing Glare cast --todo --__priority_1 cast-only --todo different look to this castbar?
 initializeMulti(357208, 2) --fire breath cast --todo
 initializeMulti(382266, 2) --fire breath cast2? --todo
 initializeMulti(198100, 2) --Kleptomania, todo update target based on cleu spellsteal
+
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initialize(280719) --Secret Technique, success
 initialize(280720) --Secret Technique, damage
@@ -1140,60 +1202,62 @@ initialize(408092) --Upheaval cast, 396286 rare cast?, 396288 damage, todo cc ca
 
 
 hasuitSetupSpellOptionsMulti = { --priority_2
-                          {hasuitSpellFunction_CleuINC,                 ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  ["duration"]=2.5,},
                           {hasuitSpellFunction_UnitCasting,             ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  },
+                          {hasuitSpellFunction_CleuINC,                 ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  ["duration"]=2.5,},
+                          hasuitYellowMiddleCastBarsSpellOptions,
 }
+initializeMulti(64382) --Shattering Throw cast
+hasuitSetupSpellOptionsMulti[3] = nil
+initializeMulti(394352, 2) --Shattering Throw missed?
+initializeMulti(64380, 2) --Shattering Throw dispel?
 initializeMulti(133) --Fireball
 initializeMulti(11366) --Pyroblast
 initializeMulti(116) --frostbolt cast
-initializeMulti(228597, 1) --frostbolt damage
-initializeMulti(30455, 1) -- Ice Lance cast success, todo only track if this will do significant damage? might want to tone down some stuff here, especially for someone new to the addon. there should be levels of how much chaos there should be that can be selected in options, probably with the default being at max and a recommendation to lower it
-initializeMulti(228598, 1) -- Ice Lance damage
+initializeMulti(228597, 2) --frostbolt damage
+initializeMulti(30455, 2) -- Ice Lance cast success, todo only track if this will do significant damage? might want to tone down some stuff here, especially for someone new to the addon. there should be levels of how much chaos there should be that can be selected in options, probably with the default being at max and a recommendation to lower it
+initializeMulti(228598, 2) -- Ice Lance damage
 initializeMulti(431044) --Frostfire Bolt
-initializeMulti(468655, 1) --Frostfire Bolt damage/aura
+initializeMulti(468655, 2) --Frostfire Bolt damage/aura
 initializeMulti(51505) --Lava Burst cast
-initializeMulti(285452, 1) --Lava Burst damage
+initializeMulti(285452, 2) --Lava Burst damage
 initializeMulti(29722) --Incinerate --todo track if big dam somehow? that could be very useful for a bunch of stuff but very specific and probably short term effectiveness. probably reserve that for things that are either weak/normal sometimes and very strong sometimes depending on an aura or whatever. some things like chaos bolt could get a % modifier number on the icon that changes based on how many procs they get, like a trinket proc adds a 1.13 multiplier/weapon enchant adds another etc, or could possibly do that for all non-dot casts as long as it doesn't obscure the icon texture too much
-initializeMulti(210714) --Icefury
-initializeMulti(274281) --New Moon
+initializeMulti(210714, 2) --Icefury. aura
+initializeMulti(274282) --New Moon
 initializeMulti(274282) --Half Moon
 initializeMulti(384110) --Wrecking Throw cast
-initializeMulti(394354, 1) --Wrecking Throw damage
-initializeMulti(64382) --Shattering Throw cast
-initializeMulti(394352, 1) --Shattering Throw missed?
-initializeMulti(64380, 1) --Shattering Throw dispel?
+initializeMulti(394354, 2) --Wrecking Throw damage
 initializeMulti(392060) --Wailing Arrow cast
-initializeMulti(392058, 1) --Wailing Arrow damage
+initializeMulti(392058, 2) --Wailing Arrow damage
 initializeMulti(19434) --aimed shot
-initializeMulti(48181) --Haunt
+initializeMulti(48182) --Haunt
 initializeMulti(228260) --Void Eruption --does this have a travel time?
 initializeMulti(6353) --Soul Fire
 initializeMulti(104316) --Call Dreadstalkers cast
-initializeMulti(193331, 1) --Call Dreadstalkers spell_summon
-initializeMulti(193332, 1) --Call Dreadstalkers spell_summon
+initializeMulti(193331, 2) --Call Dreadstalkers spell_summon
+initializeMulti(193332, 2) --Call Dreadstalkers spell_summon
 initializeMulti(5176) --Wrath
 initializeMulti(190984) --Wrath
 -- initializeMulti("Nether Portal") --?
-initializeMulti(153561, 1) --Meteor, cast success, 117588 is meteor from pet?, --__instant inc
-initializeMulti(351140, 1) --Meteor, cast damage
-initializeMulti(44425, 1) --Arcane Barrage, cast success and damage
-initializeMulti(434021, 1) --Arcane Barrage, uncommon spell damage
-initializeMulti(370452, 1) --Shattering Star, todo spell_cast_success doesn't happen at the right time. need unit_spellcast_succeeded
-initializeMulti(257541, 1) --Phoenix Flames, cast success
-initializeMulti(257542, 1) --Phoenix Flames, damage
-initializeMulti(78674, 1) --Starsurge
-initializeMulti(197626, 1) --Starsurge resto?
-initializeMulti(375982, 1) --Primordial Wave spell_cast_success
-initializeMulti(375984, 1) --Primordial Wave spell_damage
-initializeMulti(305392, 1) --?, Chill Streak cast success
-initializeMulti(204167, 1) --?, Chill Streak damage
-initializeMulti(357212, 1) --pyre spell_damage
-initializeMulti(357211, 1) --pyre spell_cast_success
+initializeMulti(153561, 2) --Meteor, cast success, 117588 is meteor from pet?, --__instant inc
+initializeMulti(351140, 2) --Meteor, cast damage
+initializeMulti(44425, 2) --Arcane Barrage, cast success and damage
+initializeMulti(434021, 2) --Arcane Barrage, uncommon spell damage
+initializeMulti(370452, 2) --Shattering Star, todo spell_cast_success doesn't happen at the right time. need unit_spellcast_succeeded
+initializeMulti(257541, 2) --Phoenix Flames, cast success
+initializeMulti(257542, 2) --Phoenix Flames, damage
+initializeMulti(78674, 2) --Starsurge
+initializeMulti(197626, 2) --Starsurge resto?
+initializeMulti(375982, 2) --Primordial Wave spell_cast_success
+initializeMulti(375984, 2) --Primordial Wave spell_damage
+initializeMulti(305392, 2) --?, Chill Streak cast success
+initializeMulti(204167, 2) --?, Chill Streak damage
+initializeMulti(357212, 2) --pyre spell_damage
+initializeMulti(357211, 2) --pyre spell_cast_success
 hasuitSetupSpellOptions = {hasuitSpellFunction_CleuINC,                 ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  ["duration"]=2.5,   ["spellINCType"]="aura",}
 initialize(212431) --Explosive Shot
 
 hasuitFramesCenterSetEventType("unitCasting")
-hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[2]
+hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initialize(386997) --Soul Rot --priority_2 cast-only
 initialize(34914) --Vampiric Touch
 initialize(391109) --Dark Ascension, this makes void volleys fly around and cc people? also buffs non-periodic by 20% and generates 30 insanity should do something to show friendly cc casts more clearly, or audio for it. enemy cc spellcasts are going to show in middle cast bars i think
@@ -1213,7 +1277,7 @@ initialize(212084) --Fel Devastation, channel
 initialize(436358) --Demolish, channel, todo gets 2 casts like eye beam
 initialize(353082) --Ring of Fire
 initialize(113656) --Fists of Fury, channel --todo track Heavy-Handed Strikes 100% parry buff
-initialize("Rune of Power") --?, Rune of Power, don't think this exists anymore?
+-- initialize("Rune of Power") --?, Rune of Power, don't think this exists anymore?
 initialize(191634) --Stormkeeper
 initialize(353128) --?, Arcanosphere, channel
 initialize(365350) --Arcane Surge
@@ -1225,9 +1289,13 @@ initialize(361469) --Living Flame, there's a guardian (did i mean pres? ah no th
 initialize(431443) --Chrono Flames
 initialize(47758) --Penance --todo get correct dest unit from cast success
 initialize(373129) --Dark Reprimand
-hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCasting,             ["priority"]=300,                                                           ["arena"]=danCommonTopLeftArenaDebuffs[2]} --same as priority_2, less important on arena frames
-initialize(342938) --Unstable Affliction cast arena
-initialize(316099) --Unstable Affliction cast arena
+
+hasuitSetupSpellOptionsMulti = { --priority_2
+                          {hasuitSpellFunction_UnitCasting,             ["priority"]=300,                                                           ["arena"]=danCommonTopLeftArenaDebuffs[2]}, --same as priority_2, less important on arena frames
+                          hasuitYellowMiddleCastBarsSpellOptions,
+}
+initializeMulti(342938) --Unstable Affliction cast arena
+initializeMulti(316099) --Unstable Affliction cast arena
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCasting,             ["priority"]=-74,               ["group"]=danCommonTopRightGroupDebuffs[3],     } --special cast-only priority_0 for unstable affliction, smaller but higher priority todo?: should be less important for people who have no ability to dispel it, but maybe hard to get that exactly right and keep it right over time
 initialize(342938) --Unstable Affliction cast group
@@ -1521,12 +1589,12 @@ hasuitFramesCenterSetEventType("aura")
 
 
 hasuitController_BottomLeft_BottomLeft      =       {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=2, ["yMinimum"]=3, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
-local danCommonHarmful = {["controller"]=hasuitController_BottomLeft_BottomLeft,["size"]=15,   ["hideCooldownText"]=true,  ["alpha"]=1}
+local danCommonHarmful = {["controllerOptions"]=hasuitController_BottomLeft_BottomLeft,["size"]=15,   ["hideCooldownText"]=true,  ["alpha"]=1}
 hasuitFramesSpellOptionsClassSpecificHarmful = {hasuitSpellFunction_AuraSourceIsPlayer,["priority"]=1, ["arena"]=danCommonHarmful, ["loadOn"]=loadOnArenaOnly} --i'm thinking about not showing debuffs bottom left at all and doing something different/using that space to show another dr like typhoon, so this is subject to change
 
 
 hasuitController_BottomRight_BottomRight    =       {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
-local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,["alpha"]=1}
+local danCommonHelpful = {["controllerOptions"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,["alpha"]=1}
 hasuitFramesSpellOptionsClassSpecificHelpful = {hasuitSpellFunction_AuraSourceIsPlayer,["priority"]=1, ["group"]=danCommonHelpful} --pretty awful for any healer i think, a specific setup per class/spec is preferred. might make something new to show hots with fixed position based on spellid but only need 1 controller, although maybe the current setup like i use on druid is fine
 
 

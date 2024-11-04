@@ -64,6 +64,7 @@ local createOptionsPages = {
 }
 
 
+local print = print
 local activeScaleMultiplier
 
 local savedUserOptions
@@ -72,6 +73,7 @@ hasuitUserOptionsOnChanged = userOptionsOnChanged
 tinsert(hasuitDoThisAddon_Loaded, 1, function()
     savedUserOptions = hasuitSavedUserOptions
     if not savedUserOptions then --will need to have checks for any new options added after release, maybe there's a better way to set this up
+        print("Welcome to HasuitFrames. If you're new I recommend looking at welcome.txt in the HasuitFrames addon folder. glhf")
         savedUserOptions = { --defaults ___
             ["partyX"]=-381,
             ["partyY"]=127, --old comment: number-hasuitRaidFrameHeightForGroupSize[5]-3?
@@ -149,6 +151,7 @@ end)
 
 
 
+local CreateFrame = CreateFrame
 
 local danBackdrop = {
     bgFile = "Interface\\ChatFrame\\ChatFrameBackground", 

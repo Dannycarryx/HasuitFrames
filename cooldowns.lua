@@ -25,8 +25,12 @@ hasuitBlessingOfAutumnIgnoreList = { --how would this interact with time stop? o
     [31616]=true, --Nature's Guardian?, what about warlock spell lock vs actual pet cd?
 }
 
-
+local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
 local tinsert = tinsert
+local recycleCooldownIcon
+function hasuitLocal3(func)
+    recycleCooldownIcon = func
+end
 
 do --cooldowns loadon
     local danDoThisOnUpdate = hasuitDoThisOnUpdate
@@ -38,7 +42,6 @@ do --cooldowns loadon
         danRestoreCooldowns1 = hasuitRestoreCooldowns
     end)
     
-    local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
     local function danRestoreCooldowns2()
         for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do
             for i=#unitTable,1,-1 do
@@ -74,7 +77,7 @@ do --cooldowns loadon
                             if frame.cooldownPriorities then
                                 for _, icon in pairs(frame.cooldownPriorities) do
                                     if icon.recycle then
-                                        hasuitRecycleCooldownIcon(icon)
+                                        recycleCooldownIcon(icon)
                                     end
                                 end
                                 frame.cooldowns = {}
@@ -99,6 +102,7 @@ local hasuitLoadOn_CooldownDisplay = hasuitLoadOn_CooldownDisplay --todo do this
 
 
 
+local hasuitSortController = hasuitSortController
 local initialize = hasuitFramesInitialize
 local hasuitFramesCenterSetEventType = hasuitFramesCenterSetEventType
 
@@ -233,8 +237,7 @@ do
     }
     
     do
-        local recycleCooldownIcon
-        function hasuitDoThisRandomFunctionAsd(func)
+        function hasuitLocal4(func)
             recycleCooldownIcon = func
         end
         local function cleanController(controller)
@@ -276,11 +279,11 @@ do
                         if not frame.cooldownsDisabled then
                             local controller1 = frame.controllersPairs[trinketControllerOptions]
                             if controller1 then
-                                hasuitSortController(controller1)
+                                hasuitSortController(controller1, true)
                             end
                             local controller2 = frame.controllersPairs[defensiveControllerOptions]
                             if controller2 then
-                                hasuitSortController(controller2)
+                                hasuitSortController(controller2, true)
                             end
                             cleanController(frame.controllersPairs[interruptControllerOptions])
                             cleanController(frame.controllersPairs[crowdControlControllerOptions])
@@ -343,6 +346,7 @@ do
     
     local lowStartAlpha = 0.67
     
+    local hasuitTrackedRaceCooldowns = hasuitTrackedRaceCooldowns
     do
         local trinketCooldowns = hasuitTrinketCooldowns
         
@@ -355,7 +359,7 @@ do
         }
         
         
-        trinketCooldowns["general"]={ --tables like this are used to create cooldown icons in UnitFrames2.lua with danAddSpecializationCooldowns based on class/spec/race or general goes on everything regardless. each table within also acts as a hasuitSetupSpellOptions and gets initialized at the bottom of the file according to ["spellId"], similar to how things are done in general.lua
+        trinketCooldowns["general"]={ --tables like this are used to create cooldown icons in UnitFrames2.lua with danAddSpecializationCooldowns based on class/spec/race or general goes on everything regardless. each table within also acts as a hasuitSetupSpellOptions and gets initialized at the bottom of the file according to ["spellId"], similar to how things are done in general.lua. If trying to understand how stuff works I recommend looking somewhere else, either in general.lua or below because this part is pretty ugly, using things in a way they weren't originally made for to get it to work.
             {cdCleT,["spellId"]=336126, ["priority"]=-10,   ["duration"]=120,--Gladiator's Medallion
                 ["pvpTrinket"]=true, ["sharedCd"]=sharedTrinketCooldowns},
             {cdCleT,["spellId"]=42292,  ["priority"]=-10,   ["duration"]=120,--PvP Trinket, oh 283167 is from hunter pets probably? don't think i let comp stomp data in
@@ -379,7 +383,7 @@ do
             if playerClass=="PRIEST" or playerClass=="WARLOCK" or playerClass=="EVOKER" or playerClass=="WARRIOR" or playerClass=="DEMONHUNTER" then --todo or playerClass=="MONK" if playing sleep
                 hasuitTrackedRaceCooldowns["Scourge"] = true --undead
                 trinketCooldowns["Scourge"]={
-                    {cdCleR, ["spellId"]=7744,["priority"]=-9,  ["duration"]=120,--Will of the Forsaken
+                    {cdCleR, ["spellId"]=7744,["priority"]=-9,  ["duration"]=120,--Will of the Forsaken, --gets initialized at the bottom of the file the same way as a hasuitSetupSpellOptions, along with everything else that looks like this
                         ["minimumDuration"]=30,["differenceFromNormalDuration"]=-90},
                 }
                 
@@ -1495,6 +1499,7 @@ do
         hasuitInterruptCooldowns,
         hasuitCrowdControlCooldowns,
     }
+    local hasuitFramesCenterSetEventTypeFromFunction = hasuitFramesCenterSetEventTypeFromFunction
     local lastFunction
     for i=1,#allCooldownsTable do
         local spellIdMerger = {}
@@ -1529,6 +1534,7 @@ do
     end
 end
 
+local hasuitVanish120 = hasuitVanish120
 function hasuitResetCooldowns(frame) --not great but works now
     local controller
     local wasOtherUnitType
@@ -1573,7 +1579,7 @@ function hasuitResetCooldowns(frame) --not great but works now
                 controller.unitTypeStuff = unitTypeStuff
                 wasOtherUnitType = true
             end
-            hasuitSortController(controller)
+            hasuitSortController(controller, true)
         end
         if wasOtherUnitType then
             icon:ClearAllPoints()

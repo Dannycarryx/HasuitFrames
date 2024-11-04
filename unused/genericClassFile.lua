@@ -3,10 +3,10 @@
 
 local function danGenericClassFile() --todo figure out how to get relevant spells for each class/spec from spellbook and make everything. this function could exist as a backup/to use on new xpac or something
     
-    local danCommon = {["controller"]=hasuitController_BottomLeft_BottomLeft,  ["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
+    local danCommon = {["controllerOptions"]=hasuitController_BottomLeft_BottomLeft,  ["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
     local danCommonOptionsHarmful = {hasuitSpellFunction_AuraSourceIsPlayerAndHarmful, ["priority"]=1, ["arena"]=danCommon, ["loadOn"]=danLoadOnArenaOnly}
     
-    local danCommon = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
+    local danCommon = {["controllerOptions"]=hasuitController_BottomRight_BottomRight,["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
     local danCommonOptionsHelpful = {hasuitSpellFunction_AuraSourceIsPlayerAndHelpful, ["priority"]=1, ["group"]=danCommon}
     
     local GetSpellName = C_Spell.GetSpellName

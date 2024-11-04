@@ -7,7 +7,6 @@ local arenaUnitFrames = hasuitUnitFramesForUnitType["arena"]
 local hasuitPlayerGUID = hasuitPlayerGUID
 
 local danCurrentIcon
-local danCurrentController
 local danCurrentFrame --after a bit of testing i realized that setting a file wide local variable and then having multiple functions use it one after another without passing it as an argument is just worse than passing a variable around multiple times from one function to another. The entire addon was made with that assumption that passing a variable around multiple times to different functions was creating a new thing every time for no reason but ya idk how it actually works. it's still a good way to do cleu though according to the test i did. also probably good for unit_aura added/updated/removed. not sure if good for anything else, needs something where a variable gets set but may or may not be needed, but if variable will always get used in the function it should just be an arg
 local danCurrentAura --oh well it gives the addon character
 
@@ -15,13 +14,12 @@ local danGetIcon
 local danCooldownDoneRecycle
 
 local unusedIcons = {}
-hasuitUnusedIcons = unusedIcons
 
 local danCleanController
 local danSortController
-local danAddToController
+local danAddToUnitFrameController
 
-local iconFramesCreated = 0
+-- local iconFramesCreated = 0
 local danBackdrop
 
 local danCurrentSpellOptions
@@ -103,8 +101,8 @@ do
 end
 
 
-function hasuitGetD2anCleuSubevent() --going to get rid of these
-    return d2anCleuSubevent
+function hasuitGetD2anCleuSubevent() --not sure exactly what the plan is for custom functions from outside, but they'll be possible in the future. These functions might go away
+    return d2anCleuSubevent --The best setup is probably to pcall external functions and give them all relevant args
 end
 function hasuitGetD4anCleuSourceGuid()
     return d4anCleuSourceGuid
@@ -143,6 +141,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     local band = bit.band
     local COMBATLOG_OBJECT_CONTROL_PLAYER = COMBATLOG_OBJECT_CONTROL_PLAYER
     local COMBATLOG_OBJECT_CONTROL_MASK = COMBATLOG_OBJECT_CONTROL_MASK
+    local hasuitFramesCenterNamePlateGUIDs = hasuitFramesCenterNamePlateGUIDs
     local function pveCleuFunc() --seems to work pretty well? weird though. example 434830 is coded so that player is the source of the cast for unit_aura and unit_spellcast_succeeded but source/dest are empty strings on cleu success and empty string for source/normal dest for spell_aura_applied
         d1anCleuTimestamp, d2anCleuSubevent, d3anCleuHideCaster, d4anCleuSourceGuid, d5anCleuSourceName, d6anCleuSourceFlags, d7anCleuSourceRaidFlags, d8anCleuDestGuid, d9anCleuDestName, 
         d10anCleuDestFlags, d11anCleuDestRaidFlags, d12anCleuSpellId, d13anCleuSpellName, d14anCleuSpellSchool, d15anCleuOther, d16anCleuOther, d17anCleuOther = CombatLogGetCurrentEventInfo()
@@ -227,7 +226,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     
     
     
-    
+    local hasuitMainLoadOnFunctionSpammable = hasuitMainLoadOnFunctionSpammable
     
     do --loadon for pve, todo fully delete all saved pve stuff on unload? 
         local loadOn = {}
@@ -270,16 +269,16 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     pveUnitCastSpellOptions =           {["priority"]=495,  ["group"]=danCommonPveUnitCast, ["loadOn"]=hasuitLoadOn_EnablePve}
     
     tinsert(hasuitDoThisAddon_Loaded, function()
-        danCommonPveAura["controller"] = hasuitController_TopRight_TopRight
-        danCommonPveAuraIsBossAura["controller"] = hasuitController_TopRight_TopRight
+        danCommonPveAura["controllerOptions"] = hasuitController_TopRight_TopRight
+        danCommonPveAuraIsBossAura["controllerOptions"] = hasuitController_TopRight_TopRight
         pveAuraSpellOptions[1] = hasuitSpellFunction_AuraMainFunction
         pveAuraSpellOptionsIsBossAura[1] = hasuitSpellFunction_AuraMainFunction
         pveAuraSpellOptionsUnknownType[1] = hasuitSpellFunction_AuraMainFunctionPveUnknown
         
-        danCommonPveCleuINC["controller"] = hasuitController_TopRight_TopRight
+        danCommonPveCleuINC["controllerOptions"] = hasuitController_TopRight_TopRight
         pveCleuINCSpellOptions[1] = hasuitSpellFunction_CleuINC
         
-        danCommonPveUnitCast["controller"] = hasuitController_TopRight_TopRight
+        danCommonPveUnitCast["controllerOptions"] = hasuitController_TopRight_TopRight
         pveUnitCastSpellOptions[1] = hasuitSpellFunction_UnitCasting
     end)
     
@@ -560,8 +559,7 @@ updatedAuraSharedFunction = function()
     if danCurrentIcon.specialFunction then 
         danCurrentIcon.specialFunction()
     end
-    danCurrentController = danCurrentIcon.controller
-    danSortController()
+    danSortController(danCurrentIcon.controller, true)
 end
 
 
@@ -712,7 +710,7 @@ end)
 
 
 
-
+local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
 function danUnitAuraIsFullUpdate()
     local unit = danCurrentFrame.unit
     local unitGUID = UnitGUID(unit)
@@ -835,13 +833,12 @@ do
         [11] =              {danFont11,                                                                         ["xOffset"]=2,  ["yOffset"]=0},
         
         ["KICKArena"]=      {danFont11, 0.8, 0.8, 0.8, 0.8, ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1},
-        ["KICKRbg"] =       {danFont7,                      ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1},
+        ["KICKRbg"] =       {danFont7,                      ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1}, --shares with weakness/tongues
         
-        ["cdProc"]=         {danFont10, 0.8, 0.8, 0.8, 0.8, ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1},
+        ["cdProc"]=         {danFont10, 0.8, 0.8, 0.8, 0.8, ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1}, --shares with roots that don't get a ccbreakbar
         ["rootArena"]=      {danFont10, 0.8, 0.8, 0.8, 0.8, ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=6},
-        ["rootRbg"] =       {danFont6,                      ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1},
+        ["rootRbg"] =       {danFont6,  0.8, 0.8, 0.8, 0.8, ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1},
         
-        ["pointsTextWeakness"]={danFont7,                   ["ownPoint"]="BOTTOM",  ["targetPoint"]="BOTTOM",   ["xOffset"]=2,  ["yOffset"]=1},
         
         ["danFontOrbOfPower"]={danFont9,                    ["ownPoint"]="TOP",     ["targetPoint"]="BOTTOM",   ["xOffset"]=1,  ["yOffset"]=-1},
         
@@ -1140,7 +1137,8 @@ do
 end
 
 
-
+-- local UnitChannelInfo = UnitChannelInfo
+-- local UnitCastingInfo = UnitCastingInfo --still not sure whether it matters keeping stuff like this together or having it spread out randomly, todo
 do
     local ccBreakOnEvent = hasuitCcBreakOnEvent
     hasuitCcBreakOnEvent = nil
@@ -1150,12 +1148,13 @@ do
     cooldownTextTimerAsd:Cancel()
 
     function danGetIcon(iconType) --todo aura hide checks whether the aura is active and if not hides like normal, if it still is cooldown:setscript(hide, show()) something like this to prevent icons lighting up briefly when cooldown is done but no remove event
-        if #unusedIcons[iconType]>0 then
-            -- danPrintTeal2("danGetIcon"..tostring(iconType), "active: "..iconFramesCreated-#unusedIcons[iconType], "inactive: "..#unusedIcons[iconType])
-            return tremove(unusedIcons[iconType])
+        local unusedTable = unusedIcons[iconType]
+        if #unusedTable>0 then
+            -- danPrintTeal2("danGetIcon"..tostring(iconType), "active: "..iconFramesCreated-#unusedTable, "inactive: "..#unusedTable)
+            return tremove(unusedTable)
         else
-            -- danPrintTeal("danGetIcon+1"..tostring(iconType), "active: "..iconFramesCreated-#unusedIcons[iconType], "inactive: "..#unusedIcons[iconType])
-            iconFramesCreated = iconFramesCreated+1
+            -- danPrintTeal("danGetIcon+1"..tostring(iconType), "active: "..iconFramesCreated-#unusedTable, "inactive: "..#unusedTable)
+            -- iconFramesCreated = iconFramesCreated+1
             
             local icon = CreateFrame("Frame")
             if iconType=="optionalBorder" or iconType=="ccBreak" then
@@ -1172,7 +1171,7 @@ do
                     icon.border:SetAllPoints()
                 end
             end
-            icon.iconType = iconType
+            icon.unusedTable = unusedTable
             
             icon.iconTexture = icon:CreateTexture(nil, "BACKGROUND") --set the iconTexture draw layer lower, todo mixin cooldown and backdrop and make every icon just 1 frame?, don't even need to make an extra one for text
             icon.iconTexture:SetAllPoints()
@@ -1280,8 +1279,7 @@ function danCooldownDoneRecycle(cooldown)
         danCurrentIcon.textFrame = nil
     end
     
-    danCurrentController = danCurrentIcon.controller
-    danCleanController()
+    danCleanController(danCurrentIcon.controller)
 end
 
 hasuitCooldownDoneRecycle = danCooldownDoneRecycle
@@ -1293,25 +1291,25 @@ hasuitCooldownDoneRecycle = danCooldownDoneRecycle
     
 
 
-
-
-
-danCleanController = function(self)
-    if not self then
-        if danCurrentController.doingSomething ~= danCleanController then 
-            danCurrentController:SetScript("OnUpdate", danCleanController)
-            danCurrentController.doingSomething = danCleanController
-        end
-        return
-    end
-    local frames = self.frames
+local function danCleanControllerOnUpdate(controller)
+    local frames = controller.frames
     for i=#frames, 1, -1 do
-        if not frames[i].active then
-            tinsert(unusedIcons[frames[i].iconType], tremove(frames, i))
+        local frame = frames[i]
+        if not frame.active then
+            tinsert(frame.unusedTable, tremove(frames, i))
         end
     end
-    danSortController(self)
+    danSortController(controller)
 end
+
+function danCleanController(controller)
+    if controller.doingSomething ~= danCleanControllerOnUpdate then 
+        controller:SetScript("OnUpdate", danCleanControllerOnUpdate)
+        controller.doingSomething = danCleanControllerOnUpdate
+    end
+end
+hasuitCleanController = danCleanController
+
 local function initializeController(controllerOptions)
     danCurrentFrame.controllersPairs[controllerOptions] = CreateFrame("Frame", nil, danCurrentFrame)
     local controller = danCurrentFrame.controllersPairs[controllerOptions]
@@ -1322,8 +1320,11 @@ local function initializeController(controllerOptions)
     controller.setPointOn = controllerOptions["setPointOnBorder"] and danCurrentFrame.border or danCurrentFrame
     controller.frames = {}
     
-    if controllerOptions.customControllerSetupFunction then
-        controllerOptions.customControllerSetupFunction(controller)
+    local customControllerSetupFunctions = controllerOptions.customControllerSetupFunctions
+    if customControllerSetupFunctions then
+        for i=1,#customControllerSetupFunctions do
+            customControllerSetupFunctions[i](controller)
+        end
     end
     
     if controllerOptions["controlsOther"] then
@@ -1341,41 +1342,52 @@ function hasuitInitializeController(frame, controllerOptions)
     return initializeController(controllerOptions)
 end
 
-function danAddToController() --this was the very first system made for the addon, just rejuvenations growing in 4 different directions at the top right of a healthbar
-    local controllerOptions = danCurrentSpellOptionsCommon["controller"]
-    danCurrentController = danCurrentFrame.controllersPairs[controllerOptions]
-    if not danCurrentController then
-        danCurrentController = initializeController(controllerOptions)
+function danAddToUnitFrameController() --this was the very first system made for the addon, just rejuvenations growing in 4 different directions at the top right of a healthbar
+    local controllerOptions = danCurrentSpellOptionsCommon["controllerOptions"]
+    local controller = danCurrentFrame.controllersPairs[controllerOptions]
+    if not controller then
+        controller = initializeController(controllerOptions) --dan1
     end
-    danCurrentIcon.controller = danCurrentController
-    tinsert(danCurrentController.frames, danCurrentIcon)
-    danSortController()
+    danCurrentIcon.controller = controller
+    tinsert(controller.frames, danCurrentIcon)
+    danSortController(controller, true)
 end
-danSortController = function(self)
-    if not self then
-        if not danCurrentController.doingSomething then 
-            danCurrentController:SetScript("OnUpdate", danSortController)
-            danCurrentController.doingSomething = danSortController
+
+
+
+
+local hasuitFramesParent = hasuitFramesParent
+-- function hasuitInitializeSeparateController(controllerOptions)
+    -- local controller = CreateFrame("Frame", nil, hasuitFramesParent)
+    -- controllerOptions.controller = controller
+    -- controller.options = controllerOptions
+    -- controller.frames = {}
+    -- return controller
+-- end
+local function danAddToSeparateController(controller, frame)
+    frame.controller = controller
+    tinsert(controller.frames, frame)
+    danSortController(controller, true) --todo improve
+end
+-- hasuitAddToSeparateController = danAddToSeparateController
+function danSortController(controller, dan)
+    if dan==true then
+        if not controller.doingSomething then 
+            controller:SetScript("OnUpdate", danSortController)
+            controller.doingSomething = danSortController
         end
         return
     end
-    self:SetScript("OnUpdate", nil)
-    self.doingSomething = false
+    controller:SetScript("OnUpdate", nil)
+    controller.doingSomething = false
     
-    self.grow(self)
+    controller.grow(controller)
 end
-
-function hasuitCleanController(controller)
-    danCurrentController = controller
-    danCleanController()
-end
-function hasuitSortController(controller) --todo
-    danCurrentController = controller
-    danSortController()
-end
+hasuitSortController = danSortController
 
 
-hasuitSort = function(a,b)
+
+function hasuitSort(a,b)
     if a.priority<b.priority then
         return true
     elseif a.priority==b.priority then
@@ -1403,10 +1415,10 @@ hasuitSort = function(a,b)
         end
     end
 end
-hasuitSortExpirationTime = function(a,b)
+function hasuitSortExpirationTime(a,b)
     return a.expirationTime<b.expirationTime
 end
-hasuitSortPriorityExpirationTime = function(a,b)
+function hasuitSortPriorityExpirationTime(a,b)
     if a.priority<b.priority then
         return true
     elseif a.priority==b.priority then
@@ -1527,10 +1539,22 @@ do
         local middleIcon = frames[1]
         if middleIcon then
             local setPointOn = controller.setPointOn
-            middleIcon:SetPoint("TOPLEFT", setPointOn, "TOPLEFT", floor(setPointOn.width/2)-floor(middleIcon.size/2), -floor(setPointOn.height/2)+floor(middleIcon.size/2))
+            middleIcon:SetPoint("TOPLEFT", setPointOn, "TOPLEFT", floor(setPointOn.width/2-middleIcon.size/2), floor(-setPointOn.height/2+middleIcon.size/2))
         end
         for i=2, #frames do --i think this could go in the if statement above but not 100% sure
             frames[i]:SetAlpha(0)
+        end
+    end
+    
+    
+    local middleCastBarsFrames
+    function hasuitLocal2(controller)
+        middleCastBarsFrames = controller.frames
+    end
+    function hasuitMiddleCastBarsGrow(controller) --hasuitSpellFunction_UnitCastingMiddleCastBars/hasuitController_Separate_UpperScreenCastBars
+        for i=1, #middleCastBarsFrames do
+            local castBar = middleCastBarsFrames[i]
+            castBar:SetPoint("CENTER", controller, "TOP", 0, -castBar.unitFrame.arenaNumber*37)
         end
     end
 end
@@ -1543,8 +1567,8 @@ end
 
 
 local function danSharedIconFunction()
-    danAddToController()
-    danCurrentIcon:SetParent(danCurrentController)
+    danAddToUnitFrameController()
+    danCurrentIcon:SetParent(danCurrentIcon.controller)
     danCurrentIcon:ClearAllPoints()
     danCurrentIcon.size = danCurrentSpellOptionsCommon["size"]
     danCurrentIcon:SetSize(danCurrentIcon.size, danCurrentIcon.size)
@@ -1638,24 +1662,9 @@ hasuitSpellFunction_AuraSourceIsPlayer = addMultiFunction(function()
         danMainAuraFunction()
     end
 end)
-function hasuitSpellFunction_AuraSourceIsPlayerAndHarmful()
-    if danCurrentAura["sourceUnit"]=="player" and danCurrentAura["isHarmful"] then
-        danMainAuraFunction()
-    end
-end
-function hasuitSpellFunction_AuraSourceIsPlayerAndHelpful()
-    if danCurrentAura["sourceUnit"]=="player" and danCurrentAura["isHelpful"] then
-        danMainAuraFunction()
-    end
-end
 
 hasuitSpellFunction_AuraSourceIsNotPlayer = addMultiFunction(function() --todo something similar to pve boss aura function to decide whether to give spell this function or skip it if class can't cast it anyway? or an alt initialize function, not sure exactly what i was thinking here but something during initialize to decide this is probably best? pve boss aura thing doesn't seem like it'd be useful here
     if danCurrentAura["sourceUnit"]~="player" then
-        danMainAuraFunction()
-    end
-end)
-hasuitAuraIsDebuffOnly = addMultiFunction(function()
-    if danCurrentAura["isHarmful"] then
         danMainAuraFunction()
     end
 end)
@@ -1673,7 +1682,7 @@ end)
 
 
 
---[[
+--[[ --todo
 danAuraMissingFunction = addMultiFunction(function(icon)
     danCurrentIcon = danGetIcon("missing")
     danSharedIconFunction()
@@ -1726,8 +1735,10 @@ danAuraMissingFunctionHidesWhileActive = addMultiFunction(function()
 end)
 ]]
 
-
-
+local hypoCooldownTimerDone
+function hasuitLocal5(func)
+    hypoCooldownTimerDone = func
+end
 local function hypo2ndTimerThing(icon, cooldownExpirationTime)
     if icon.hypoExpirationTime>cooldownExpirationTime then
         if icon.priority==256 and not icon.isPrimary then
@@ -1748,8 +1759,10 @@ local function hypo2ndTimerThing(icon, cooldownExpirationTime)
     end
 end
 
-
-
+local cooldownOnCooldownDone
+function hasuitLocal6(func)
+    cooldownOnCooldownDone = func
+end
 local function auraRemovedHypoCooldownFunction(frame)
     local cooldowns = frame.cooldowns
     if cooldowns then
@@ -1762,7 +1775,7 @@ local function auraRemovedHypoCooldownFunction(frame)
                 if not expirationTime or expirationTime<=GetTime() then
                     affectedIcon.expirationTime = GetTime()
                     affectedIcon.cooldown:Clear()
-                    hasuitCooldownOnCooldownDone(affectedIcon.cooldown)
+                    cooldownOnCooldownDone(affectedIcon.cooldown)
                 else
                     affectedIcon.cooldown:SetCooldown(affectedIcon.startTime, expirationTime-affectedIcon.startTime)
                 end
@@ -1794,8 +1807,7 @@ hasuitSpellFunction_AuraHypoCooldownFunction = addMultiFunction(function()
                             affectedIcon.priority = 256
                             affectedIcon:SetAlpha(0.5)
                         end
-                        danCurrentController = affectedIcon.controller
-                        danSortController()
+                        danSortController(affectedIcon.controller, true)
                     end
                 end
             end
@@ -1817,12 +1829,10 @@ end)
 
 hasuitSpellFunction_AuraPoints2CooldownReductionExternal = addMultiFunction(function()
     if danCurrentEvent=="added" and danAuraEventActive and danCurrentAura["points"][2]==danCurrentSpellOptions["points2"] and danCurrentAura["sourceUnit"] then
-        local frame = danCurrentFrame
-        danCurrentFrame = hasuitUnitFrameForUnit[danCurrentAura["sourceUnit"]] --fml
-        if danCurrentFrame then
-            danCooldownReductionFunction()
-        end
-        danCurrentFrame = frame
+        local unitFrame = danCurrentFrame
+        danCurrentFrame = hasuitUnitFrameForUnit[danCurrentAura["sourceUnit"]]
+        danCooldownReductionFunction()
+        danCurrentFrame = unitFrame
     end
 end)
 
@@ -2058,8 +2068,6 @@ do
     local blessingOfAutumnIgnoreList
     tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function()
         blessingOfAutumnIgnoreList = hasuitBlessingOfAutumnIgnoreList
-        hasuitBlessingOfAutumnIgnoreList = nil
-        hasuitSpecialAuraFunction_BlessingOfAutumn = nil --bored todo could clean up global table? shouldn't have any value keeping anything there really, plan is for people to put stuff into player login table or similar where it'll all still be available and they can make that stuff local in their own addon, then might as well be removed from global after?
     end)
     local danSpellOptions = {["CDr"]=0.3}
     local function asd(timer) --might just work well as is without anything extra needing to be done, one potential problem is enemy stealthing, could fix that easily if a new system is made related to that or todo?: if the fullupdate just gets ignored if enemy is known to have used stealth ability, the setscript hide thing should get disabled for those icons?, other problem is just remembering to add relevant stuff to the ignore list, not sure of a good way to automate that
@@ -2347,7 +2355,7 @@ hasuitNpcIds = {
     [1863] = 6358, --succubus
     [17252] = 119914, --felguard
 }
-
+local hasuitNpcIds = hasuitNpcIds
 
 local unitKBelongsToV = {} --todo reset on instance changed or something? hopefully all pet stuff will work itself out after adding pet frames
 local function hasuitSpellFunction_CleuSpellSummon()
@@ -2387,8 +2395,7 @@ do
                     icon.cooldown:Clear()
                     -- icon.alpha = 1
                     icon:SetAlpha(icon.alpha)
-                    danCurrentController = icon.controller
-                    danSortController()
+                    danSortController(icon.controller, true)
                 end
             end
         end
@@ -2456,10 +2463,10 @@ function danCooldownReductionFunction() --could split this into multiple functio
                     if currentTime>=expirationTime then
                         icon.cooldown:Clear()
                         if not icon.charges then
-                            hasuitCooldownOnCooldownDone(icon.cooldown)
+                            cooldownOnCooldownDone(icon.cooldown)
                         else
                             icon.cdrLeftOver = currentTime-expirationTime
-                            hasuitCooldownOnCooldownDone(icon.cooldown)
+                            cooldownOnCooldownDone(icon.cooldown)
                             icon.cdrLeftOver = nil
                         end
                     else
@@ -2468,8 +2475,7 @@ function danCooldownReductionFunction() --could split this into multiple functio
                         startCooldownTimerText(icon)
                         
                     end
-                    danCurrentController = icon.controller
-                    danSortController()
+                    danSortController(icon.controller, true)
                 end
             end
         end
@@ -2553,6 +2559,7 @@ function hasuitSpellFunction_CleuInterruptCooldownReductionSolarBeam() --solar b
     end
 end
 
+local hasuitVanish96 = hasuitVanish96
 function hasuitSpellFunction_CleuAppliedCooldownReductionThiefsBargain354827() --might reuse for other stuff later
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
@@ -2633,8 +2640,7 @@ function danCleuCooldownStart(GriftahsEmbellishingPowder) --there's a ~0.2 secon
         end
     end
     
-    danCurrentController = danCurrentIcon.controller
-    danSortController()
+    danSortController(danCurrentIcon.controller, true)
 end
 hasuitSpellFunction_CleuSuccessCooldownStart1 = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
@@ -2742,6 +2748,7 @@ hasuitSpellFunction_CleuSuccessCooldownStartSolarBeam = addMultiFunction(functio
 end)
 
 
+local hasuitSpecIsHealerTable = hasuitSpecIsHealerTable
 
 hasuitSpellFunction_CleuSuccessCooldownStartPvPTrinket = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
@@ -3222,9 +3229,9 @@ local sourceHasSoul = {}
 hasuitFramesCenterSetEventType("cleu")
 hasuitSetupSpellOptions = {function() --soul of the forest empowered hots 1
     local frame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
-    if frame and frame.disableSoul then
-        return
-    end
+    -- if frame and frame.disableSoul then
+        -- return
+    -- end
     local currentTime = GetTime()
     if d2anCleuSubevent == "SPELL_CAST_SUCCESS" then
         if sourceHasSoul[d4anCleuSourceGuid] then
@@ -3263,30 +3270,31 @@ initialize(114108) --soul of the forest
 
 local soulLoadingFrame = CreateFrame("Frame")
 soulLoadingFrame:SetScript("OnEvent", function(_, event) --todo
-    if event=="LOADING_SCREEN_ENABLED" then
-        for sourceGUID, hasSoul in pairs(sourceHasSoul) do
-            local frame = hasuitUnitFrameForUnit[sourceGUID]
-            if frame then
-                frame.disableSoul = true
-            else
-                sourceHasSoul[sourceGUID] = nil
-            end
-        end
-    else
-        for sourceGUID, hasSoul in pairs(sourceHasSoul) do
-            local frame = hasuitUnitFrameForUnit[sourceGUID]
-            if frame then
-                C_Timer.After(0, function()
-                    frame.disableSoul = nil
-                end)
-            else
-                sourceHasSoul[sourceGUID] = nil
-            end
-        end
-    end
+    sourceHasSoul = {}
+    -- if event=="LOADING_SCREEN_ENABLED" then
+        -- for sourceGUID, hasSoul in pairs(sourceHasSoul) do
+            -- local frame = hasuitUnitFrameForUnit[sourceGUID]
+            -- if frame then
+                -- frame.disableSoul = true
+            -- else
+                -- sourceHasSoul[sourceGUID] = nil
+            -- end
+        -- end
+    -- else
+        -- for sourceGUID, hasSoul in pairs(sourceHasSoul) do
+            -- local frame = hasuitUnitFrameForUnit[sourceGUID]
+            -- if frame then
+                -- C_Timer.After(0, function()
+                    -- frame.disableSoul = nil
+                -- end)
+            -- else
+                -- sourceHasSoul[sourceGUID] = nil
+            -- end
+        -- end
+    -- end
 end)
 soulLoadingFrame:RegisterEvent("LOADING_SCREEN_ENABLED")
-soulLoadingFrame:RegisterEvent("LOADING_SCREEN_DISABLED")
+-- soulLoadingFrame:RegisterEvent("LOADING_SCREEN_DISABLED")
 
 
 
@@ -3294,19 +3302,7 @@ soulLoadingFrame:RegisterEvent("LOADING_SCREEN_DISABLED")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-function hasuitSpecialAuraFunction_RedLifebloom(icon) --specialFunction
+local function danSpecialAuraFunction_RedLifebloom(icon) --specialFunction
     if icon then
         icon.red = true
         icon.iconTexture:SetVertexColor(1, 0.55, 0.55)
@@ -3341,16 +3337,13 @@ function hasuitSpecialAuraFunction_RedLifebloom(icon) --specialFunction
     danCurrentIcon.expectedTime = GetTime()+timerTime
     local icon = danCurrentIcon
     danCurrentIcon.timer = C_Timer_NewTimer(timerTime, function()
-        hasuitSpecialAuraFunction_RedLifebloom(icon)
+        danSpecialAuraFunction_RedLifebloom(icon)
     end)
 end
-tinsert(hasuitDoThisPlayer_Login, function()
-    if not hasuitUsedRedLifebloom then
-        hasuitSpecialAuraFunction_RedLifebloom = nil
-    else
-        hasuitUsedRedLifebloom = nil
-    end
-end)
+hasuitSpecialAuraFunction_RedLifebloom = danSpecialAuraFunction_RedLifebloom
+
+
+
 
 do
     local playerClass = hasuitPlayerClass
@@ -3435,7 +3428,6 @@ end
 
 
 
-
 local hasuitCastSpellIdFunctions = {}
 hasuitFramesCenterAddToAllTable(hasuitCastSpellIdFunctions, "unitCasting")
 local hasuitGeneralCastStartFrame = CreateFrame("Frame")
@@ -3467,8 +3459,7 @@ end)
 
 
 
-
-
+local unusedCastBars = hasuitUnusedCastBars
 
 do
     local danFrame = CreateFrame("Frame")
@@ -3480,15 +3471,39 @@ do
         local sourceCastTable = activeCasts[sourceGUID]
         if sourceCastTable then
             for i=1,#sourceCastTable do
-                sourceCastTable[i].cooldown:Clear()
-                danCooldownDoneRecycle(sourceCastTable[i].cooldown)
+                local cooldown = sourceCastTable[i].cooldown
+                cooldown:Clear()
+                danCooldownDoneRecycle(cooldown)
             end
             activeCasts[sourceGUID] = nil
+        end
+        
+        local unitFrame = hasuitUnitFrameForUnit[sourceGUID] --todo maybe combine with the table that was already used above
+        if unitFrame then
+            local castBar = unitFrame.castBar
+            if castBar then
+                castBar.active = false
+                castBar.timer:Cancel()
+                castBar:SetAlpha(0)
+                castBar:SetScript("OnUpdate", nil)
+                danCleanController(castBar.controller)
+                castBar.unitFrame.castBar = nil
+            end
         end
     end)
 end
 
+
+local function castBarTimersUp(timer) --backup plan instead of checking in the onupdate function. The game won't reliably send a cast stopped event i don't think, although not 100% sure, todo re-add hasuitDoThisEasySavedVariables outside and see whether this ever does anything
+    local castBar = timer.castBar --could do a check for whether casting or not but will have to add .unit and .castingInfo
+    castBar.active = false
+    castBar:SetAlpha(0)
+    castBar:SetScript("OnUpdate", nil)
+    danCleanController(castBar.controller)
+    castBar.unitFrame.castBar = nil
+end
 do
+    local castBarTimersUp = castBarTimersUp --? added to the big list of random things like this waiting to test. I think this does nothing
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("UNIT_SPELLCAST_DELAYED")
     danFrame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
@@ -3507,7 +3522,7 @@ do
             for i=1,#sourceCastTable do
                 local icon = sourceCastTable[i]
                 
-                local _, _, _, startTime, endTime = icon.castingInfo(unit)
+                local _, _, _, startTime, endTime = icon.castingInfo(unit) --bored todo
                 if startTime then --startTime was nil once
                     startTime = startTime/1000
                     endTime = endTime/1000
@@ -3518,11 +3533,125 @@ do
                 end
             end
         end
+        
+        local unitFrame = hasuitUnitFrameForUnit[sourceGUID] --todo maybe combine with the table that was already used above, also do something about pet casts like seduction. Could do it where this gets combined with above and sorted to predictable positions in the grow function based on whether it's an actual arena unit, and fill in the gaps with other units like pets or other units in other instance types
+        if unitFrame then
+            local castBar = unitFrame.castBar
+            if castBar then
+                local _, _, _, _, endTime = castBar.castingInfo(unit)
+                endTime = endTime/1000
+                castBar:SetMinMaxValues(castBar.startTime, endTime) --any reason not to do this? also using gettime below is a bad idea because of fake startcasting events? not totally sure
+                
+                castBar.timer:Cancel()
+                local timer = C_Timer_NewTimer(endTime-GetTime(), castBarTimersUp) --will see if this ever hides a cast bar early. could also maybe just set one at the start with like 3 seconds more than its duration and not update it here
+                timer.castBar = castBar
+                castBar.timer = timer
+            end
+        end
     end)
 end
 
 
 hasuitFramesCenterSetEventType("unitCasting")
+
+
+
+
+
+
+do
+    local castBarTimersUp = castBarTimersUp
+    local danGetCastBar
+    function hasuitLocal1(func)
+        danGetCastBar = func
+    end
+    
+    local function castBarOnUpdateFunction(castBar) --the amount that these new cast bars are better than my old middle cast bar addon is kind of crazy, not to mention they're like 10x less blurry
+        castBar:SetValue(GetTime()) --(could maybe do something with elapsed arg instead of gettime?)
+    end
+    -- local function danUpdateCastEndTime(unit) --this is what it did for cast delayed event
+        -- local endTime
+        -- if UnitCastingInfo(unit) then 
+            -- endTime = select(5, UnitCastingInfo(unit))
+        -- elseif UnitChannelInfo(unit) then
+            -- endTime = select(5, UnitChannelInfo(unit))
+        -- end
+        -- if endTime then 
+            -- local duration = tonumber(string.format("%.4f", endTime/1000-trackedUnitsFrame[unit].startTime))
+            -- trackedUnitsFrame[unit]:SetMinMaxValues(0, duration)
+            -- trackedUnitsFrame[unit]:SetValue(GetTime()-trackedUnitsFrame[unit].startTime)
+        -- end
+    -- end --everything else looks pretty alien because it's doing some weird stuff to try to predict who a cast is going to be on. going to only use this from now on I think. other way was basically exploiting i've realized. the addon made it too good, especially now that it's basically required to make a complicated custom keybind addon too to get it to work with the 255 character limit in tww. note at the top saying --made may 2023, heavily bug fixed early/mid october 2023. --writing these comments 11/4/2024
+    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function() --todo test to make sure the pixels are good. They look good. I'm assuming width needs to stay even for setpoint center here
+        local sourceGUID = UnitGUID(danCurrentUnit)
+        if sourceGUID~=hasuitPlayerGUID then
+        -- if sourceGUID==hasuitPlayerGUID then
+            -- if not hasuitPlayerFrame.arenaNumber then
+                -- hasuitPlayerFrame.arenaNumber = 1
+            -- end
+            local unitFrame = hasuitUnitFrameForUnit[sourceGUID]
+            if unitFrame then
+                local spellOptionsCommon = danCurrentSpellOptions[unitFrame.unitType]
+                if spellOptionsCommon then
+                    if not unitFrame.castBar then --game sends startcasting events for the same unit while already casting so this is needed
+                        local spellCast = danCurrentEvent=="UNIT_SPELLCAST_START"
+                        if not spellCast and spellOptionsCommon["ignoreChanneling"] then
+                            return
+                        end
+                        
+                        -- local asd, spellNameText, _, startTime, endTime = (spellCast and UnitCastingInfo(danCurrentUnit)) or UnitChannelInfo(danCurrentUnit) --won't work, only returns 1 thing instead of 5
+                        
+                        local castingInfo = spellCast and UnitCastingInfo or UnitChannelInfo
+                        local _, spellNameText, _, startTime, endTime = castingInfo(danCurrentUnit) --spellName is first arg
+                        
+                        if startTime then --i remember getting an error from not having this check once in the function below. not 100% sure if needed
+                            startTime = startTime/1000
+                            endTime = endTime/1000
+                            local castBar = danGetCastBar()
+                            castBar.startTime = startTime
+                            unitFrame.castBar = castBar
+                            
+                            local timer = C_Timer_NewTimer(endTime-startTime, castBarTimersUp)
+                            timer.castBar = castBar
+                            castBar.timer = timer
+                            
+                            castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
+                            castBar:SetReverseFill(not spellCast)
+                            castBar.castingInfo = castingInfo
+                            
+                            local width = spellOptionsCommon["width"]
+                            local height = spellOptionsCommon["height"]
+                            -- castBar.width = width
+                            -- castBar.height = height
+                            castBar:SetSize(width, height)
+                            
+                            castBar.unitFrame = unitFrame
+                            castBar:SetParent(unitFrame)
+                            castBar.active = true
+                            castBar:SetAlpha(1)
+                            
+                            castBar:SetMinMaxValues(startTime, endTime)
+                            
+                            local textOfSpellName = castBar.textOfSpellName
+                            textOfSpellName:SetFontObject(spellOptionsCommon["fontObject"]) --SetTextColor
+                            textOfSpellName:SetText(spellNameText)
+                            
+                            
+                            danAddToSeparateController(spellOptionsCommon.controller, castBar)
+                            
+                            castBar:SetScript("OnUpdate", castBarOnUpdateFunction)
+                        end
+                    end
+                end
+            end
+        end
+    end)
+end
+
+
+
+
+
 
 
 hasuitSpellFunction_UnitCasting = addMultiFunction(function()
@@ -3609,8 +3738,7 @@ function hideCooldown(icon)
     icon.priority = icon.basePriority+800
     icon:SetAlpha(0)
     icon.alpha = 0
-    danCurrentController = icon.controller
-    danSortController()
+    danSortController(icon.controller, true)
 end
 
 
@@ -3647,8 +3775,7 @@ do
                                 icon.priority = icon.basePriority
                                 icon:SetAlpha(1)
                                 icon.alpha = 1
-                                danCurrentController = icon.controller
-                                danSortController()
+                                danSortController(icon.controller, true)
                             end
                         elseif not icon.expirationTime or icon.expirationTime<GetTime() then
                             icon:SetAlpha(1)
@@ -3672,8 +3799,7 @@ do
                         icon.expirationTime = milliseconds1+milliseconds2
                         icon.cooldown:SetCooldown(milliseconds1, milliseconds2)
                         
-                        danCurrentController = icon.controller
-                        danSortController()
+                        danSortController(icon.controller, true)
                         
                         startCooldownTimerText(icon)
                         icon:SetAlpha(0.5)

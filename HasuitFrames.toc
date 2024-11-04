@@ -6,6 +6,7 @@
 
 center.lua
 HasuitFrames.lua
+castbars.lua
 general.lua
 
 classSpecific\Druid.lua

@@ -28,22 +28,22 @@ local normalGrow = hasuitNormalGrow
 hasuitFramesSpellOptionsClassSpecificHelpful = nil
 hasuitController_BottomRight_BottomRight    =       {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
 
-local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=18, ["hideCooldownText"]=false, ["alpha"]=1}
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=-1,    ["group"]=danCommonHelpful, ["specialAuraFunction"]=hasuitSpecialAuraFunction_RedLifebloom} hasuitUsedRedLifebloom = true
+local danCommonHelpful = {["controllerOptions"]=hasuitController_BottomRight_BottomRight,["size"]=18, ["hideCooldownText"]=false, ["alpha"]=1}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=-1,    ["group"]=danCommonHelpful, ["specialAuraFunction"]=hasuitSpecialAuraFunction_RedLifebloom}
 initialize(124682) --Enveloping Mist
 
-local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,  ["alpha"]=1}
+local danCommonHelpful = {["controllerOptions"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,  ["alpha"]=1}
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=1,     ["group"]=danCommonHelpful, ["specialAuraFunction"]=hasuitSpecialAuraFunction_CanChangeTexture, ["specialSize"]=18}
 initialize(119611) --Renewing Mist
 
-local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,  ["alpha"]=1}
+local danCommonHelpful = {["controllerOptions"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,  ["alpha"]=1}
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2,     ["group"]=danCommonHelpful}
 initialize(115175) --Soothing Mist
 
 
 
 local hasuitController_BottomRight_BottomRight2   = {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=19, ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
-local danCommonHelpful = {["controller"]=hasuitController_BottomRight_BottomRight2,["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1}
+local danCommonHelpful = {["controllerOptions"]=hasuitController_BottomRight_BottomRight2,["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1}
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=1,     ["group"]=danCommonHelpful}
 initialize("Chi Harmony") --Chi Harmony
 initialize(205655) --Dome of Mist

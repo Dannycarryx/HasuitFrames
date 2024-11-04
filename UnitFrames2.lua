@@ -25,7 +25,7 @@ local groupColoredBackgroundMinimum
 local arenaColoredBackgroundMinimum
 
 
-
+local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
 local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
 local arenaUnitFrames = hasuitUnitFramesForUnitType["arena"]
 local changeUnitTypeColorBackgrounds
@@ -148,7 +148,6 @@ end)
 
 local frameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize
 local numColumnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
-local frameHeightForGroupSize = hasuitRaidFrameHeightForGroupSize
 
 local danGetHealthBar
 local unusedHealthBars = {}
@@ -801,7 +800,7 @@ local danGetUnit_HealthFunctionAbsorbs
 local danAbsorbFunction
 
 
-function hasuitUnitFrameMakeHealthBarMain()
+local function hasuitUnitFrameMakeHealthBarMain()
     danCurrentFrame = danGetHealthBar()
     danCurrentFrame:Show()
     
@@ -887,7 +886,8 @@ end
 
 
 
-
+local danHideUnitFrame2
+local danHideInactiveFrames
 
 local danGetUnit_HealthFunctionLines
 
@@ -1109,15 +1109,17 @@ function danHideUnitFrame2(frame)
             diminishIcon:SetAlpha(0)
             diminishIcon.cooldown:Clear()
             
-            tinsert(hasuitUnusedIcons[diminishIcon.iconType], tremove(arenaStuff, i))
+            tinsert(diminishIcon.unusedTable, tremove(arenaStuff, i))
         end
-        if frame.arenaSpecIcon then
-            frame.arenaSpecIcon:SetAlpha(0)
-            tinsert(hasuitUnusedIcons[frame.arenaSpecIcon.iconType], frame.arenaSpecIcon)
+        if frame.arenaSpecIcon then --will test stuff like this some time and see what's best to do here. doubt this is best
+            local arenaSpecIcon = frame.arenaSpecIcon
+            arenaSpecIcon:SetAlpha(0)
+            tinsert(arenaSpecIcon.unusedTable, arenaSpecIcon)
             frame.arenaSpecIcon = nil
             frame.arenaSpec = nil
         end
-        frame.arenaStuff = nil
+        frame.arenaNumber = nil
+        frame.arenaStuff = nil --bored todo replace with arenaNumber probably
     end
     frame.specId = nil
     frame.cooldowns = nil
@@ -1232,7 +1234,7 @@ function danUpdateClassColor3(frame)
     end
 end
 
-
+local hasuitTrackedRaceCooldowns = hasuitTrackedRaceCooldowns
 local danAddSpecializationCooldowns
 function danUpdateClass(frame)
     local failed
@@ -1619,6 +1621,9 @@ do
 end
 
 
+local hasuitCooldownTextFonts = hasuitCooldownTextFonts
+local hasuitFrameTypeUpdateCount = hasuitFrameTypeUpdateCount
+local hasuitGetIcon = hasuitGetIcon
 
 local numberOfTrackedDrs
 local arenaDiminishTextures = {}
@@ -1911,7 +1916,7 @@ do
             end
         end
         
-        hasuitHideInactiveFrames()
+        danHideInactiveFrames()
         for i=1,#lastFrames do --to skip the 10 second hide/recycle timer if calling test function multiple times. could have something that auto skips it if there are too many frames made, like if dropping a 40man raid, joining a different one with different unitguids, and repeating as many times in 10 seconds could end up with a big excess of frames that will never get used
             local frame = lastFrames[i]
             if frame.updated ~= updatedPlus1 then
@@ -1950,6 +1955,7 @@ do
     end
 end
 
+local hasuitSpecIsHealerTable = hasuitSpecIsHealerTable
 
 local GetArenaOpponentSpec = GetArenaOpponentSpec
 local GetNumArenaOpponentSpecs = GetNumArenaOpponentSpecs
@@ -1982,7 +1988,7 @@ do
         hasuitArenaTestNumber = number
         
         hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
-        hasuitHideInactiveFrames()
+        danHideInactiveFrames()
         for i=1,#arenaUnitFrames do
             local frame = arenaUnitFrames[i]
             if not UnitExists(frame.unit) then
@@ -2287,6 +2293,7 @@ function danSortGroup()
     end
 end
 
+local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
 
 local danCurrentArenaSpec
 function danUpdateExistingUnit() --dan4
@@ -2414,7 +2421,6 @@ do
             end
         end
         
-        hasuitUpdateAllUnitsForUnitType = {}
         hasuitUpdateAllUnitsForUnitType["group"] = hasuitUpdateGroupRosterSafe
         hasuitUpdateAllUnitsForUnitType["arena"] = danUpdateArenaFramesSafe
     end
@@ -2669,6 +2675,7 @@ do
         
         icon.recycle = nil
     end
+    local hasuitCleanController = hasuitCleanController
     local function danRecycleCooldownIcon(icon)
         icon.active = false
         icon:SetAlpha(0)
@@ -2677,9 +2684,9 @@ do
         
         hasuitCleanController(icon.controller)
     end
-    hasuitRecycleCooldownIcon = danRecycleCooldownIcon
-    hasuitDoThisRandomFunctionAsd(danRecycleCooldownIcon)
-    hasuitDoThisRandomFunctionAsd = nil
+    hasuitLocal3(danRecycleCooldownIcon)
+    hasuitLocal4(danRecycleCooldownIcon)
+    local hasuitStartCooldownTimerText = hasuitStartCooldownTimerText
     local function cooldownOnCooldownDone(cooldown)
         local icon = cooldown.parentIcon
         -- icon.alpha = 1
@@ -2728,7 +2735,7 @@ do
             end
         end
     end
-    function hasuitHypoCooldownTimerDone(icon) --todo spell school interrupted puts spells on cd
+    local function hypoCooldownTimerDone(icon) --todo spell school interrupted puts spells on cd
         if icon.specialTimer then
             icon.specialTimer:Cancel()
             icon.specialTimer = nil
@@ -2737,13 +2744,16 @@ do
             cooldownOnCooldownDone(icon.cooldown)
         end
     end
-    hasuitCooldownOnCooldownDone = cooldownOnCooldownDone
-    -- local cooldownsControllers = hasuitController_CooldownsControllers --temporary?
+    hasuitLocal5(hasuitHypoCooldownTimerDone)
+    local hasuitSortController = hasuitSortController
+    hasuitLocal6(cooldownOnCooldownDone)
+    local cooldownsControllers = hasuitController_CooldownsControllers
+    local hasuitInitializeController = hasuitInitializeController
     function danAddSpecializationCooldowns(specId, isClassUpdate)
-        for i=1,#hasuitController_CooldownsControllers do
-            local controllerOptions = hasuitController_CooldownsControllers[i]
+        for i=1,#cooldownsControllers do
+            local controllerOptions = cooldownsControllers[i]
             local unitTypeStuff = controllerOptions[danCurrentUnitType]
-            if unitTypeStuff then --similar to danCommon
+            if unitTypeStuff then
                 local specCooldowns = unitTypeStuff["specCooldowns"][specId]
                 local oldSpecCooldowns = not isClassUpdate and unitTypeStuff["specCooldowns"][danCurrentFrame.specId]
                 local newSpellIds = {}
@@ -2877,7 +2887,7 @@ do
                             danCurrentFrame.cooldownOptions[spellId] = cooldownOptions
                         end
                     end
-                    hasuitSortController(controller)
+                    hasuitSortController(controller, true)
                 end
                 if oldSpecCooldowns then
                     for j=1,#oldSpecCooldowns do
@@ -3174,9 +3184,11 @@ function danUpdateArenaFramesUnsafe()
             
             if not danCurrentFrame then
                 hasuitUnitFrameMakeHealthBarMain()
+                danCurrentFrame.arenaNumber = i
             else
                 if hasuitUnitFrameForUnit[danCurrentUnit]~=danCurrentFrame or danCurrentFrame.arenaSpec~=danCurrentArenaSpec then
                     danUpdateExistingUnit()
+                    danCurrentFrame.arenaNumber = i
                 end
                 
                 
@@ -3191,7 +3203,7 @@ function danUpdateArenaFramesUnsafe()
         end
     end
     
-    hasuitHideInactiveFrames()
+    danHideInactiveFrames()
     updateTargetBorder()
 end
 
@@ -3214,7 +3226,7 @@ function danUpdateOtherUnits(groupType, number, lastNumber)
 end
 
 
-function hasuitHideInactiveFrames()
+function danHideInactiveFrames()
     for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do
         for i=#unitTable,1,-1 do
             local frame = unitTable[i]
@@ -3290,7 +3302,7 @@ function hasuitUpdateGroupRosterUnsafe()
         end
     end
     
-    hasuitHideInactiveFrames()
+    danHideInactiveFrames()
     
     
     for unitGUID, unit in pairs(hasuitFramesCenterNamePlateGUIDs) do --probably just coincidental that there are never problems here, forgot about making sure these always get set after all unit updates are finished (arena frames). should probably separate this from group and do it after any unit type update?/all updates are complete and not spam it for no reason? todo
@@ -3417,7 +3429,7 @@ do
             
             local row=0
             local i=1
-            while i<=numGroupFrames do
+            while i<=numGroupFrames do --should be repeat?
                 for column=0, maxColumnsMinus1 do
                     danCurrentFrame = groupUnitFrames[i]
                     if danCurrentFrame then
@@ -3699,6 +3711,7 @@ local function tempHideArenaStuff(arenaStuff)
 end
 local danRefreshFramesInShuffle
 do
+    local hasuitResetCooldowns = hasuitResetCooldowns
     local notDead = hasuitNotDead
     hasuitNotDead = nil
     function danRefreshFramesInShuffle()
@@ -3796,7 +3809,7 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
     if event=="PLAYER_ENTERING_BATTLEGROUND" then --fixing/avoiding potential problems with an arena frame with the wrong class getting used, can happen if frames fail to hide like a wargame that ended 3v1 in the starting gates and then the 1 frame persisted and caused the next game to show 2 ferals when it should've been 1 feral 1 pally
         if #arenaUnitFrames~=0 then
             hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
-            hasuitHideInactiveFrames() --should make a more specific version of this?
+            danHideInactiveFrames() --should make a more specific version of this?
         end
     end
     if event=="ARENA_OPPONENT_UPDATE" then
@@ -3878,7 +3891,7 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
             -- hasuitUnitFrameForUnit[arenaUnitFrames[i].unit] = nil
             -- hasuitUnitFrameForUnit["arena"..i] = nil
         -- end
-        hasuitHideInactiveFrames() --shouldn't need to go through every unit type table here? todo
+        danHideInactiveFrames() --shouldn't need to go through every unit type table here? todo
         
         danHideTargetLines()
         

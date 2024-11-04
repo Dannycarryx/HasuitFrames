@@ -1,0 +1,92 @@
+Hey, thanks for using my addon! 
+
+To get started if you play anything other than rdruid you might need to add spells that you want to track for your own class, primarily anything that should show up on 
+party/raid frames like hots. The best way to do this is to just message me a list of spells missing for your class and I'll add them to the main addon. 
+If anything is missing just let me know and I'll add it. The discord for the addon is HasuitFrames, or you can dm me at _dannycarry
+
+I also recommend typing /hf in-game and running test functions for different group/arena sizes and seeing if you need to move anything. Do this by clicking a box and hitting enter. 
+There's a second page with more options you can go to to the left of the close button, but options for moving/positioning/sizing are kind of limited for now until I work on them more. 
+
+
+Alternatively to messaging about missing spells, you can use the template in HasuitFramesTemplate.lua and add everything yourself. Doing this can disable any spells from the main addon for 
+the class/spec you're playing if you want it to, or you can disable specific ones, so you can have your own personalized setup. You'll be adding stuff in your own addon with functions from mine. 
+The template has detailed instructions on how to make your own blank addon and how to get started adding custom stuff into my addon through it. The first thing there after showing how to make a 
+blank addon is something simple you can copy paste and add spells to. 
+
+That should be all that's necessary to play. 
+
+Below that is a description of how to customize things a bit more, like changing size or opacity of an icon, or how to track an icon in a different location. 
+
+I tried to make it easy to get everything set up and working well, even with no experience programming. 
+Don't be afraid of using a text editor instead of a normal gui from an addon. I personally used default notepad++ (Windows 10) to make 100% of the addon, so that's what I'd recommend, 
+although I've also never tried anything else. ctrl-f find in files is extremely helpful to be able to find something across many files instead of ctrl-fing each one one at a time, (find in all opened documents is good too) 
+
+
+
+
+Coming soon: 
+Guide for more advanced things like if you want to make your own functions or controllers and add spells with those, like making a new controller in the middle of the screen somewhere tracking 
+enemy cooldown auras that are active (I have plans for adding audio warnings to the main addon for certain things like this in the future that will have an easy option to disable in /hf), or if 
+there's some custom function you want to run every time the game sends a certain event for a spell, like changing the frame's border color if they have a magic debuff, or print something to chat 
+when some event is seen. Pretty much anything will be possible. The guide will also show how to access certain parts of the addon's unit frame update functions from your external addon and efficiently run a 
+custom function on every unit frame every time some condition changes, like once every time unitFrame width changes, or just every time they get updated at all. 
+
+Coming after that, or maybe before: 
+Guide for adding or removing cooldowns, this should already be possible and pretty easy if you know how it works? Not 100% sure though. You could also create new cooldown 
+controllers and put cooldowns somewhere new. 
+
+Coming as well: 
+In-depth guide for how the addon works, as well as a full list of functions/variables, and intended ways of adding customization along with individual guides for those if needed. 
+
+And potentially new features that make more of the addon accessible from outside for more customization, let me know if you have ideas for things you'd want to do but the addon doesn't allow it. 
+One thing I probably won't be adding is any libs, unless someone can convince me. I'm not a fan of something like that, although honestly I have no idea what any of them do and don't know how to 
+add one even if I wanted to. 
+I'm more open to a localization lib if that's what people are used to using to help translate things though. I'll need help with that from anyone generous enough to contribute. I'm not sure how 
+that normally works. 
+
+
+
+The addon is like a motorcycle. As Terry Davis said, if you lean over on a motorcycle, it crashes. If something breaks in my addon, even if it seems small, it can have cascading 
+effects and quickly make the game unplayable. I like the motorcycle approach, but part of that is that people's personal addons are going to be putting things into shared arrays of 
+functions and if there are any errors the rest of the array and anything after will get canceled. If that becomes a problem I have an easy backup plan of updating the addon and temporarily(tm) 
+pcalling everything that might be shared with an external addon, and then working on making a new system of only pcalling things that were added from outside just to be a bit more efficient. 
+
+
+With all that being said, I hope to eventually get everything made 100% so that no customization is needed, and I also want to get to a point where this is the only addon needed to be downloaded 
+to play the game competitively, but that's in the future. 
+
+If you're curious there's a list of ideas I have for the addon or things I'm working on. It's something I've been using as I make things to keep a list of priorities and not forget about anything. 
+This is a place to look if you want to know whether I have immediate plans for adding something, or feel free to just message me _dannycarry on Discord 
+It's in   addon idea list.txt 
+
+
+There's also a Patreon? possibly 
+donation link? 
+btc? 
+xmr? 
+
+
+
+
+
+
+
+
+
+
+Why this setup instead of the normal way of doing everything in-game?: 
+It's much more freeing using a text editor instead, and saves a lot of effort from me and also saves computer resources. 
+Creating everything from savedvariables, especially custom functions, is pretty inefficient and an ugly way of doing it in my opinion. 
+Copy pasting 20 spells directly into an addon at the same time can be nice compared to slowly copy pasting one at a time and hitting enter, or just putting down a random function you want to have 
+or run something whenever. You could make something quickly that might not even be related to my addon if you want. There's no limitation on anything whatsoever like there is in any addon's gui. (except locals that might not be accessible from outside, which I plan on reducing) 
+This way you can also build up knowledge incrementally over time and be able to make more and better things. Not to mention you could create 10x more custom stuff than the addon currently has 
+and block out the sun with ui and not come close to lagging, even in 40man raids. 
+
+downsides I can think of: 
+Harder to visualize what you're doing and what options might be available (there will be guides though) 
+Extra step for sharing things of getting everyone to open a text editor and copy paste into their unique addon somewhere, although for this default notepad would be fine? 
+People might share entire addons they made, which is fine and probably a good way of doing it, but that could lead to addon spam in the addon list (talking about you dbm). Hopefully 
+people will put HasuitFrames as the beginning of the name for any addon they make related to it at least. 
+No enforcement of using the correct values for things. Someone could try to track a spell with an existing hasuitSpellFunction_ but put a number in the spellOptions table for something instead of a string 
+and they'd only find out later, possibly causing errors. Not an inherent problem here but easier to check for the other way. 
+
