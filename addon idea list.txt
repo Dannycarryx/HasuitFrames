@@ -6,11 +6,11 @@ enabling people to track their own abilities? might be the last thing before a r
 ability to disable some or all class specific abilities tracked for player to let people make their own setup easily
 clean this file up
 adjust new middle cast bars position a bit, probably finish making them good for people with ranged kicks at least
+make a variable like d12 or d13 and set it for non-cleu so that people can initialize a spellname or spellid and have it not get ignored or however that works. should be able to use spellnames or spellids and not worry about it
 
 
 other important:
 clean up the rest of the globals that might have been missed. Make function that compares _G before and after loading the addon and then check after most stuff gets deleted for what's missing
-display for spellcasts and who they're from for people with ranged kicks like shaman, (modify middlecastbars for people with ranged kicks to show more and whether interruptible, and give the arena number casting each one/align them on the right? with distinct heights to make it obvious to be able to kick the right target)
 display for purgable buffs for people that have purge
 pet frames
 way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
@@ -38,6 +38,7 @@ option to just have normal frames instead of click-through to move, option to di
 fix new 4/5 cd system. problem is cds reset when groupsize leaves 4 or 5. could be fixed more easily with a savedvariables system for remembering cooldowns for short logouts/reloads/unitframe hides and comes back?
 improve/figure out scale. whole system needs to be made for size stuff and idk what i'm doing with other people's screen sizes
 initialize(198034) --Divine Hammer, todo 1 Holy Power per sec, use same system as blessingofautumn for this?
+better display for forbearance. right now you can only see if forbearance is preventing an affected ability like lay on hands from being used on the paladin, not if it can't be used on teammate. Technically people will be able to add forbearance as a dot or something if they want but that's not ideal. maybe that's a better temporary solution for the main addon though too. idk
 
 even less important:
 summon/rez/phase indicators
@@ -58,7 +59,7 @@ whole loading sequence should be looked at. initialize should just put stuff int
 
 get rid of the gap that can happen if arena1/3 are targeting something but not arena2, maybe do something to make lines more distinct if a class is targeting their same class
 
-make color check function more specific and not based on 5 different functions like unit_flags assuming anything can indicate d/c or reconnect? although that might just be the best way to do it
+make color check function more specific and not based on 5 different events like unit_flags assuming anything can indicate d/c or reconnect? although that might just be the best way to do it
 
 Recompense sac damage on next judgement, has points, not sure how/where to show it exactly but can be big
 
@@ -72,7 +73,7 @@ improve overridesSame to be able to override based on more than just its own pri
 
 clean up cooldowns.lua
 
-get rid of some redundant hasuitInstanceType=="arena" checks with new hasuitDoThisGroupUnitUpdate system?
+get rid of some redundant hasuitInstanceType=="arena" checks with new hasuitDoThis_GroupUnitFramesUpdate system?
 
 split up the big grow function
 

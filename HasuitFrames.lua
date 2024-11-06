@@ -53,7 +53,7 @@ local IsInInstance = IsInInstance
 
 local initialize = hasuitFramesInitialize
 local hasuitFramesCenterSetEventType = hasuitFramesCenterSetEventType
-local hasuitDoThisAddon_Loaded = hasuitDoThisAddon_Loaded
+local hasuitDoThis_Addon_Loaded = hasuitDoThis_Addon_Loaded
 
 
 
@@ -248,7 +248,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
                 end
             end
         end
-        tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+        tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, loadOnCondition)
         loadOnCondition()
         hasuitLoadOn_EnablePve = loadOn
     end
@@ -268,7 +268,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     local danCommonPveUnitCast =        {["size"]=12,   ["hideCooldownText"]=true,  ["alpha"]=1}
     pveUnitCastSpellOptions =           {["priority"]=495,  ["group"]=danCommonPveUnitCast, ["loadOn"]=hasuitLoadOn_EnablePve}
     
-    tinsert(hasuitDoThisAddon_Loaded, function()
+    tinsert(hasuitDoThis_Addon_Loaded, function()
         danCommonPveAura["controllerOptions"] = hasuitController_TopRight_TopRight
         danCommonPveAuraIsBossAura["controllerOptions"] = hasuitController_TopRight_TopRight
         pveAuraSpellOptions[1] = hasuitSpellFunction_AuraMainFunction
@@ -298,7 +298,7 @@ local addMultiFunction = hasuitFramesCenterAddMultiFunction
 
 do --breakable cc threshhold bar, trolled and thought more than 1 unit_health could happen on a frame but looks like it's capped to that so heal and damage on the same gettime will make this inaccurate. looks like the only way to do it right is cleu, will want cleu for fake karma absorb/ray of hope too at least. this way of doing it was(is) also bad because of absorbs falling off and counting like they took that as actual damage, also damage on a 1 health target that can't die. also good in some ways like it'll show on someone too far away to be giving cleu events?
     local iconTypes
-    tinsert(hasuitDoThisAddon_Loaded, function()
+    tinsert(hasuitDoThis_Addon_Loaded, function()
         iconTypes = hasuitIconTypes
         hasuitIconTypes = nil
     end)
@@ -337,7 +337,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
     hasuitCcBreakOnEvent = ccBreakOnEvent
     local ccBreakHealthThreshold = hasuitCcBreakHealthThreshold
     local ccBreakHealthThresholdPve = hasuitCcBreakHealthThresholdPve
-    tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function()
+    tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function()
         ccBreakHealthThreshold = hasuitCcBreakHealthThreshold
         ccBreakHealthThresholdPve = hasuitCcBreakHealthThresholdPve
     end)
@@ -413,20 +413,20 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                     local frameKey = UnitGUID(sourceUnit)..spellId
                     if ccBreakBars[frameKey] then
                         ccBreakBars[frameKey].frameKey = nil
-                        -- hasuitDoThisEasySavedVariables("already have ccBreakBars[frameKey] 1")
+                        -- hasuitDoThis_EasySavedVariables("already have ccBreakBars[frameKey] 1")
                         danCurrentFrame.ccBreakBarsCount = danCurrentFrame.ccBreakBarsCount - 1
                     end
                     ccBreakBars[frameKey] = ccBreakBar
                     ccBreakBar.frameKey = frameKey
                     -- if sourceUnit=="" then
-                        -- hasuitDoThisEasySavedVariables("sourceUnit empty string")
+                        -- hasuitDoThis_EasySavedVariables("sourceUnit empty string")
                     -- end
                 else
-                    -- hasuitDoThisEasySavedVariables("aura no sourceUnit")
+                    -- hasuitDoThis_EasySavedVariables("aura no sourceUnit")
                     local frameKey = spellId
                     if ccBreakBars[frameKey] then --unit_aura not giving a source guid sucks
                         ccBreakBars[frameKey].frameKey = nil
-                        -- hasuitDoThisEasySavedVariables("already have ccBreakBars[frameKey] 2")
+                        -- hasuitDoThis_EasySavedVariables("already have ccBreakBars[frameKey] 2")
                         danCurrentFrame.ccBreakBarsCount = danCurrentFrame.ccBreakBarsCount - 1
                     end
                     ccBreakBars[frameKey] = ccBreakBar
@@ -473,7 +473,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
     
     
     
-    local danDoThisOnUpdate = hasuitDoThisOnUpdate
+    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
     hasuitFramesCenterSetEventType("cleu")
     hasuitSpellFunction_CleuCcBreakThreshold = addMultiFunction(function()
         if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
@@ -1346,7 +1346,7 @@ function danAddToUnitFrameController() --this was the very first system made for
     local controllerOptions = danCurrentSpellOptionsCommon["controllerOptions"]
     local controller = danCurrentFrame.controllersPairs[controllerOptions]
     if not controller then
-        controller = initializeController(controllerOptions) --dan1
+        controller = initializeController(controllerOptions)
     end
     danCurrentIcon.controller = controller
     tinsert(controller.frames, danCurrentIcon)
@@ -1425,19 +1425,18 @@ function hasuitSortPriorityExpirationTime(a,b)
         return a.expirationTime<b.expirationTime
     end
 end
-danBackdrop = {edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 1}
-
-
+hasuit1PixelBorderBackdrop = {edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 1}
+danBackdrop = hasuit1PixelBorderBackdrop
 
 
 
 do
     local danCurrentUnitFrameWidth
-    tinsert(hasuitDoThisGroup_Roster_UpdateWidthChanged.functions, function()
+    tinsert(hasuitDoThis_Group_Roster_UpdateWidthChanged.functions, function()
         danCurrentUnitFrameWidth = hasuitRaidFrameWidth
     end)
     local danCurrentUnitFrameHeight
-    tinsert(hasuitDoThisGroup_Roster_UpdateHeightChanged.functions, function()
+    tinsert(hasuitDoThis_Group_Roster_UpdateHeightChanged.functions, function()
         danCurrentUnitFrameHeight = hasuitRaidFrameHeight
     end)
 
@@ -1533,7 +1532,7 @@ do
     end
     
     local floor = floor
-    function hasuitMiddleGrow(controller) --bored todo add check in ifUnitFramesSizeChangesFunction based on there being at least 1 middle icon active on any frame, (the condition to add a check for repositioning this that adds to hasuitDoThisGroupUnitUpdate)
+    function hasuitMiddleGrow(controller) --bored todo add check in ifUnitFramesSizeChangesFunction based on there being at least 1 middle icon active on any frame, (the condition to add a check for repositioning this that adds to hasuitDoThis_GroupUnitFramesUpdate)
         local frames = controller.frames
         sort(frames, controller.options["sort"])
         local middleIcon = frames[1]
@@ -1589,7 +1588,7 @@ do
     end
     local function auraExpiredOnCooldownDone(cooldown)
         -- if cooldown.auraExpiredEarlyCount then
-            -- hasuitDoThisEasySavedVariables("cooldown.auraExpiredEarlyCount") --not sure what goes wrong here but this happens
+            -- hasuitDoThis_EasySavedVariables("cooldown.auraExpiredEarlyCount") --not sure what goes wrong here but this happens
         -- end
         cooldown.auraExpiredEarlyCount = 0
         cooldown:SetScript("OnHide", auraExpiredOnHide)
@@ -1946,7 +1945,7 @@ do --smoke bomb, technically not going to be reliable if player is in a differen
             
             smokeBombRangeActiveOnTarget(danCurrentFrame)
         -- else
-            -- hasuitDoThisEasySavedVariables("hasuitSpecialAuraFunction_SmokeBombFunctionForArenaFrames not added")
+            -- hasuitDoThis_EasySavedVariables("hasuitSpecialAuraFunction_SmokeBombFunctionForArenaFrames not added")
         end
     end
 
@@ -1997,7 +1996,7 @@ do --smoke bomb, technically not going to be reliable if player is in a differen
                 end
             end
         -- else
-            -- hasuitDoThisEasySavedVariables("hasuitSpecialAuraFunction_SmokeBombForPlayer not added")
+            -- hasuitDoThis_EasySavedVariables("hasuitSpecialAuraFunction_SmokeBombForPlayer not added")
         end
     end
 end
@@ -2066,7 +2065,7 @@ end
 
 do
     local blessingOfAutumnIgnoreList
-    tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function()
+    tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function()
         blessingOfAutumnIgnoreList = hasuitBlessingOfAutumnIgnoreList
     end)
     local danSpellOptions = {["CDr"]=0.3}
@@ -2099,7 +2098,7 @@ do
         elseif danCurrentEvent=="added" then
             local icon = danCurrentIcon
             -- if icon.frame then
-                -- hasuitDoThisEasySavedVariables("icon.frame already exists on added?")
+                -- hasuitDoThis_EasySavedVariables("icon.frame already exists on added?")
             -- end
             
             icon.frame = danCurrentFrame
@@ -2291,7 +2290,7 @@ hasuitSpellFunction_CleuINC = addMultiFunction(function() --todo should be remad
     end
 end)
 
-tinsert(hasuitDoThisPlayer_Login, function()
+tinsert(hasuitDoThis_Player_Login, function()
     danPlayerFrame = hasuitPlayerFrame
 end)
 
@@ -2302,7 +2301,7 @@ hasuitSpellFunction_CleuDiminish = addMultiFunction(function()
         if drType then
             if d2anCleuSubevent=="SPELL_AURA_APPLIED" or d2anCleuSubevent=="SPELL_AURA_REFRESH" then 
                 danCurrentEvent = "DR"
-                danCurrentIcon = danCurrentFrame.arenaStuff[drType] --dan7
+                danCurrentIcon = danCurrentFrame.arenaStuff[drType]
                 danCurrentIcon:SetAlpha(1)
                 
                 local currentTime = GetTime()
@@ -2992,7 +2991,7 @@ end)
 do
     local danRemoveUnitHealthControlSafe
     local danRemoveUnitHealthControlNotSafe
-    tinsert(hasuitDoThisAddon_Loaded, function()
+    tinsert(hasuitDoThis_Addon_Loaded, function()
         danRemoveUnitHealthControlSafe = hasuitRemoveUnitHealthControlSafe
         danRemoveUnitHealthControlNotSafe = hasuitRemoveUnitHealthControlNotSafe
     end)
@@ -3018,7 +3017,7 @@ do
     local UnitIsDeadOrGhost = UnitIsDeadOrGhost
     local danClassColors = hasuitClassColorsHexList
     
-    local danDoThisOnUpdate = hasuitDoThisOnUpdate
+    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
     
     local function unitDiedFunction(frame)
         frame.text:SetText(danClassColors[frame.unitClass]..frame.unitName) --bored todo make .unitName this string to begin with, forgot why i changed it away from that, probably when frames were just completely breaking after trying to make unit died function with old unit_health setup
@@ -3145,7 +3144,7 @@ end)
 
 do
     local danInspectNewUnitFrame
-    tinsert(hasuitDoThisAddon_Loaded, function()
+    tinsert(hasuitDoThis_Addon_Loaded, function()
         danInspectNewUnitFrame = hasuitInspectNewUnitFrame
         hasuitInspectNewUnitFrame = nil
     end)
@@ -3426,7 +3425,7 @@ end
 -- hasuitGeneralCastFrame:RegisterEvent("UNIT_SPELLCAST_RETICLE_CLEAR")
 
 
-
+local danCurrentSpellId
 
 local hasuitCastSpellIdFunctions = {}
 hasuitFramesCenterAddToAllTable(hasuitCastSpellIdFunctions, "unitCasting")
@@ -3447,6 +3446,7 @@ hasuitGeneralCastStartFrame:SetScript("OnEvent", function(_, event, unit, castId
     if stuff then
         danCurrentUnit = unit
         danCurrentEvent = event
+        danCurrentSpellId = spellId
         for i=1, #stuff do 
             danCurrentSpellOptions = stuff[i]
             danCurrentSpellOptions[1]()
@@ -3459,14 +3459,19 @@ end)
 
 
 
-local unusedCastBars = hasuitUnusedCastBars
-
 do
+    local lastEventId
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("UNIT_SPELLCAST_STOP")
     danFrame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
     danFrame:RegisterEvent("UNIT_SPELLCAST_EMPOWER_STOP")
     danFrame:SetScript("OnEvent", function(_, event, unit, castId, spellId)
+        local currentEventId = GetCurrentEventID()
+        if lastEventId == currentEventId then
+            return
+        end
+        lastEventId = currentEventId
+        
         local sourceGUID = UnitGUID(unit)
         local sourceCastTable = activeCasts[sourceGUID]
         if sourceCastTable then
@@ -3494,13 +3499,14 @@ do
 end
 
 
-local function castBarTimersUp(timer) --backup plan instead of checking in the onupdate function. The game won't reliably send a cast stopped event i don't think, although not 100% sure, todo re-add hasuitDoThisEasySavedVariables outside and see whether this ever does anything
+local function castBarTimersUp(timer) --backup plan instead of checking in the onupdate function. The game won't reliably send a cast stopped event i don't think, although not 100% sure, todo re-add hasuitDoThis_EasySavedVariables outside and see whether this ever does anything
     local castBar = timer.castBar --could do a check for whether casting or not but will have to add .unit and .castingInfo
     castBar.active = false
     castBar:SetAlpha(0)
     castBar:SetScript("OnUpdate", nil)
     danCleanController(castBar.controller)
     castBar.unitFrame.castBar = nil
+    -- print("timer's up") --happens but doesn't break it
 end
 do
     local castBarTimersUp = castBarTimersUp --? added to the big list of random things like this waiting to test. I think this does nothing
@@ -3534,13 +3540,14 @@ do
             end
         end
         
-        local unitFrame = hasuitUnitFrameForUnit[sourceGUID] --todo maybe combine with the table that was already used above, also do something about pet casts like seduction. Could do it where this gets combined with above and sorted to predictable positions in the grow function based on whether it's an actual arena unit, and fill in the gaps with other units like pets or other units in other instance types
+        local unitFrame = hasuitUnitFrameForUnit[sourceGUID] --todo maybe combine with the table that was already used above, also do something about pet casts like seduction. Could do it where this gets combined with above and sorted to predictable positions in the grow function based on whether it's an actual arena unit, and fill in the gaps with other units like pets or other units in other instance types, or probably put those above or below during arena
         if unitFrame then
             local castBar = unitFrame.castBar
             if castBar then
                 local _, _, _, _, endTime = castBar.castingInfo(unit)
                 endTime = endTime/1000
-                castBar:SetMinMaxValues(castBar.startTime, endTime) --any reason not to do this? also using gettime below is a bad idea because of fake startcasting events? not totally sure
+                -- castBar:SetMinMaxValues(castBar.startTime, endTime)
+                castBar:SetMinMaxValues(0, endTime-castBar.startTime)
                 
                 castBar.timer:Cancel()
                 local timer = C_Timer_NewTimer(endTime-GetTime(), castBarTimersUp) --will see if this ever hides a cast bar early. could also maybe just set one at the start with like 3 seconds more than its duration and not update it here
@@ -3548,6 +3555,23 @@ do
                 castBar.timer = timer
             end
         end
+        
+        
+        -- local function danUpdateCastEndTime(unit) --the amount that these new cast bars are better than my old middle cast bar addon is kind of crazy, not to mention they're like 10x less blurry. this is what it did for cast delayed event
+            -- local endTime
+            -- if UnitCastingInfo(unit) then 
+                -- endTime = select(5, UnitCastingInfo(unit))
+            -- elseif UnitChannelInfo(unit) then
+                -- endTime = select(5, UnitChannelInfo(unit))
+            -- end
+            -- if endTime then 
+                -- local duration = tonumber(string.format("%.4f", endTime/1000-trackedUnitsFrame[unit].startTime))
+                -- trackedUnitsFrame[unit]:SetMinMaxValues(0, duration)
+                -- trackedUnitsFrame[unit]:SetValue(GetTime()-trackedUnitsFrame[unit].startTime)
+            -- end
+        -- end --everything else looks pretty alien because it's doing some weird stuff to try to predict who a cast is going to be on. going to only use this from now on I think. other way was basically exploiting i've realized. the addon made it too good, especially now that it's basically required to make a complicated custom keybind addon too to get it to work with the 255 character limit in tww. note at the top saying --made may 2023, heavily bug fixed early/mid october 2023. --writing these comments 11/4/2024
+        
+        
     end)
 end
 
@@ -3565,23 +3589,30 @@ do
     function hasuitLocal1(func)
         danGetCastBar = func
     end
-    
-    local function castBarOnUpdateFunction(castBar) --the amount that these new cast bars are better than my old middle cast bar addon is kind of crazy, not to mention they're like 10x less blurry
-        castBar:SetValue(GetTime()) --(could maybe do something with elapsed arg instead of gettime?)
+    local function castBarOnUpdateFunction(castBar, elapsed)
+        -- castBar:SetValue(GetTime()) --problem when GetTime value is kind of high?, value gets rounded or something and only actually changes once every other onupdate. worked fine when I made it like this
+        -- castBar:SetValue(GetTime()-castBar.startTime) --easy fix
+        local currentValue = castBar.currentValue+elapsed --more efficient fix? hopefully no problems associated with it
+        castBar.currentValue = currentValue
+        castBar:SetValue(currentValue) --just doing GetValue might actually be better here, we'll see later. assuming this is best. also GetValue might have an extra problem of rounding things and getting incorrect value drifting over time, but the drift would probably be way too small to ever matter here if that's even a thing
+        -- print(currentValue==castBar:GetValue(), currentValue) --false majority of the time
+        -- if not castBar.active then
+            -- print(hasuitRed, "castbar not active")
+        -- end
     end
-    -- local function danUpdateCastEndTime(unit) --this is what it did for cast delayed event
-        -- local endTime
-        -- if UnitCastingInfo(unit) then 
-            -- endTime = select(5, UnitCastingInfo(unit))
-        -- elseif UnitChannelInfo(unit) then
-            -- endTime = select(5, UnitChannelInfo(unit))
-        -- end
-        -- if endTime then 
-            -- local duration = tonumber(string.format("%.4f", endTime/1000-trackedUnitsFrame[unit].startTime))
-            -- trackedUnitsFrame[unit]:SetMinMaxValues(0, duration)
-            -- trackedUnitsFrame[unit]:SetValue(GetTime()-trackedUnitsFrame[unit].startTime)
-        -- end
-    -- end --everything else looks pretty alien because it's doing some weird stuff to try to predict who a cast is going to be on. going to only use this from now on I think. other way was basically exploiting i've realized. the addon made it too good, especially now that it's basically required to make a complicated custom keybind addon too to get it to work with the 255 character limit in tww. note at the top saying --made may 2023, heavily bug fixed early/mid october 2023. --writing these comments 11/4/2024
+    hasuitMiddleCastBarsAllowChannelingForSpellId = {
+        [20578]=true, --Cannibalize
+        [359073]=true, --Eternity Surge
+        [382411]=true, --Eternity Surge
+        [396286]=true, --Upheaval
+        [408092]=true, --Upheaval
+    }
+    local hasuitMiddleCastBarsAllowChannelingForSpellId = hasuitMiddleCastBarsAllowChannelingForSpellId
+    -- hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = { --todo at the same time as merging with activeCasts[sourceGUID], --hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId[danCurrentSpellId] and UnitReaction("player", unit)<5
+        -- [118905]=true, --Static Charge
+    -- }
+    -- local hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId
+    
     hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function() --todo test to make sure the pixels are good. They look good. I'm assuming width needs to stay even for setpoint center here
         local sourceGUID = UnitGUID(danCurrentUnit)
         if sourceGUID~=hasuitPlayerGUID then
@@ -3595,7 +3626,7 @@ do
                 if spellOptionsCommon then
                     if not unitFrame.castBar then --game sends startcasting events for the same unit while already casting so this is needed
                         local spellCast = danCurrentEvent=="UNIT_SPELLCAST_START"
-                        if not spellCast and spellOptionsCommon["ignoreChanneling"] then
+                        if not spellCast and not hasuitMiddleCastBarsAllowChannelingForSpellId[danCurrentSpellId] then --channeling or empower
                             return
                         end
                         
@@ -3604,16 +3635,22 @@ do
                         local castingInfo = spellCast and UnitCastingInfo or UnitChannelInfo
                         local _, spellNameText, _, startTime, endTime = castingInfo(danCurrentUnit) --spellName is first arg
                         
+                        
                         if startTime then --i remember getting an error from not having this check once in the function below. not 100% sure if needed
                             startTime = startTime/1000
                             endTime = endTime/1000
                             local castBar = danGetCastBar()
                             castBar.startTime = startTime
                             unitFrame.castBar = castBar
+                            local duration = endTime-startTime
                             
-                            local timer = C_Timer_NewTimer(endTime-startTime, castBarTimersUp)
+                            local timer = C_Timer_NewTimer(duration, castBarTimersUp)
                             timer.castBar = castBar
                             castBar.timer = timer
+                            
+                            castBar:SetMinMaxValues(0, duration)
+                            castBar.currentValue = 0
+                            castBar:SetScript("OnUpdate", castBarOnUpdateFunction)
                             
                             castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
                             castBar:SetReverseFill(not spellCast)
@@ -3630,16 +3667,11 @@ do
                             castBar.active = true
                             castBar:SetAlpha(1)
                             
-                            castBar:SetMinMaxValues(startTime, endTime)
-                            
                             local textOfSpellName = castBar.textOfSpellName
                             textOfSpellName:SetFontObject(spellOptionsCommon["fontObject"]) --SetTextColor
                             textOfSpellName:SetText(spellNameText)
                             
-                            
                             danAddToSeparateController(spellOptionsCommon.controller, castBar)
-                            
-                            castBar:SetScript("OnUpdate", castBarOnUpdateFunction)
                         end
                     end
                 end

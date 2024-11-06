@@ -70,7 +70,7 @@ local activeScaleMultiplier
 local savedUserOptions
 local userOptionsOnChanged = {} --or just clicked/pressed enter, value doesn't have to actually change
 hasuitUserOptionsOnChanged = userOptionsOnChanged
-tinsert(hasuitDoThisAddon_Loaded, 1, function()
+tinsert(hasuitDoThis_Addon_Loaded, 1, function()
     savedUserOptions = hasuitSavedUserOptions
     if not savedUserOptions then --will need to have checks for any new options added after release, maybe there's a better way to set this up
         print("Welcome to HasuitFrames. If you're new I recommend looking at welcome.txt in the HasuitFrames addon folder. glhf")
@@ -107,7 +107,7 @@ tinsert(hasuitDoThisAddon_Loaded, 1, function()
     
     
     
-    local danDoThisUserOptionsLoaded = hasuitDoThisUserOptionsLoaded
+    local danDoThisUserOptionsLoaded = hasuitDoThis_UserOptionsLoaded
     for i=1,#danDoThisUserOptionsLoaded do
         danDoThisUserOptionsLoaded[i]()
     end
@@ -286,8 +286,8 @@ do
     end
 end
 
-local danDoThisAfterCombat = hasuitDoThisAfterCombat
-local danDoThisOnUpdate = hasuitDoThisOnUpdate
+local danDoThisAfterCombat = hasuitDoThis_AfterCombat
+local danDoThisOnUpdate = hasuitDoThis_OnUpdate
 local InCombatLockdown = InCombatLockdown
 local userOptionsFrame = CreateFrame("Frame", "hasuitFramesOptionsFrame", UIParent, "BackdropTemplate")
 userOptionsFrame:SetPropagateKeyboardInput(true)

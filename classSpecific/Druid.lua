@@ -127,7 +127,7 @@ initialize(188550   ) --lifebloom
 initialize(33763    ) --lifebloom, todo only cd text if low duration?
 
 
-local danCommon = {["controllerOptions"]=danController_BottomRight_BottomRightHots2, ["size"]=15, ["alpha"]=1,    ["hideCooldownText"]=true,  ["specialIconType"]="optionalBorder"} --what's the difference between local common here and not having local? seems like if anything it would be better to do it like this, or maybe significantly better
+local danCommon = {["controllerOptions"]=danController_BottomRight_BottomRightHots2, ["size"]=15, ["alpha"]=1,    ["hideCooldownText"]=true,  ["specialIconType"]="optionalBorder"}
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=1,                                 ["group"]=danCommon,    ["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulHots}
 initialize(8936     ) --regrowth
 

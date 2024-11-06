@@ -38,10 +38,10 @@ local updateArenaPositions
 local updatingGroupPositions
 local danUpdateGroupPositionsButtons
 
-tinsert(hasuitDoThisUserOptionsLoaded, function()
+tinsert(hasuitDoThis_UserOptionsLoaded, function()
     local savedUserOptions = hasuitSavedUserOptions
     local userOptionsOnChanged = hasuitUserOptionsOnChanged
-    local danRunAfterCombat = hasuitDoThisAfterCombat
+    local danRunAfterCombat = hasuitDoThis_AfterCombat
     
     
     
@@ -758,7 +758,7 @@ do
         lastFrameBorderUpdated = border
     end
     
-    tinsert(hasuitDoThisPlayer_Target_Changed, updateTargetBorder)
+    tinsert(hasuitDoThis_Player_Target_Changed, updateTargetBorder)
 end
 
 
@@ -1007,7 +1007,7 @@ local danCurrentUnitFrameWidthPlus2
 local danCurrentUnitFrameWidthPlus3
 do
     local frameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize --todo update group size/button stuff here
-    tinsert(hasuitDoThisGroup_Roster_UpdateWidthChanged.functions, 1, function()
+    tinsert(hasuitDoThis_Group_Roster_UpdateWidthChanged.functions, 1, function()
         danCurrentUnitFrameWidth = frameWidthForGroupSize[danCurrentGroupSize]
         danCurrentUnitFrameWidthPlus2 = danCurrentUnitFrameWidth+2
         danCurrentUnitFrameWidthPlus3 = danCurrentUnitFrameWidth+3
@@ -1020,7 +1020,7 @@ local danCurrentUnitFrameHeightPlus2
 local danCurrentUnitFrameHeightPlus3
 do
     local frameHeightForGroupSize = hasuitRaidFrameHeightForGroupSize
-    tinsert(hasuitDoThisGroup_Roster_UpdateHeightChanged.functions, 1, function()
+    tinsert(hasuitDoThis_Group_Roster_UpdateHeightChanged.functions, 1, function()
         danCurrentUnitFrameHeight = frameHeightForGroupSize[danCurrentGroupSize]
         danCurrentUnitFrameHeightPlus2 = danCurrentUnitFrameHeight+2
         danCurrentUnitFrameHeightPlus3 = danCurrentUnitFrameHeight+3
@@ -1611,7 +1611,7 @@ end
 
 do
     local GetNumSubgroupMembers = GetNumSubgroupMembers
-    tinsert(hasuitDoThisGroup_Roster_UpdateGroupSizeChanged, 1, function()
+    tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, 1, function()
         danCurrentGroupSize = hasuitGroupSize
         danCurrentPartySize = GetNumSubgroupMembers()
         
@@ -1631,7 +1631,7 @@ local arenaDiminishTextures = {}
 local updatingGroupRoster
 local hasuitUpdateGroupRosterUnsafe
 
-tinsert(hasuitDoThisPlayer_Login, 1, function()
+tinsert(hasuitDoThis_Player_Login, 1, function()
     do
         local buttonUnits = { --todo improve groupsize changing in combat
             "raid6",
@@ -1831,9 +1831,9 @@ end)
 local playerRaidUnit
 do
     
-    local danDoThis = hasuitDoThisGroup_Roster_UpdateAlways
-    local danDoThisGroupSizeChanged = hasuitDoThisGroup_Roster_UpdateGroupSizeChanged
-    local danDoThisRelevantSizes = hasuitDoThisRelevantSizes
+    local danDoThis = hasuitDoThis_Group_Roster_UpdateAlways
+    local danDoThisGroupSizeChanged = hasuitDoThis_Group_Roster_UpdateGroupSizeChanged
+    local danDoThisRelevantSizes = hasuitDoThis_RelevantSizes
     
     
     local targetGUID
@@ -2296,7 +2296,7 @@ end
 local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
 
 local danCurrentArenaSpec
-function danUpdateExistingUnit() --dan4
+function danUpdateExistingUnit()
     local insert
     if danCurrentFrame.hideTimer then
         insert = true
@@ -2391,12 +2391,12 @@ do
     end)
     danPlayerRolesAssignedFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
     
-    local hasuitDoThisGroup_Roster_UpdateAlways = hasuitDoThisGroup_Roster_UpdateAlways
+    local hasuitDoThis_Group_Roster_UpdateAlways = hasuitDoThis_Group_Roster_UpdateAlways
     
-    local danDoThisOnUpdate = hasuitDoThisOnUpdate
+    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
     danDoThisOnUpdate(function()
         local rosterUpdateFunction = hasuitUpdateAllUnitsForUnitType["group"]
-        tinsert(hasuitDoThisGroup_Roster_UpdateAlways, rosterUpdateFunction)
+        tinsert(hasuitDoThis_Group_Roster_UpdateAlways, rosterUpdateFunction)
     end)
     
     
@@ -2485,7 +2485,7 @@ end
 local initialize = hasuitFramesInitialize
 local hasuitSpellFunction_CleuDiminish = hasuitSpellFunction_CleuDiminish
 local trackedDiminishSpells = hasuitTrackedDiminishSpells
-tinsert(hasuitDoThisAddon_Loaded, function()
+tinsert(hasuitDoThis_Addon_Loaded, function()
     hasuitFramesCenterSetEventType("cleu")
     local drLoadOn
     do --dr loadon
@@ -2502,7 +2502,7 @@ tinsert(hasuitDoThisAddon_Loaded, function()
                 end
             end
         end
-        tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+        tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, loadOnCondition)
         loadOnCondition() --these are redundant i think, should get rid of them when changing initialize function? or probably already could
         drLoadOn = loadOn
     end
@@ -2960,7 +2960,7 @@ do
     local CanInspect = CanInspect
     local function delayedNotify(frame)
         if not danInspectRegistered then
-            -- hasuitDoThisEasySavedVariables("not danInspectRegistered")
+            -- hasuitDoThis_EasySavedVariables("not danInspectRegistered")
             danInspectFrame:RegisterEvent("INSPECT_READY")
             danInspectRegistered = true
         end
@@ -3085,9 +3085,9 @@ initialize(384255) --Changing Talents
 
 
 
--- local hasuitDoThisGroupUnitUpdate_before = hasuitDoThisGroupUnitUpdate_before
--- local hasuitDoThisGroupUnitUpdate = hasuitDoThisGroupUnitUpdate
--- local hasuitDoThisGroupUnitUpdate_after = hasuitDoThisGroupUnitUpdate_after
+-- local hasuitDoThis_GroupUnitFramesUpdate_before = hasuitDoThis_GroupUnitFramesUpdate_before
+-- local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
+-- local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
 local lastRaidSize = 0
 local lastPartySize = 0
 function danUpdateGroupUnits(groupType, number, lastNumber)
@@ -3097,8 +3097,8 @@ function danUpdateGroupUnits(groupType, number, lastNumber)
     local updateCount = hasuitFrameTypeUpdateCount[danCurrentUnitType]+1
     hasuitFrameTypeUpdateCount[danCurrentUnitType] = updateCount
     
-    -- for i=1,#hasuitDoThisGroupUnitUpdate_before do
-        -- hasuitDoThisGroupUnitUpdate_before[i]() --not sure if this should exist or not, probably should if committing to the custom uniframes functions idea
+    -- for i=1,#hasuitDoThis_GroupUnitFramesUpdate_before do
+        -- hasuitDoThis_GroupUnitFramesUpdate_before[i]() --not sure if this should exist or not, probably should if committing to the custom uniframes functions idea
     -- end
     for i=1, number do
         danCurrentUnit = groupType..i
@@ -3128,20 +3128,20 @@ function danUpdateGroupUnits(groupType, number, lastNumber)
             end
             danCurrentFrame.updated = updateCount
             
-            -- for j=1,#hasuitDoThisGroupUnitUpdate do --won't work from test function if solo because number (party size) is 0 and the test function cheats to make frames, it just makes them directly and gives them fake .updated so they don't hide
+            -- for j=1,#hasuitDoThis_GroupUnitFramesUpdate do --won't work from test function if solo because number (party size) is 0 and the test function cheats to make frames, it just makes them directly and gives them fake .updated so they don't hide
                 -- print("asd")
-                -- hasuitDoThisGroupUnitUpdate[j](danCurrentFrame)
+                -- hasuitDoThis_GroupUnitFramesUpdate[j](danCurrentFrame)
             -- end
             
         else
             hasuitUnitFrameForUnit[danCurrentUnit] = nil
         end
     end
-    -- if #hasuitDoThisGroupUnitUpdate_after>0 then
-        -- for i=1,#hasuitDoThisGroupUnitUpdate_after do
-            -- hasuitDoThisGroupUnitUpdate_after[i]()
+    -- if #hasuitDoThis_GroupUnitFramesUpdate_after>0 then
+        -- for i=1,#hasuitDoThis_GroupUnitFramesUpdate_after do
+            -- hasuitDoThis_GroupUnitFramesUpdate_after[i]()
         -- end
-        -- wipe(hasuitDoThisGroupUnitUpdate_after)
+        -- wipe(hasuitDoThis_GroupUnitFramesUpdate_after)
     -- end
     
     danUpdatingRole = false
@@ -3174,7 +3174,7 @@ function danUpdateArenaFramesUnsafe()
                 
                 
                 danCurrentFrame = hasuitUnitFrameForUnit[danCurrentUnit]
-                if danCurrentFrame and danCurrentFrame.unitGUID then
+                if danCurrentFrame and (danCurrentFrame.unitGUID or danCurrentFrame.arenaSpec~=danCurrentArenaSpec) then
                     danCurrentFrame = nil
                 end
                 
@@ -3186,7 +3186,7 @@ function danUpdateArenaFramesUnsafe()
                 hasuitUnitFrameMakeHealthBarMain()
                 danCurrentFrame.arenaNumber = i
             else
-                if hasuitUnitFrameForUnit[danCurrentUnit]~=danCurrentFrame or danCurrentFrame.arenaSpec~=danCurrentArenaSpec then
+                if hasuitUnitFrameForUnit[danCurrentUnit]~=danCurrentFrame then
                     danUpdateExistingUnit()
                     danCurrentFrame.arenaNumber = i
                 end
@@ -3253,7 +3253,7 @@ function danHideInactiveFrames()
         end
     end
 end
-local danRunAfterCombat = hasuitDoThisAfterCombat
+local danRunAfterCombat = hasuitDoThis_AfterCombat
 function hasuitUpdateGroupRosterUnsafe()
     updatingGroupRoster = false
     
@@ -3360,17 +3360,17 @@ end
 
 
 do
-    -- local hasuitDoThisGroupUnitUpdate_Positions_before = hasuitDoThisGroupUnitUpdate_Positions_before
-    local hasuitDoThisGroupUnitUpdate_Positions = hasuitDoThisGroupUnitUpdate_Positions
-    local hasuitDoThisGroupUnitUpdate_Positions_after = hasuitDoThisGroupUnitUpdate_Positions_after
+    -- local hasuitDoThis_GroupUnitFramesUpdate_Positions_before = hasuitDoThis_GroupUnitFramesUpdate_Positions_before
+    local hasuitDoThis_GroupUnitFramesUpdate_Positions = hasuitDoThis_GroupUnitFramesUpdate_Positions
+    local hasuitDoThis_GroupUnitFramesUpdate_Positions_after = hasuitDoThis_GroupUnitFramesUpdate_Positions_after
     local partyWasBroken
     local lastRaidSize2 = 0
     function danUpdateGroupPositionsButtons() --should handle people leaving well? but not joining, todo? can look broken if group size changes size/columns in combat atm but probably rare. should never make game unplayable even when that happens?
         updatingGroupPositions = false
         
         
-        -- for i=1,#hasuitDoThisGroupUnitUpdate_Positions_before do
-            -- hasuitDoThisGroupUnitUpdate_Positions_before[i](danCurrentFrame)
+        -- for i=1,#hasuitDoThis_GroupUnitFramesUpdate_Positions_before do
+            -- hasuitDoThis_GroupUnitFramesUpdate_Positions_before[i](danCurrentFrame)
         -- end
         
         if danCurrentGroupSize<=5 then
@@ -3387,8 +3387,8 @@ do
                     macroTargetFrame:SetAttribute("unit", danCurrentFrame.unit)
                 end
                 
-                for j=1,#hasuitDoThisGroupUnitUpdate_Positions do
-                    hasuitDoThisGroupUnitUpdate_Positions[j](danCurrentFrame)
+                for j=1,#hasuitDoThis_GroupUnitFramesUpdate_Positions do
+                    hasuitDoThis_GroupUnitFramesUpdate_Positions[j](danCurrentFrame)
                 end
                 
             end
@@ -3446,8 +3446,8 @@ do
                             macroTargetFrame:SetAttribute("unit", danCurrentFrame.unit)
                         end
                         
-                        for j=1,#hasuitDoThisGroupUnitUpdate_Positions do
-                            hasuitDoThisGroupUnitUpdate_Positions[j](danCurrentFrame)
+                        for j=1,#hasuitDoThis_GroupUnitFramesUpdate_Positions do
+                            hasuitDoThis_GroupUnitFramesUpdate_Positions[j](danCurrentFrame)
                         end
                         i = i + 1
                         
@@ -3471,11 +3471,11 @@ do
             
         end
         
-        if #hasuitDoThisGroupUnitUpdate_Positions_after>0 then
-            for j=1,#hasuitDoThisGroupUnitUpdate_Positions_after do
-                hasuitDoThisGroupUnitUpdate_Positions_after[j]()
+        if #hasuitDoThis_GroupUnitFramesUpdate_Positions_after>0 then
+            for j=1,#hasuitDoThis_GroupUnitFramesUpdate_Positions_after do
+                hasuitDoThis_GroupUnitFramesUpdate_Positions_after[j]()
             end
-            wipe(hasuitDoThisGroupUnitUpdate_Positions_after)
+            wipe(hasuitDoThis_GroupUnitFramesUpdate_Positions_after)
         end
     end
 end
@@ -3558,6 +3558,7 @@ do
                     targetedCountNpc = targetedCountNpc+1
                 end
             end
+            local targetedCountPlayer = targetedCountPlayer
             if targetedCountPlayer~=0 then
                 -- if targetedCountPlayer>3 then
                     -- frame.targetedCountText:SetTextColor(1,0.2,0)
@@ -3617,10 +3618,10 @@ do
             
         end
     end
-    tinsert(hasuitDoThisPlayer_Login, function()
+    tinsert(hasuitDoThis_Player_Login, function()
         if true then --todo option to disable? not sure it's even worth the space in options but it would probably make the addon use 1/3rd cpu/memory in rbgs
             seeIfTargetCountBruteForceShouldLoad()
-            tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, seeIfTargetCountBruteForceShouldLoad)
+            tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, seeIfTargetCountBruteForceShouldLoad)
         end
     end)
 end
@@ -3924,7 +3925,7 @@ do
     local function danInspectAllGroup()
         C_Timer_After(0, danInspectAllGroup2)
     end
-    tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, function()
+    tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, function()
         danPlayerFrame:SetAlpha(1)
         updateTargetBorder()
         C_Timer_After(0, danInspectAllGroup)

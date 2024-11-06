@@ -72,45 +72,45 @@ hasuitSavedVariables = {} --for things in the future like keeping track of how l
 
 
 
-hasuitDoThisAddon_Loaded = {} --not accessible from external addons
-hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {} --can sync any addons together here, give them these or other functions/run things in certain orders, other addon should do the same thing with hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {} so that it doesn't matter which addon loads first
-hasuitDoThisPlayer_Entering_WorldFirstOnly = {}
-hasuitDoThisPlayer_Entering_WorldSkipsFirst = {}
+hasuitDoThis_Addon_Loaded = {} --not accessible from external addons
+hasuitDoThis_Player_Login = hasuitDoThis_Player_Login or {} --can sync any addons together here, give them these or other functions/run things in certain orders, other addon should do the same thing with hasuitDoThis_Player_Login = hasuitDoThis_Player_Login or {} so that it doesn't matter which addon loads first
+hasuitDoThis_Player_Entering_WorldFirstOnly = {} --other stuff is accessible but you need to do it inside of the function you put into hasuitDoThis_Player_Login to make sure it doesn't matter which addon loads first. basically anything external should be 100% wrapped in the function you tinsert into hasuitDoThis_Player_Login and from there everything global made in my addon will be loaded and can be grabbed and used locally before it gets set nil. (Setting nil only removes the global pointer, anything grabbed to use locally will stay and can continue to be used.)
+hasuitDoThis_Player_Entering_WorldSkipsFirst = {}
 
-hasuitDoThisGroup_Roster_UpdateAlways = {}
-hasuitDoThisGroup_Roster_UpdateGroupSizeChanged = {}
--- hasuitDoThisGroup_Roster_UpdateWidthChanged --tinsert into .functions
--- hasuitDoThisGroup_Roster_UpdateHeightChanged --tinsert into .functions
--- hasuitDoThisGroup_Roster_UpdateColumnsChanged --tinsert into .functions
--- hasuitDoThisGroup_Roster_UpdateGroupSize_5 --tinsert into .functions
--- hasuitDoThisGroup_Roster_UpdateGroupSize_5_8 --tinsert into .functions
-
-
-hasuitDoThisPlayer_Target_Changed = {}
-
-hasuitDoThisUserOptionsLoaded = {} --not accessible from external addons, happens early on addon_loaded
-
--- hasuitDoThisOnUpdate(func)
--- hasuitDoThisOnUpdatePosition1(func)
-
--- hasuitDoThisAfterCombat(func)
+hasuitDoThis_Group_Roster_UpdateAlways = {}
+hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = {}
+-- hasuitDoThis_Group_Roster_UpdateWidthChanged --tinsert into .functions
+-- hasuitDoThis_Group_Roster_UpdateHeightChanged --tinsert into .functions
+-- hasuitDoThis_Group_Roster_UpdateColumnsChanged --tinsert into .functions
+-- hasuitDoThis_Group_Roster_UpdateGroupSize_5 --tinsert into .functions
+-- hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 --tinsert into .functions
 
 
+hasuitDoThis_Player_Target_Changed = {}
+
+hasuitDoThis_UserOptionsLoaded = {} --not accessible from external addons, happens early on addon_loaded
+
+-- hasuitDoThis_OnUpdate(func)
+-- hasuitDoThis_OnUpdatePosition1(func)
+
+-- hasuitDoThis_AfterCombat(func)
 
 
 
 
--- hasuitDoThisGroupUnitUpdate_before = {} --normal
--- hasuitDoThisGroupUnitUpdate = {} --gives unitFrame as arg1
--- hasuitDoThisGroupUnitUpdate_after = {} --wipes at the end if it did anything
+
+
+-- hasuitDoThis_GroupUnitFramesUpdate_before = {} --normal
+-- hasuitDoThis_GroupUnitFramesUpdate = {} --gives unitFrame as arg1
+-- hasuitDoThis_GroupUnitFramesUpdate_after = {} --wipes at the end if it did anything
 --these are for efficiently running functions on every group unitFrame every time there's a group update (usually group_roster_update but the function can come from unit_aura guid not matching or arena update stealing a group frame(s), or player_login
 --the way it's set up allows for only running a function on every unitframe based on one condition changing and then not repeating the function on future group updates, until the condition you care about changes again
 --example for properly using in testingExternalAddon.lua, will make a guide some time
 
 
--- hasuitDoThisGroupUnitUpdate_Positions_before = {} --normal, these wait for combat to drop
-hasuitDoThisGroupUnitUpdate_Positions = {} --gives unitFrame as arg1
-hasuitDoThisGroupUnitUpdate_Positions_after = {} --wipes at the end if it did anything
+-- hasuitDoThis_GroupUnitFramesUpdate_Positions_before = {} --normal, these wait for combat to drop
+hasuitDoThis_GroupUnitFramesUpdate_Positions = {} --gives unitFrame as arg1
+hasuitDoThis_GroupUnitFramesUpdate_Positions_after = {} --wipes at the end if it did anything
 
 
 
@@ -127,9 +127,9 @@ local GetInstanceInfo = GetInstanceInfo
 local mainLoadOnFunctionSpammable
 local tinsert = table.insert
 do
-    local danDoThisAddonLoaded = hasuitDoThisAddon_Loaded
-    local danDoThisPlayerLogin = hasuitDoThisPlayer_Login
-    local danDoThisEnteringFirst = hasuitDoThisPlayer_Entering_WorldFirstOnly
+    local danDoThisAddonLoaded = hasuitDoThis_Addon_Loaded
+    local danDoThisPlayerLogin = hasuitDoThis_Player_Login
+    local danDoThisEnteringFirst = hasuitDoThis_Player_Entering_WorldFirstOnly
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("ADDON_LOADED")
     danFrame:RegisterEvent("PLAYER_LOGIN")
@@ -154,7 +154,7 @@ do
                 danDoThisEnteringFirst[i]()
             end
             mainLoadOnFunctionSpammable() --not really necessary since every groupsize loadon will also call this initially but oh well
-            local danDoThisEnteringWorld = hasuitDoThisPlayer_Entering_WorldSkipsFirst
+            local danDoThisEnteringWorld = hasuitDoThis_Player_Entering_WorldSkipsFirst
             danFrame:SetScript("OnEvent", function()
                 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
                 hasuitInstanceId = instanceId
@@ -177,7 +177,7 @@ end
 
 
 
-do --hasuitDoThisOnUpdate, hasuitDoThisOnUpdatePosition1
+do --hasuitDoThis_OnUpdate, hasuitDoThis_OnUpdatePosition1
     local danDoThis
     local danFrame = CreateFrame("Frame")
     local function onUpdateFunction()
@@ -190,7 +190,7 @@ do --hasuitDoThisOnUpdate, hasuitDoThisOnUpdatePosition1
             danFrame:SetScript("OnUpdate", nil) --is there a good way to not have to setscript onupdate an extra time if adding to the table mid-onupdate?
         end
     end
-    function hasuitDoThisOnUpdate(func)
+    function hasuitDoThis_OnUpdate(func)
         if danDoThis then
             tinsert(danDoThis, func)
         else
@@ -198,7 +198,7 @@ do --hasuitDoThisOnUpdate, hasuitDoThisOnUpdatePosition1
             danFrame:SetScript("OnUpdate", onUpdateFunction)
         end
     end
-    function hasuitDoThisOnUpdatePosition1(func)
+    function hasuitDoThis_OnUpdatePosition1(func)
         if danDoThis then
             tinsert(danDoThis, 1, func)
         else
@@ -206,7 +206,7 @@ do --hasuitDoThisOnUpdate, hasuitDoThisOnUpdatePosition1
             danFrame:SetScript("OnUpdate", onUpdateFunction)
         end
     end
-    -- function hasuitDoThisOnUpdateSpecificPosition(func, index)
+    -- function hasuitDoThis_OnUpdateSpecificPosition(func, index)
         -- if danDoThis then
             -- tinsert(danDoThis, index, func)
         -- else
@@ -229,10 +229,10 @@ end
 
 
 
-do --hasuitDoThisAfterCombat
+do --hasuitDoThis_AfterCombat
     local danDoThis
     local danFrame = CreateFrame("Frame")
-    function hasuitDoThisAfterCombat(func)
+    function hasuitDoThis_AfterCombat(func)
         if danDoThis then
             tinsert(danDoThis, func)
         else
@@ -252,7 +252,7 @@ end
 local GetNumGroupMembers = GetNumGroupMembers
 do
     local danDoThisRelevantSizes = {}
-    hasuitDoThisRelevantSizes = danDoThisRelevantSizes
+    hasuitDoThis_RelevantSizes = danDoThisRelevantSizes
     do
         local function getDoThisSizeTable(danSizeTable)
             local relevantGroupSizes = {functions={}}
@@ -267,19 +267,19 @@ do
             tinsert(danDoThisRelevantSizes, relevantGroupSizes)
             return relevantGroupSizes
         end
-        hasuitDoThisGroup_Roster_UpdateWidthChanged =       getDoThisSizeTable({5,8,15,20,24,28,32,36,40}) --todo make this kind of thing work the same way on a table like hasuitRaidFrameWidthForGroupSize? might be nice when useroptions can change frame size and stuff
-        hasuitDoThisGroup_Roster_UpdateHeightChanged =      getDoThisSizeTable({8,10,15,40})
-        hasuitDoThisGroup_Roster_UpdateColumnsChanged =     getDoThisSizeTable({5,8,20,24,28,32,36,40})
-        hasuitDoThisGroup_Roster_UpdateGroupSize_5 =        getDoThisSizeTable({5,40})
-        hasuitDoThisGroup_Roster_UpdateGroupSize_5_8 =      getDoThisSizeTable({5,8,40})
+        hasuitDoThis_Group_Roster_UpdateWidthChanged =       getDoThisSizeTable({5,8,15,20,24,28,32,36,40}) --todo make this kind of thing work the same way on a table like hasuitRaidFrameWidthForGroupSize? might be nice when useroptions can change frame size and stuff
+        hasuitDoThis_Group_Roster_UpdateHeightChanged =      getDoThisSizeTable({8,10,15,40})
+        hasuitDoThis_Group_Roster_UpdateColumnsChanged =     getDoThisSizeTable({5,8,20,24,28,32,36,40})
+        hasuitDoThis_Group_Roster_UpdateGroupSize_5 =        getDoThisSizeTable({5,40})
+        hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 =      getDoThisSizeTable({5,8,40})
     end
     
-    local danDoThisOnUpdate = hasuitDoThisOnUpdate
-    local danDoThis = hasuitDoThisGroup_Roster_UpdateAlways
-    local danDoThisGroupSizeChanged = hasuitDoThisGroup_Roster_UpdateGroupSizeChanged
+    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
+    local danDoThis = hasuitDoThis_Group_Roster_UpdateAlways
+    local danDoThisGroupSizeChanged = hasuitDoThis_Group_Roster_UpdateGroupSizeChanged
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-    tinsert(hasuitDoThisAddon_Loaded, 1, function() --ends up being #2 (for now?)
+    tinsert(hasuitDoThis_Addon_Loaded, 1, function() --ends up being #2 (for now?)
         for i=1,#danDoThisGroupSizeChanged do
             danDoThisGroupSizeChanged[i]()
         end
@@ -302,7 +302,7 @@ do
         
         do
             local columnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
-            tinsert(hasuitDoThisGroup_Roster_UpdateColumnsChanged.functions, 1, function()
+            tinsert(hasuitDoThis_Group_Roster_UpdateColumnsChanged.functions, 1, function()
                 hasuitRaidFrameColumns = columnsForGroupSize[hasuitGroupSize]
             end)
         end
@@ -341,7 +341,7 @@ do
 end
 
 
-hasuitRaidFrameWidthForGroupSize = { --hasuitDoThisGroup_Roster_UpdateWidthChanged
+hasuitRaidFrameWidthForGroupSize = { --hasuitDoThis_Group_Roster_UpdateWidthChanged
     [0]=114,
     114,--1
     114,--2
@@ -392,7 +392,7 @@ hasuitRaidFrameWidthForGroupSize = { --hasuitDoThisGroup_Roster_UpdateWidthChang
     78,--39
     78,--40
 }
-hasuitRaidFrameHeightForGroupSize = { --hasuitDoThisGroup_Roster_UpdateHeightChanged
+hasuitRaidFrameHeightForGroupSize = { --hasuitDoThis_Group_Roster_UpdateHeightChanged
     [0]=90,--0 --bored todo make it so that hasuitGroupSize can be 0 and not matter, maybe already could remove the check that makes it 1?
     90,--1
     90,--2
@@ -438,7 +438,7 @@ hasuitRaidFrameHeightForGroupSize = { --hasuitDoThisGroup_Roster_UpdateHeightCha
     49,--39
     49,--40
 }
-hasuitRaidFrameColumnsForGroupSize = { --hasuitDoThisGroup_Roster_UpdateColumnsChanged
+hasuitRaidFrameColumnsForGroupSize = { --hasuitDoThis_Group_Roster_UpdateColumnsChanged
     [0]=1,--0
     1,--1
     1,--2
@@ -554,7 +554,7 @@ local function mainLoadOnFunction()
 end
 local GetTime = GetTime
 local lastTime
-local danPriorityOnUpdate = hasuitDoThisOnUpdatePosition1
+local danPriorityOnUpdate = hasuitDoThis_OnUpdatePosition1
 function mainLoadOnFunctionSpammable()
     local currentTime = GetTime()
     if lastTime~=currentTime then
@@ -732,7 +732,7 @@ end
 
 local initializeMulti = hasuitFramesInitializeMulti
 function hasuitFramesInitializeMultiPlusDiminish(spellId)
-    -- hasuitDoThisEasySavedVariables(spellId, danTestingCollectionTableDiminish)
+    -- hasuitDoThis_EasySavedVariables(spellId, danTestingCollectionTableDiminish)
     tinsert(drSpellTable, spellId)
     initializeMulti(spellId)
 end
@@ -792,7 +792,7 @@ end)
 
 
 do
-    local danDoThis = hasuitDoThisPlayer_Target_Changed
+    local danDoThis = hasuitDoThis_Player_Target_Changed
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
     danFrame:SetScript("OnEvent", function()
@@ -854,36 +854,36 @@ end)
 
 
 
-tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --a list, semi enforced naturally. todo add things that stay global and don't get set to nil as comments. This should hopefully be a comprehensive list of things that can be accessed from outside of the addon, not a full list of internal functions
+tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi enforced naturally. todo add things that stay global and don't get set to nil as comments. This should hopefully be a comprehensive list of things that can be accessed from outside of the addon, not a full list of internal functions
     C_Timer.After(0, function() --hasuitSetupSpellOptions
-        hasuitDoThisAddon_Loaded = nil
-        hasuitDoThisPlayer_Login = nil
-        hasuitDoThisPlayer_Entering_WorldFirstOnly = nil
-        hasuitDoThisPlayer_Entering_WorldSkipsFirst = nil
+        hasuitDoThis_Addon_Loaded = nil
+        hasuitDoThis_Player_Login = nil
+        hasuitDoThis_Player_Entering_WorldFirstOnly = nil
+        hasuitDoThis_Player_Entering_WorldSkipsFirst = nil
         
-        hasuitDoThisGroup_Roster_UpdateAlways = nil
-        hasuitDoThisGroup_Roster_UpdateGroupSizeChanged = nil
-        hasuitDoThisGroup_Roster_UpdateWidthChanged = nil
-        hasuitDoThisGroup_Roster_UpdateHeightChanged = nil
-        hasuitDoThisGroup_Roster_UpdateColumnsChanged = nil
-        hasuitDoThisGroup_Roster_UpdateGroupSize_5 = nil
-        hasuitDoThisGroup_Roster_UpdateGroupSize_5_8 = nil
-        hasuitDoThisRelevantSizes = nil
+        hasuitDoThis_Group_Roster_UpdateAlways = nil
+        hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = nil
+        hasuitDoThis_Group_Roster_UpdateWidthChanged = nil
+        hasuitDoThis_Group_Roster_UpdateHeightChanged = nil
+        hasuitDoThis_Group_Roster_UpdateColumnsChanged = nil
+        hasuitDoThis_Group_Roster_UpdateGroupSize_5 = nil
+        hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 = nil
+        hasuitDoThis_RelevantSizes = nil
         
-        -- hasuitDoThisGroupUnitUpdate_before = nil
-        -- hasuitDoThisGroupUnitUpdate = nil
-        -- hasuitDoThisGroupUnitUpdate_after = nil
-        -- hasuitDoThisGroupUnitUpdate_Positions_before = nil
-        hasuitDoThisGroupUnitUpdate_Positions = nil
-        hasuitDoThisGroupUnitUpdate_Positions_after = nil
+        -- hasuitDoThis_GroupUnitFramesUpdate_before = nil
+        -- hasuitDoThis_GroupUnitFramesUpdate = nil
+        -- hasuitDoThis_GroupUnitFramesUpdate_after = nil
+        -- hasuitDoThis_GroupUnitFramesUpdate_Positions_before = nil
+        hasuitDoThis_GroupUnitFramesUpdate_Positions = nil
+        hasuitDoThis_GroupUnitFramesUpdate_Positions_after = nil
         
-        hasuitDoThisOnUpdate = nil
-        hasuitDoThisOnUpdatePosition1 = nil
-        hasuitDoThisPlayerTargetChanged = nil
-        hasuitDoThisAfterCombat = nil
+        hasuitDoThis_OnUpdate = nil
+        hasuitDoThis_OnUpdatePosition1 = nil
+        hasuitDoThis_PlayerTargetChanged = nil
+        hasuitDoThis_AfterCombat = nil
         
-        hasuitDoThisPlayer_Target_Changed = nil
-        hasuitDoThisUserOptionsLoaded = nil
+        hasuitDoThis_Player_Target_Changed = nil
+        hasuitDoThis_UserOptionsLoaded = nil --todo separate stuff that can't actually be accessed from outside like this, and probably some things that there isn't much of a use for and exist to put things from one file into another. 3 categories in total i think
         hasuitUserOptionsOnChanged = nil
         
         hasuitRaidFrameWidthForGroupSize = nil
@@ -918,6 +918,7 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --a list, semi en
         hasuitLoadOn_BgOnly = nil
         hasuitLoadOn_NotArenaOnly = nil
         hasuitLoadOn_ArenaOnly = nil
+        hasuitLoadOn_PvpEnemyMiddleCastBars = nil
         hasuitLoadOn_RootCleuBreakable = nil
         hasuitLoadOn_PartySize = nil
         hasuitLoadOn_CooldownDisplay = nil
@@ -1039,27 +1040,25 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --a list, semi en
         hasuitController_Separate_UpperScreenCastBars = nil
         hasuitController_CooldownsControllers = nil
         
-        danCommonMiddleCastBars1 = nil
-        danCommonMiddleCastBars2 = nil
-        danCommonMiddleCastBars3 = nil
-        danCommonMiddleCastBars4 = nil
-        danCommonMiddleCastBars5 = nil
-        hasuitBigRedMiddleCastBarsSpellOptions =    nil
-        hasuitBigGreenMiddleCastBarsSpellOptions =  nil
-        hasuitYellowMiddleCastBarsSpellOptions =    nil
-        hasuitRootMiddleCastBarsSpellOptions =      nil
-        hasuitMiscMiddleCastBarsSpellOptions = nil
+        hasuitBigRedMiddleCastBarsSpellOptions = nil
+        hasuitGreenishDefensiveMiddleCastBarsSpellOptions = nil
+        hasuitOrangeMiddleCastBarsSpellOptions = nil
+        hasuitYellowMiddleCastBarsSpellOptions = nil
+        hasuitSmallMiscMiddleCastBarsSpellOptions = nil
+        hasuitSmallDamageMiddleCastBarsSpellOptions = nil
         hasuitCastBarFont20 = nil
         hasuitCastBarFont18 = nil
         hasuitCastBarFont15 = nil
         hasuitCastBar1Font = nil
+        hasuitMiddleCastBarsAllowChannelingForSpellId = nil
+        hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = nil
+        
         hasuitLocal1 = nil
         hasuitLocal2 = nil
         hasuitLocal3 = nil
         hasuitLocal4 = nil
         hasuitLocal5 = nil
         hasuitLocal6 = nil
-        hasuitUnusedCastBars = nil
         
         hasuitResetCooldowns = nil
         hasuitSetIconText = nil
@@ -1080,6 +1079,7 @@ tinsert(hasuitDoThisPlayer_Entering_WorldFirstOnly, function() --a list, semi en
         hasuitUnitAuraIsFullUpdate = nil
         
         hasuitCooldownTextFonts = nil
+        hasuit1PixelBorderBackdrop = nil
         
     end)
 end)

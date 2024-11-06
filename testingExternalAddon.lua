@@ -1,7 +1,7 @@
 
 --needs the 
--- hasuitDoThisPlayer_Login = hasuitDoThisPlayer_Login or {}
--- tinsert(hasuitDoThisPlayer_Login, function()
+-- hasuitDoThis_Player_Login = hasuitDoThis_Player_Login or {}
+-- tinsert(hasuitDoThis_Player_Login, function()
 	
 -- end)
 --thing
@@ -10,8 +10,8 @@
  --first attempt to let people make custom functions that affect unitframes in their external addon. need to have a better idea of what i want this to be for otherwise should leave it for later, seems like a useful thing though
 
 local danRemoveFunctionFromArray = hasuitRemoveUnitHealthControlNotSafe --should rename maybe?
-local hasuitDoThisGroupUnitUpdate_Positions = hasuitDoThisGroupUnitUpdate_Positions
-local hasuitDoThisGroupUnitUpdate_Positions_after = hasuitDoThisGroupUnitUpdate_Positions_after
+local hasuitDoThis_GroupUnitFramesUpdate_Positions = hasuitDoThis_GroupUnitFramesUpdate_Positions
+local hasuitDoThis_GroupUnitFramesUpdate_Positions_after = hasuitDoThis_GroupUnitFramesUpdate_Positions_after
 local repositioningFunctionIsActive
 local tinsert = tinsert
 local floor = floor
@@ -39,29 +39,29 @@ local function customUpdateGroupUnitFrameFunction(unitFrame) --will update when 
     end
 end
 local function removeAfter()
-    danRemoveFunctionFromArray(hasuitDoThisGroupUnitUpdate_Positions, customUpdateGroupUnitFrameFunction) --this makes it only happen once when unitframe size changes and not spam future group updates
+    danRemoveFunctionFromArray(hasuitDoThis_GroupUnitFramesUpdate_Positions, customUpdateGroupUnitFrameFunction) --this makes it only happen once when unitframe size changes and not spam future group updates
     repositioningFunctionIsActive = false
 end
 local function ifUnitFramesSizeChangesFunction()
     if hasuitInstanceType=="pvp" and not repositioningFunctionIsActive then --middle icon can only be active in bgs atm, hopefully hasuitInstanceType is always set correctly here. I think it will be. todo look into this, will actually be easy to see the exact earliest time that instancetype changes now that I think about it
         repositioningFunctionIsActive = true
-        tinsert(hasuitDoThisGroupUnitUpdate_Positions, customUpdateGroupUnitFrameFunction)
-        tinsert(hasuitDoThisGroupUnitUpdate_Positions_after, removeAfter)
+        tinsert(hasuitDoThis_GroupUnitFramesUpdate_Positions, customUpdateGroupUnitFrameFunction)
+        tinsert(hasuitDoThis_GroupUnitFramesUpdate_Positions_after, removeAfter)
     end
 end
-tinsert(hasuitDoThisGroup_Roster_UpdateWidthChanged.functions, ifUnitFramesSizeChangesFunction) --could check pixel perfect mode and prevent this/change middle grow function to setpoint on center instead of topleft because it'll do nothing useful if pixel perfect mode is off
-tinsert(hasuitDoThisGroup_Roster_UpdateHeightChanged.functions, ifUnitFramesSizeChangesFunction)
+tinsert(hasuitDoThis_Group_Roster_UpdateWidthChanged.functions, ifUnitFramesSizeChangesFunction) --could check pixel perfect mode and prevent this/change middle grow function to setpoint on center instead of topleft because it'll do nothing useful if pixel perfect mode is off
+tinsert(hasuitDoThis_Group_Roster_UpdateHeightChanged.functions, ifUnitFramesSizeChangesFunction)
 
 
 
 
 
 
--- tinsert(hasuitDoThisGroup_Roster_UpdateGroupSize_5.functions, function() --unitFrames will attach to raid buttons instead of party buttons and ignore combat if switching from group 5 to 6+, use this for that case if switching from 5 to 6+ might be relevant --actually they won't change size I think so this isn't needed
+-- tinsert(hasuitDoThis_Group_Roster_UpdateGroupSize_5.functions, function() --unitFrames will attach to raid buttons instead of party buttons and ignore combat if switching from group 5 to 6+, use this for that case if switching from 5 to 6+ might be relevant --actually they won't change size I think so this isn't needed
     -- if not repositioningFunctionIsActive then
         -- repositioningFunctionIsActive = true
-        -- tinsert(hasuitDoThisGroupUnitUpdate, customUpdateGroupUnitFrameFunction) --needs a delay though too because this happens before size actually changes
-        -- tinsert(hasuitDoThisGroupUnitUpdate_after, removeAfter)
+        -- tinsert(hasuitDoThis_GroupUnitFramesUpdate, customUpdateGroupUnitFrameFunction) --needs a delay though too because this happens before size actually changes
+        -- tinsert(hasuitDoThis_GroupUnitFramesUpdate_after, removeAfter)
     -- end
 -- end)
 

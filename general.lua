@@ -23,7 +23,7 @@ do --instanceType none
             loadOn.shouldLoad = false
         end
     end
-    tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+    tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, loadOnCondition)
     loadOnCondition()
     hasuitLoadOn_InstanceTypeNone = loadOn
 end
@@ -37,7 +37,7 @@ do --instanceType pvp, (bg only)
             loadOn.shouldLoad = false
         end
     end
-    tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+    tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, loadOnCondition)
     loadOnCondition()
     hasuitLoadOn_BgOnly = loadOn
 end
@@ -46,20 +46,23 @@ local loadOnBgOnly = hasuitLoadOn_BgOnly
 do --arena or not arena loadons
     local loadOn = {}
     local loadOn2 = {}
+    local loadOn3 = hasuitLoadOn_PvpEnemyMiddleCastBars
     local function loadOnCondition()
         if hasuitInstanceType~="arena" then --should load
             if not loadOn.shouldLoad then
                 loadOn.shouldLoad = true
                 loadOn2.shouldLoad = false
+                loadOn3.shouldLoad = false
             end
         else --should NOT load
             if loadOn.shouldLoad~=false then
                 loadOn.shouldLoad = false
                 loadOn2.shouldLoad = true
+                loadOn3.shouldLoad = true
             end
         end
     end
-    tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
+    tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, loadOnCondition)
     loadOnCondition()
     hasuitLoadOn_NotArenaOnly = loadOn
     hasuitLoadOn_ArenaOnly = loadOn2
@@ -174,7 +177,7 @@ do
         [40] =  {22, 21, 20, 17, 15, 13, 10 }, --todo system for changing sizes of things based on frame size, and system for changing scale of everything while keeping every number an integer
     }
     local lastGroupSize = 0
-    local sizeTable = hasuitDoThisGroup_Roster_UpdateGroupSize_5_8
+    local sizeTable = hasuitDoThis_Group_Roster_UpdateGroupSize_5_8
     local hasuitLoadOn_RootCleuBreakable = hasuitLoadOn_RootCleuBreakable
     local function danRbgFunction()
         local bigGroupDebuffsRaidForSize = bigGroupDebuffsRaid[sizeTable.activeRelevantSize]
@@ -326,7 +329,7 @@ initializePlusDiminish(202346) --double barrel
 initializePlusDiminish(385149) --exorcism
 initializePlusDiminish(255941) --wake of ashes
 initializePlusDiminish(200200) --holy word: chastise, stun
-initializePlusDiminish(118905) --static charge --todo cast non-tracked units
+initializePlusDiminish(118905) --Static Charge --todo cast non-tracked units
 initializePlusDiminish(77505 ) --earthquake
 initializePlusDiminish(117526) --binding shot
 initializePlusDiminish(171017) --Meteor Strike, haven't seen
@@ -534,7 +537,7 @@ initializeMultiPlusDiminish(393456) --Entrapment
 initializeMulti(157997) --Ice Nova, self-dr? could add something to track this for mages or at least make an easy way for them to add stuff to track it themselves
 initializeMulti(91807) --Shambling Rush, no dr, breaks
 
-hasuitSetupSpellOptionsMulti[3] = hasuitRootMiddleCastBarsSpellOptions
+hasuitSetupSpellOptionsMulti[3] = hasuitOrangeMiddleCastBarsSpellOptions
 initializeMultiPlusDiminish(339) --Entangling Roots
 
 
@@ -599,7 +602,7 @@ hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priori
 initialize(442804) --Curse of the Satyr
 hasuitSetupSpellOptionsMulti = {
     hasuitSetupSpellOptions,
-    hasuitMiscMiddleCastBarsSpellOptions,
+    hasuitSmallMiscMiddleCastBarsSpellOptions,
 }
 initializeMulti(2812) --Denounce, can't crit
 -- initialize("Divine Plea")
@@ -704,7 +707,7 @@ initialize(227847) --Bladestorm
 initialize(389774) --Bladestorm
 hasuitSetupSpellOptionsMulti = {
     hasuitSetupSpellOptions,
-    hasuitBigGreenMiddleCastBarsSpellOptions,
+    hasuitGreenishDefensiveMiddleCastBarsSpellOptions,
 }
 initializeMulti(421453) --Ultimate Penitence absorb(cc immunity?) todo improve this since basing this on the absorb buff isn't perfect
 -- initialize(436358) --Demolish, immune to stuns/knockbacks? todo there's no unit_aura for this. it gets cleu applied though for some reason, along with channel start and cast success
@@ -947,7 +950,7 @@ initialize(381755) --earth elemental 15% bonus health
 -- initialize(586) --Fade, todo tell if it's 10% or useless from points[1]
 hasuitSetupSpellOptionsMulti = {
     hasuitSetupSpellOptions,
-    hasuitMiscMiddleCastBarsSpellOptions,
+    hasuitSmallMiscMiddleCastBarsSpellOptions,
 }
 initializeMulti(20578) --Cannibalize
 
@@ -959,53 +962,53 @@ initializeMulti(20578) --Cannibalize
 
 
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=115,               ["group"]=danCommonTopLeftGroup,        }    --PET DEFENSIVES, todo
-initialize(7870) --Lesser Invisibility, succubus pet
-initialize(96243) --Invisibility, pet?
-initialize("Play Dead")
-initialize("Soulburn: Health Funnel")
-initialize("Agile Reflexes")
-initialize("Ancient Hide")
-initialize("Bristle")
-initialize("Bulwark")
-initialize("Catlike Reflexes")
-initialize("Defense Matrix")
-initialize("Dragon's Guile")
-initialize("Feather Flurry")
-initialize("Fleethoof")
-initialize("Gastric Bloat")
-initialize("Gruff")
-initialize("Harden Carapace")
-initialize("Harden Skin")
-initialize("Hardy")
-initialize("Huddle")
-initialize("Niuzao's Fortitude")
-initialize("Obsidian Skin")
-initialize("Primal Agility")
-initialize("Protective Bile")
-initialize("Putrid Bulwark")
-initialize("Scale Shield")
-initialize("Serpent's Swiftness")
-initialize(17767) --Shadow Bulwark
-initialize(132413) --Shadow Bulwark
-initialize("Shadow Shield")
-initialize("Shell Shield")
-initialize("Shimmering Scales")
-initialize("Silverback")
-initialize("Solid Shell")
-initialize("Spirit Walk")
-initialize("Stone Armor")
-initialize("Swarm of Flies")
-initialize("Thick Fur")
-initialize("Thick Hide")
-initialize("Void Shield")
-initialize("Winged Agility")
-initialize("Mend Pet")
-initialize("Feast")
+-- hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=115,               ["group"]=danCommonTopLeftGroup,        }    --PET DEFENSIVES, todo
+-- initialize(7870) --Lesser Invisibility, succubus pet
+-- initialize(96243) --Invisibility, pet?
+-- initialize("Play Dead")
+-- initialize("Soulburn: Health Funnel")
+-- initialize("Agile Reflexes")
+-- initialize("Ancient Hide")
+-- initialize("Bristle")
+-- initialize("Bulwark")
+-- initialize("Catlike Reflexes")
+-- initialize("Defense Matrix")
+-- initialize("Dragon's Guile")
+-- initialize("Feather Flurry")
+-- initialize("Fleethoof")
+-- initialize("Gastric Bloat")
+-- initialize("Gruff")
+-- initialize("Harden Carapace")
+-- initialize("Harden Skin")
+-- initialize("Hardy")
+-- initialize("Huddle")
+-- initialize("Niuzao's Fortitude")
+-- initialize("Obsidian Skin")
+-- initialize("Primal Agility")
+-- initialize("Protective Bile")
+-- initialize("Putrid Bulwark")
+-- initialize("Scale Shield")
+-- initialize("Serpent's Swiftness")
+-- initialize(17767) --Shadow Bulwark
+-- initialize(132413) --Shadow Bulwark
+-- initialize("Shadow Shield")
+-- initialize("Shell Shield")
+-- initialize("Shimmering Scales")
+-- initialize("Silverback")
+-- initialize("Solid Shell")
+-- initialize("Spirit Walk")
+-- initialize("Stone Armor")
+-- initialize("Swarm of Flies")
+-- initialize("Thick Fur")
+-- initialize("Thick Hide")
+-- initialize("Void Shield")
+-- initialize("Winged Agility")
+-- initialize("Mend Pet")
+-- initialize("Feast")
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=120,                       ["group"]=danCommonTopLeftGroup,        } --END SMALL BUFFS ___
-initialize(61684) --pet dash
-initialize(24450) --pet Prowl
+-- hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=120,                       ["group"]=danCommonTopLeftGroup,        } --END SMALL BUFFS ___
+-- initialize(61684) --pet dash
+-- initialize(24450) --pet Prowl
 
 
 
@@ -1151,7 +1154,7 @@ do --groupSize 5 or less
             end
         end
     end
-    tinsert(hasuitDoThisGroup_Roster_UpdateGroupSize_5.functions, loadOnCondition)
+    tinsert(hasuitDoThis_Group_Roster_UpdateGroupSize_5.functions, loadOnCondition)
     loadOnCondition()
     hasuitLoadOn_PartySize = loadOn
 end
@@ -1184,7 +1187,8 @@ initializeMulti(274283) --Full Moon
 initializeMulti(199786) --Glacial Spike cast
 initializeMulti(116858) --Chaos Bolt
 initializeMulti(370965) --The Hunt
-initializeMulti(410126, 2) --Searing Glare cast --todo --__priority_1 cast-only --todo different look to this castbar?
+hasuitSetupSpellOptionsMulti[3] = hasuitOrangeMiddleCastBarsSpellOptions
+initializeMulti(410126, 2) --Searing Glare cast --showing on unitframes, ?
 initializeMulti(357208, 2) --fire breath cast --todo
 initializeMulti(382266, 2) --fire breath cast2? --todo
 initializeMulti(198100, 2) --Kleptomania, todo update target based on cleu spellsteal
@@ -1195,10 +1199,15 @@ initialize(280720) --Secret Technique, damage
 initialize(282449) --Secret Technique, success and damage from guardian
 initialize(228600) --Glacial Spike damage/aura
 initialize(370970) --the hunt root
-hasuitSetupSpellOptions = {hasuitSpellFunction_CleuCasting,             ["priority"]=186,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  ["castType"]="channel", ["backupDuration"]=1.6,}
-initialize(359073) --eternity surge --todo inc based on dest guid for cleu
-initialize(382411) --eternity surge --359077 is damage
-initialize(408092) --Upheaval cast, 396286 rare cast?, 396288 damage, todo cc category for knocked in the air like this?
+
+hasuitSetupSpellOptionsMulti = { --priority_2
+                          {hasuitSpellFunction_CleuCasting,             ["priority"]=186,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  ["castType"]="channel", ["backupDuration"]=1.6,},
+                          hasuitYellowMiddleCastBarsSpellOptions,
+}
+initializeMulti(359073) --Eternity Surge --todo inc based on dest guid for cleu
+initializeMulti(382411) --Eternity Surge --359077 is damage
+initializeMulti(396286) --Upheaval cast
+initializeMulti(408092) --Upheaval cast, rare, todo cc category for knocked in the air like this?
 
 
 hasuitSetupSpellOptionsMulti = { --priority_2
@@ -1222,14 +1231,14 @@ initializeMulti(51505) --Lava Burst cast
 initializeMulti(285452, 2) --Lava Burst damage
 initializeMulti(29722) --Incinerate --todo track if big dam somehow? that could be very useful for a bunch of stuff but very specific and probably short term effectiveness. probably reserve that for things that are either weak/normal sometimes and very strong sometimes depending on an aura or whatever. some things like chaos bolt could get a % modifier number on the icon that changes based on how many procs they get, like a trinket proc adds a 1.13 multiplier/weapon enchant adds another etc, or could possibly do that for all non-dot casts as long as it doesn't obscure the icon texture too much
 initializeMulti(210714, 2) --Icefury. aura
-initializeMulti(274282) --New Moon
+initializeMulti(274281) --New Moon
 initializeMulti(274282) --Half Moon
 initializeMulti(384110) --Wrecking Throw cast
 initializeMulti(394354, 2) --Wrecking Throw damage
 initializeMulti(392060) --Wailing Arrow cast
 initializeMulti(392058, 2) --Wailing Arrow damage
 initializeMulti(19434) --aimed shot
-initializeMulti(48182) --Haunt
+initializeMulti(48181) --Haunt
 initializeMulti(228260) --Void Eruption --does this have a travel time?
 initializeMulti(6353) --Soul Fire
 initializeMulti(104316) --Call Dreadstalkers cast
@@ -1292,7 +1301,7 @@ initialize(373129) --Dark Reprimand
 
 hasuitSetupSpellOptionsMulti = { --priority_2
                           {hasuitSpellFunction_UnitCasting,             ["priority"]=300,                                                           ["arena"]=danCommonTopLeftArenaDebuffs[2]}, --same as priority_2, less important on arena frames
-                          hasuitYellowMiddleCastBarsSpellOptions,
+                          hasuitSmallDamageMiddleCastBarsSpellOptions,
 }
 initializeMulti(342938) --Unstable Affliction cast arena
 initializeMulti(316099) --Unstable Affliction cast arena

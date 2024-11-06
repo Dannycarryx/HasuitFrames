@@ -5,7 +5,7 @@
 
 
 local tinsert = tinsert
-tinsert(hasuitDoThisPlayer_Login, function()
+tinsert(hasuitDoThis_Player_Login, function()
     local savedUserOptions = hasuitSavedUserOptions
     local userOptionsOnChanged = hasuitUserOptionsOnChanged
     
@@ -123,12 +123,12 @@ tinsert(hasuitDoThisPlayer_Login, function()
                         end
                     end
                 -- else
-                    -- hasuitDoThisEasySavedVariables("groupMode: "..tostring(groupMode)) --can be nil sometimes
+                    -- hasuitDoThis_EasySavedVariables("groupMode: "..tostring(groupMode)) --can be nil sometimes
                 end
                 
                 danDisableBlizzardUnitFrame2(CompactRaidFrameContainer)
                 
-                -- local danDoThisOnUpdate = hasuitDoThisOnUpdate
+                -- local danDoThisOnUpdate = hasuitDoThis_OnUpdate
                 -- hooksecurefunc("CompactUnitFrame_OnLoad", function(frame)
                     -- danDoThisOnUpdate(function()
                         -- if type(frame)=="table" and frame.optionTable then
@@ -140,7 +140,7 @@ tinsert(hasuitDoThisPlayer_Login, function()
             end
         end
         for i=1,#ignoredFramesList do
-            ignoredFramesList[i].danSeen = nil --.danSeen probably does nothing
+            ignoredFramesList[i].danSeen = nil --freeing microscopic amount of memory/making frames the way they were before in case there are any pairs( things that go on them that could break from this still being there. .danSeen probably does nothing to begin with but definitely nothing after this
         end
     end
 end) --ps no frame for arenapet15?

@@ -33,12 +33,12 @@ function hasuitLocal3(func)
 end
 
 do --cooldowns loadon
-    local danDoThisOnUpdate = hasuitDoThisOnUpdate
+    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
     local arenaCrowdControlSpellUpdateFrame = hasuitArenaCrowdControlSpellUpdateFrame
     hasuitArenaCrowdControlSpellUpdateFrame = nil
     
     local danRestoreCooldowns1
-    tinsert(hasuitDoThisAddon_Loaded, function()
+    tinsert(hasuitDoThis_Addon_Loaded, function()
         danRestoreCooldowns1 = hasuitRestoreCooldowns
     end)
     
@@ -92,8 +92,8 @@ do --cooldowns loadon
             end
         end
     end
-    tinsert(hasuitDoThisPlayer_Entering_WorldSkipsFirst, loadOnCondition)
-    tinsert(hasuitDoThisGroup_Roster_UpdateGroupSize_5.functions, loadOnCondition)
+    tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, loadOnCondition)
+    tinsert(hasuitDoThis_Group_Roster_UpdateGroupSize_5.functions, loadOnCondition)
     loadOnCondition()
     hasuitLoadOn_CooldownDisplay = loadOn
 end
@@ -252,7 +252,7 @@ do
             end
         end
         local danRestoreCooldowns
-        tinsert(hasuitDoThisAddon_Loaded, function()
+        tinsert(hasuitDoThis_Addon_Loaded, function()
             danRestoreCooldowns = hasuitRestoreCooldowns
         end)
         local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
@@ -265,7 +265,7 @@ do
         local defensiveControllerOptionsGroupUnitTypeStuff = defensiveControllerOptions["group"]
         local interruptControllerOptionsGroupUnitTypeStuff = interruptControllerOptions["group"]
         local crowdControlControllerOptionsGroupUnitTypeStuff = crowdControlControllerOptions["group"]
-        tinsert(hasuitDoThisGroup_Roster_UpdateGroupSizeChanged, function() --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size forgot about that
+        tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, function() --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size forgot about that
             local groupSize = hasuitGroupSize
             if groupSize==4 or groupSize==5 then
                 if lastSize~=4 and lastSize~=5 then
