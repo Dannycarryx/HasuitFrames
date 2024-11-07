@@ -46,19 +46,16 @@ local loadOnBgOnly = hasuitLoadOn_BgOnly
 do --arena or not arena loadons
     local loadOn = {}
     local loadOn2 = {}
-    local loadOn3 = hasuitLoadOn_PvpEnemyMiddleCastBars
     local function loadOnCondition()
         if hasuitInstanceType~="arena" then --should load
             if not loadOn.shouldLoad then
                 loadOn.shouldLoad = true
                 loadOn2.shouldLoad = false
-                loadOn3.shouldLoad = false
             end
         else --should NOT load
             if loadOn.shouldLoad~=false then
                 loadOn.shouldLoad = false
                 loadOn2.shouldLoad = true
-                loadOn3.shouldLoad = true
             end
         end
     end
@@ -112,7 +109,7 @@ hasuitController_BottomLeft_BottomRight      =      {["xDirection"]=1,  ["yDirec
 hasuitController_TopRight_TopLeft            =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
 hasuitController_BottomRight_BottomLeft      =      {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
 
-hasuitController_Middle_Middle               =      {                                                                                                                                                                                                   ["frameLevel"]=22,  ["sort"]=danSort,   ["grow"]=hasuitMiddleGrow} --limited to 1 icon showing in the middle
+hasuitController_Middle_Middle               =      {                                                                                                                                                                                                   ["frameLevel"]=22,  ["sort"]=danSort,   ["grow"]=hasuitMiddleIconGrow} --limited to 1 icon showing in the middle
 
 
 
@@ -288,7 +285,14 @@ initialize(207736) --Shadowy Duel
 
 
 hasuitFramesCenterSetDrType("stun")
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-63,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1]} --STUNS
+
+
+hasuitSetupSpellOptionsMulti = { --CC can break threshold *1
+                          {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-63,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1]}, --STUNS
+                          hasuitBigRedMiddleCastBarsSpellOptions,
+}
+initializeMultiPlusDiminish(118905) --Static Charge
+hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initializePlusDiminish(202244) --Overrun
 initializePlusDiminish(203123) --Maim
 initializePlusDiminish(5211) --Mighty Bash
@@ -329,7 +333,6 @@ initializePlusDiminish(202346) --double barrel
 initializePlusDiminish(385149) --exorcism
 initializePlusDiminish(255941) --wake of ashes
 initializePlusDiminish(200200) --holy word: chastise, stun
-initializePlusDiminish(118905) --Static Charge --todo cast non-tracked units
 initializePlusDiminish(77505 ) --earthquake
 initializePlusDiminish(117526) --binding shot
 initializePlusDiminish(171017) --Meteor Strike, haven't seen
@@ -358,9 +361,13 @@ hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,         ["prior
 initializePlusDiminish(305485) --Lightning Lasso
 initializePlusDiminish(205630) --illidan's grasp channel
 
-
 hasuitFramesCenterSetDrType("disorient") --fear
-initializePlusDiminish(605) --Mind Control
+hasuitSetupSpellOptionsMulti = {
+                          hasuitSetupSpellOptions,
+                          hasuitBigRedMiddleCastBarsSpellOptions,
+}
+initializeMultiPlusDiminish(605) --Mind Control
+
 
 
 hasuitSetupSpellOptionsMulti = { --CC can break threshold *1
@@ -370,7 +377,7 @@ hasuitSetupSpellOptionsMulti = { --CC can break threshold *1
 }
 initializeMultiPlusDiminish(360806) --Sleep Walk
 -- initializeMultiPlusDiminish("Mesmerize") --?
-initializeMultiPlusDiminish(6358) --Seduction, 119909 is cleu cast only and seen a lot. will seduction show up fine with uni tcast?
+initializeMultiPlusDiminish(6358) --Seduction, 119909 is cleu cast only and seen a lot
 initializeMultiPlusDiminish(1513) --Scare Beast --todo feral/in form only
 initializeMultiPlusDiminish(10326) --Turn Evil --todo can be feared only
 initializeMulti(5782, 3) --Fear, cast only
@@ -387,12 +394,12 @@ initializeMultiPlusDiminish(202274) --Hot Trub?
 hasuitFramesCenterSetDrType("incapacitate") --sheep
 initializeMultiPlusDiminish(82691) --Ring of Frost, no cast
 
-hasuitFramesCenterSetEventType("unitCasting")
-hasuitSetupSpellOptions = hasuitBigRedMiddleCastBarsSpellOptions
-initialize(113724) --Ring of Frost cast
-hasuitFramesCenterSetEventType("aura")
-
+hasuitSetupSpellOptionsMulti[3] = hasuitBigRedMiddleCastBarsSpellOptions
+initializeMulti(113724, 3) --Ring of Frost cast
 initializeMultiPlusDiminish(GetSpellName(277784)) --Hex
+hasuitSetupSpellOptionsMulti[3] = nil
+
+
 hasuitFramesCenterSetDrType("disorient") --fear
 initializeMulti(87204) --Sin and Punishment --no dr
 initializeMulti(358861) --Void Volley: Horrify, no dr
@@ -1129,6 +1136,8 @@ for i=1,5 do
     danCommonTopRightGroupDebuffs[i]    =   {["controllerOptions"]=hasuitController_TopRight_TopRight,  ["hideCooldownText"]=true,  ["alpha"]=1,    }
     danCommonTopLeftArenaDebuffs[i]     =   {["controllerOptions"]=hasuitController_TopLeft_TopLeft,    ["hideCooldownText"]=true,  ["alpha"]=1,    }
 end
+hasuitDanCommonTopRightGroupDebuffs = danCommonTopRightGroupDebuffs
+hasuitDanCommonTopLeftArenaDebuffs = danCommonTopLeftArenaDebuffs
 
 
 do --groupSize 5 or less
@@ -1200,7 +1209,7 @@ initialize(282449) --Secret Technique, success and damage from guardian
 initialize(228600) --Glacial Spike damage/aura
 initialize(370970) --the hunt root
 
-hasuitSetupSpellOptionsMulti = { --priority_2
+hasuitSetupSpellOptionsMulti = { --priority_1
                           {hasuitSpellFunction_CleuCasting,             ["priority"]=186,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  ["castType"]="channel", ["backupDuration"]=1.6,},
                           hasuitYellowMiddleCastBarsSpellOptions,
 }
@@ -1265,6 +1274,14 @@ initializeMulti(357211, 2) --pyre spell_cast_success
 hasuitSetupSpellOptions = {hasuitSpellFunction_CleuINC,                 ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  ["duration"]=2.5,   ["spellINCType"]="aura",}
 initialize(212431) --Explosive Shot
 
+
+hasuitSetupSpellOptionsMulti[2] = hasuitYellowMiddleCastBarsSpellOptions
+initializeMulti(395160) --Eruption, spellcast
+initializeMulti(365350) --Arcane Surge
+initializeMulti(191634) --Stormkeeper
+initializeMulti(353128) --Arcanosphere, channel
+initializeMulti(436358) --Demolish, channel, todo gets 2 casts like eye beam
+
 hasuitFramesCenterSetEventType("unitCasting")
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initialize(386997) --Soul Rot --priority_2 cast-only
@@ -1280,23 +1297,19 @@ initialize(194153) --Starfire
 initialize(202347) --Stellar Flare
 initialize(390612) --Frost Bomb
 initialize(5143) --Arcane Missiles
-initialize(395160) --Eruption
 initialize(198013) --Eye Beam --todo eye beam causes 2 channel start events on the same frame and no cleu cast event. will need a significant change to the setup to get this to not show 2
 initialize(212084) --Fel Devastation, channel
-initialize(436358) --Demolish, channel, todo gets 2 casts like eye beam
 initialize(353082) --Ring of Fire
 initialize(113656) --Fists of Fury, channel --todo track Heavy-Handed Strikes 100% parry buff
 -- initialize("Rune of Power") --?, Rune of Power, don't think this exists anymore?
-initialize(191634) --Stormkeeper
-initialize(353128) --?, Arcanosphere, channel
-initialize(365350) --Arcane Surge
 initialize(324536) --Malefic Rapture, todo proper targets inc icon
 initialize(368847) --?, Firestorm
 initialize(278350) --Vile Taint --30 sec cd aoe dot affliction?
 hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCasting,             ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  ["ignoreSameUnitType"]=true,}
 initialize(361469) --Living Flame, there's a guardian (did i mean pres? ah no the unit type is guardian, not the spec) version of this 401382
 initialize(431443) --Chrono Flames
-initialize(47758) --Penance --todo get correct dest unit from cast success
+initialize(47757) --Penance --todo get correct dest unit from cast success
+initialize(47758) --Penance?
 initialize(373129) --Dark Reprimand
 
 hasuitSetupSpellOptionsMulti = { --priority_2

@@ -9,6 +9,10 @@
 
 local screenHeight
 
+local currentX
+local currentY
+local yChange
+
 local danCreateCheckButton
 local danCreateEditBox
 local danCreateNewHeader
@@ -37,7 +41,7 @@ local createOptionsPages = {
         danCreateEditBox("raidTest", "Test Size")
     end,
     function() --2
-        createPageBackground(150)
+        createPageBackground(220)
         
         danSetPointAndDirection("TOP", "TOPLEFT", 390, 19, -25)
         danCreateNewHeader("group")
@@ -56,6 +60,14 @@ local createOptionsPages = {
         danCreateEditBox("arenaColoredBackgroundMinimum")
         danCreateNewHeader("arena")
         danCreateCheckButton("hideBlizzardArena")
+        
+        danCreateNewHeader("middle castbars", -30, -15) --idk
+        currentX = currentX-70
+        currentY = currentY-7
+        danCreateEditBox("middleCastBarsX", "X")
+        yChange = 0
+        currentX = currentX+108
+        danCreateEditBox("middleCastBarsY", "Y")
         
         danSetPointAndDirection("TOP", "TOPLEFT", 570, -34, -25)
         danCreateNewHeader("raid")
@@ -83,6 +95,9 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
             
             ["raidX"]=0,
             ["raidY"]=-215,
+            
+            ["middleCastBarsX"]=0,
+            ["middleCastBarsY"]=220,
             
             
             ["groupColoredBackgroundMinimum"]=4, --todo option for pve only?
@@ -153,11 +168,7 @@ end)
 
 local CreateFrame = CreateFrame
 
-local danBackdrop = {
-    bgFile = "Interface\\ChatFrame\\ChatFrameBackground", 
-    edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", 
-    edgeSize = 1,
-}
+local danBackdrop = hasuitCommonBackdrop
 local danFont25 = CreateFont("danUserOptionsFont25")
 danFont25:SetFont("Fonts/FRIZQT__.TTF", 25, "OUTLINE")
 local danFont16 = CreateFont("danUserOptionsFont16")
@@ -211,9 +222,6 @@ do
         currentEditBox = editBox
         editBox:SetFocus()
     end
-    local yChange
-    local x
-    local y
     local ownPoint
     local targetPoint
     function danCreateEditBox(optionsKey, leftText)
@@ -221,8 +229,8 @@ do
         editBox:SetBackdrop(danBackdrop)
         editBox:SetBackdropColor(0,0,0)
         editBox:SetBackdropBorderColor(0.5,0.5,0.5)
-        y = y+yChange
-        editBox:SetPoint(ownPoint, currentOptionsPage, targetPoint, x, y)
+        currentY = currentY+yChange
+        editBox:SetPoint(ownPoint, currentOptionsPage, targetPoint, currentX, currentY)
         editBox:SetSize(80,20)
         editBox:SetFontObject(danFont16)
         editBox:SetJustifyH("CENTER")
@@ -245,8 +253,8 @@ do
         local checkButton = CreateFrame("Button", nil, currentOptionsPage, "BackdropTemplate")
         checkButton:SetBackdrop(danBackdrop)
         checkButton:SetBackdropBorderColor(0,0,0)
-        y = y+yChange
-        checkButton:SetPoint(ownPoint, currentOptionsPage, targetPoint, x, y)
+        currentY = currentY+yChange
+        checkButton:SetPoint(ownPoint, currentOptionsPage, targetPoint, currentX, currentY)
         checkButton:SetSize(80,20)
         checkButton:SetScript("OnMouseDown", checkButtonMouseDown)
         checkButton.optionsOnChangedFunction = userOptionsOnChanged[optionsKey]
@@ -270,21 +278,26 @@ do
         end
         return checkButton
     end
-    function danCreateNewHeader(headerText)
+    function danCreateNewHeader(headerText, xOffset, yOffset)
         local header = currentOptionsPage:CreateFontString()
         header:SetFontObject(danFont25)
         header:SetText(headerText)
-        y = y+yChange-3
-        header:SetPoint(ownPoint,currentOptionsPage,targetPoint,x,y)
+        -- if xOffset then
+            -- currentX = currentX+xOffset
+        -- end
+        currentY = currentY+yChange-3+(yOffset or 0)
+        header:SetPoint(ownPoint,currentOptionsPage,targetPoint,currentX+(xOffset or 0), currentY)
     end
     function danSetPointAndDirection(setOwnPoint, setTargetPoint, setX, setY, setYChange)
         ownPoint = setOwnPoint
         targetPoint = setTargetPoint
-        x = setX
-        y = setY
+        currentX = setX
+        currentY = setY
         yChange = setYChange
     end
 end
+
+local UIParent = UIParent
 
 local danDoThisAfterCombat = hasuitDoThis_AfterCombat
 local danDoThisOnUpdate = hasuitDoThis_OnUpdate
@@ -380,13 +393,15 @@ local function openMainOptions()
 end
 local function openMainOptionsFirst()
     userOptionsShown = true
-    userOptionsFrame:SetClampedToScreen(true) --Frame:SetClampRectInsets(left, right, top, bottom)
+    userOptionsFrame:SetClampedToScreen(true)
+    userOptionsFrame:SetClampRectInsets(500, -500, 0, 0)
     userOptionsFrame:SetIgnoreParentScale(true)
     userOptionsFrame:SetScale(0.71111111111111)
     userOptionsFrame:SetBackdrop(danBackdrop)
     userOptionsFrame:SetSize(710,30)
     userOptionsFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 200)
-    userOptionsFrame:SetFrameStrata("HIGH")
+    userOptionsFrame:SetFrameStrata("DIALOG")
+    userOptionsFrame:SetFrameLevel(8)
     userOptionsFrame:SetBackdropColor(0,0,0,0.8)
     userOptionsFrame:SetBackdropBorderColor(0,0,0)
     userOptionsFrame:SetMovable(true)
@@ -410,7 +425,7 @@ local function openMainOptionsFirst()
     text:SetText("x")
     text:SetPoint("CENTER",1,1)
     closeButton:SetPoint("TOPRIGHT",userOptionsFrame,"TOPRIGHT")
-    closeButton:SetFrameLevel(3)
+    closeButton:SetFrameLevel(10)
     closeButton:EnableMouse(true)
     closeButton:RegisterForClicks("AnyDown")
     closeButton:SetScript("OnClick", hideUserOptionsFrame)
@@ -426,7 +441,7 @@ local function openMainOptionsFirst()
     text:SetPoint("CENTER",1,1)
     text:SetJustifyH("CENTER")
     nextButton:SetPoint("TOPRIGHT",closeButton,"TOPLEFT")
-    nextButton:SetFrameLevel(3)
+    nextButton:SetFrameLevel(10)
     nextButton:EnableMouse(true)
     nextButton:RegisterForClicks("AnyDown")
     nextButton:SetScript("OnClick", nextPage)
@@ -441,4 +456,3 @@ SLASH_HasuitFrames2 = "/hasuitframes"
 SLASH_HasuitFrames3 = "/hasuit"
 SLASH_HasuitFrames4 = "/hasuit frames"
 SlashCmdList.HasuitFrames = openMainOptionsFirst
-

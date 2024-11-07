@@ -265,10 +265,11 @@ do
         local defensiveControllerOptionsGroupUnitTypeStuff = defensiveControllerOptions["group"]
         local interruptControllerOptionsGroupUnitTypeStuff = interruptControllerOptions["group"]
         local crowdControlControllerOptionsGroupUnitTypeStuff = crowdControlControllerOptions["group"]
-        tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, function() --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size forgot about that
+        tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, function() --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size forgot about that, --todo make this more efficient interacting with the loadon condition, broke going from (fake) groupsize 5 to 3 i think? outside with test function into arena
             local groupSize = hasuitGroupSize
             if groupSize==4 or groupSize==5 then
-                if lastSize~=4 and lastSize~=5 then
+                if lastSize~=4 then
+                    lastSize = 4
                     trinketControllerOptionsGroupUnitTypeStuff["xOffset"] = -5
                     defensiveControllerOptionsGroupUnitTypeStuff["xOffset"] = -34
                     defensiveControllerOptionsGroupUnitTypeStuff["limit"] = 5
@@ -279,11 +280,11 @@ do
                         if not frame.cooldownsDisabled then
                             local controller1 = frame.controllersPairs[trinketControllerOptions]
                             if controller1 then
-                                hasuitSortController(controller1, true)
+                                hasuitSortController(controller1)
                             end
                             local controller2 = frame.controllersPairs[defensiveControllerOptions]
                             if controller2 then
-                                hasuitSortController(controller2, true)
+                                hasuitSortController(controller2)
                             end
                             cleanController(frame.controllersPairs[interruptControllerOptions])
                             cleanController(frame.controllersPairs[crowdControlControllerOptions])
@@ -291,7 +292,8 @@ do
                     end
                 end
             elseif groupSize<4 then
-                if lastSize==4 or lastSize==5 then
+                if lastSize~=3 then
+                    lastSize = 3
                     trinketControllerOptionsGroupUnitTypeStuff["xOffset"] = -44
                     defensiveControllerOptionsGroupUnitTypeStuff["xOffset"] = -73
                     defensiveControllerOptionsGroupUnitTypeStuff["limit"] = 7
@@ -315,8 +317,9 @@ do
                         end
                     end
                 end
+            else
+                lastSize = nil
             end
-            lastSize = groupSize
         end)
     end
     
@@ -327,17 +330,17 @@ hasuitFramesCenterSetEventType("cleu")
 
 
 do
-    local cdCle1=hasuitSpellFunction_CleuSuccessCooldownStart1
-    local cdCle2=hasuitSpellFunction_CleuSuccessCooldownStart2
-    local cdCleT=hasuitSpellFunction_CleuSuccessCooldownStartPvPTrinket
-    local cdCleR=hasuitSpellFunction_CleuAppliedCooldownStartRacial
-    local cdCast=hasuitSpellFunction_UnitCastSucceededCooldownStart
-    local cdPet=hasuitSpellFunction_CleuCooldownStartPet
-    local cdHeal=hasuitSpellFunction_CleuHealCooldownStart
-    local cdCleE=hasuitSpellFunction_CleuSpellEmpowerStartCooldownStart2
-    local cleAura=hasuitSpellFunction_CleuAppliedCooldownStart
-    local cleAurR=hasuitSpellFunction_CleuRemovedCooldownStart
-    local cleAurP=hasuitSpellFunction_CleuAppliedCooldownStartPreventMultiple
+    local cdCle1    =   hasuitSpellFunction_CleuSuccessCooldownStart1
+    local cdCle2    =   hasuitSpellFunction_CleuSuccessCooldownStart2
+    local cdCleT    =   hasuitSpellFunction_CleuSuccessCooldownStartPvPTrinket
+    local cdCleR    =   hasuitSpellFunction_CleuAppliedCooldownStartRacial
+    local cdCast    =   hasuitSpellFunction_UnitCastSucceededCooldownStart
+    local cdPet     =   hasuitSpellFunction_CleuCooldownStartPet
+    local cdHeal    =   hasuitSpellFunction_CleuHealCooldownStart
+    local cdCleE    =   hasuitSpellFunction_CleuSpellEmpowerStartCooldownStart2
+    local cleAura   =   hasuitSpellFunction_CleuAppliedCooldownStart
+    local cleAurR   =   hasuitSpellFunction_CleuRemovedCooldownStart
+    local cleAurP   =   hasuitSpellFunction_CleuAppliedCooldownStartPreventMultiple
     
     local shiftingPowerAffectedSpells = {}
     local coldSnapAffectedSpells = {}
@@ -1579,7 +1582,7 @@ function hasuitResetCooldowns(frame) --not great but works now
                 controller.unitTypeStuff = unitTypeStuff
                 wasOtherUnitType = true
             end
-            hasuitSortController(controller, true)
+            hasuitSortController(controller)
         end
         if wasOtherUnitType then
             icon:ClearAllPoints()

@@ -32,6 +32,7 @@ hasuitClassColorsHexList = { --string.format("Hexadecimal: %X", number)
     ["WARLOCK"] = "|cff8788EE",
     ["WARRIOR"] = "|cffC69B6D",
 }
+hasuitRAID_CLASS_COLORS = {}
 
 hasuitSpecIsHealerTable = {
     [105] = true, --resto druid
@@ -42,7 +43,11 @@ hasuitSpecIsHealerTable = {
     [257] = true, --holy priest
     [264] = true, --rsham
 }
-
+hasuitCommonBackdrop = {
+    bgFile = "Interface\\ChatFrame\\ChatFrameBackground", 
+    edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", 
+    edgeSize = 1,
+}
 
 
 
@@ -96,8 +101,8 @@ hasuitDoThis_UserOptionsLoaded = {} --not accessible from external addons, happe
 -- hasuitDoThis_AfterCombat(func)
 
 
-
-
+-- unitFrame.customDanInspectedUnitFrame, table that gets unitFrame as arg1 when .specId gets updated from inspecting
+-- controllerOptions.customControllerSetupFunctions, table that gets controller as arg1 when it gets created on a unitframe, once per controlleroptions per unitframe
 
 
 -- hasuitDoThis_GroupUnitFramesUpdate_before = {} --normal
@@ -111,7 +116,6 @@ hasuitDoThis_UserOptionsLoaded = {} --not accessible from external addons, happe
 -- hasuitDoThis_GroupUnitFramesUpdate_Positions_before = {} --normal, these wait for combat to drop
 hasuitDoThis_GroupUnitFramesUpdate_Positions = {} --gives unitFrame as arg1
 hasuitDoThis_GroupUnitFramesUpdate_Positions_after = {} --wipes at the end if it did anything
-
 
 
 
@@ -854,6 +858,9 @@ end)
 
 
 
+
+
+
 tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi enforced naturally. todo add things that stay global and don't get set to nil as comments. This should hopefully be a comprehensive list of things that can be accessed from outside of the addon, not a full list of internal functions
     C_Timer.After(0, function() --hasuitSetupSpellOptions
         hasuitDoThis_Addon_Loaded = nil
@@ -913,15 +920,16 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitFramesSpellOptionsClassSpecificHarmful = nil
         hasuitFramesSpellOptionsClassSpecificHelpful = nil
         
+        
         hasuitLoadOn_EnablePve = nil
         hasuitLoadOn_InstanceTypeNone = nil
         hasuitLoadOn_BgOnly = nil
         hasuitLoadOn_NotArenaOnly = nil
         hasuitLoadOn_ArenaOnly = nil
-        hasuitLoadOn_PvpEnemyMiddleCastBars = nil
         hasuitLoadOn_RootCleuBreakable = nil
         hasuitLoadOn_PartySize = nil
         hasuitLoadOn_CooldownDisplay = nil
+        hasuitLoadOn_PvpEnemyMiddleCastBars = nil
         
         
         hasuitSpellFunction_CleuCcBreakThreshold = nil
@@ -1012,7 +1020,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitSortPriorityExpirationTime = nil
         
         hasuitNormalGrow = nil
-        hasuitMiddleGrow = nil
+        hasuitMiddleIconGrow = nil
         hasuitMiddleCastBarsGrow = nil
         
         hasuitTrinketCooldowns = nil
@@ -1024,7 +1032,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitCleanController = nil
         hasuitInitializeController = nil
         hasuitSortController = nil
-        -- hasuitAddToSeparateController = nil
+        hasuitAddToSeparateController = nil
         
         hasuitController_TopRight_TopRight = nil
         hasuitController_TopLeft_TopLeft = nil
@@ -1037,7 +1045,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitController_BottomRight_BottomRight = nil
         hasuitController_BottomLeft_BottomLeft = nil
         
-        hasuitController_Separate_UpperScreenCastBars = nil
+        -- hasuitController_Separate_UpperScreenCastBars = nil
         hasuitController_CooldownsControllers = nil
         
         hasuitBigRedMiddleCastBarsSpellOptions = nil
@@ -1045,20 +1053,25 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitOrangeMiddleCastBarsSpellOptions = nil
         hasuitYellowMiddleCastBarsSpellOptions = nil
         hasuitSmallMiscMiddleCastBarsSpellOptions = nil
+        hasuitUntrackedMiddleCastBarsSpellOptions = nil
         hasuitSmallDamageMiddleCastBarsSpellOptions = nil
         hasuitCastBarFont20 = nil
         hasuitCastBarFont18 = nil
-        hasuitCastBarFont15 = nil
+        hasuitCastBarFont14 = nil
         hasuitCastBar1Font = nil
         hasuitMiddleCastBarsAllowChannelingForSpellId = nil
         hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = nil
         
-        hasuitLocal1 = nil
-        hasuitLocal2 = nil
+        hasuitDanCommonTopRightGroupDebuffs = nil
+        hasuitDanCommonTopLeftArenaDebuffs = nil
+        
+        hasuitLocal1 = nil --inaccessible from outside, todo
+        
         hasuitLocal3 = nil
         hasuitLocal4 = nil
         hasuitLocal5 = nil
         hasuitLocal6 = nil
+        hasuitLocal7 = nil
         
         hasuitResetCooldowns = nil
         hasuitSetIconText = nil
@@ -1080,6 +1093,13 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         
         hasuitCooldownTextFonts = nil
         hasuit1PixelBorderBackdrop = nil
+        hasuitCommonBackdrop = nil
+        hasuitRAID_CLASS_COLORS = nil
+        hasuitCastBarOnUpdateFunction = nil
+        hasuitGeneralCastStartFrame = nil
+        hasuitGeneralCastStartFrame_NoRangedKickForPlayer = nil
+        hasuitGeneralCastStartFrame_PlayerHasRangedKick = nil
+        hasuitPlayerCaresAboutRangedKickSometimes = nil
         
     end)
 end)

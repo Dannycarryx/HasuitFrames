@@ -2,9 +2,10 @@
 
 
 
+local hasuitSpellFunction_UnitCastingMiddleCastBars = hasuitSpellFunction_UnitCastingMiddleCastBars
 local tremove = tremove
 local CreateFrame = CreateFrame
--- local danBackdrop = hasuit1PixelBorderBackdrop
+-- local danBorderBackdrop = hasuit1PixelBorderBackdrop
 
 local unusedCastBars = {}
 function hasuitGetCastBar() --bored todo migrate danGetIcon to be with this in a file, maybe with initializeController and stuff like that too, leaving hasuitSpellFunction_ stuff together in HasuitFrames.lua? not sure if that should be split further into eventtypes. either way probably not worth the effort to do any of this
@@ -24,9 +25,20 @@ function hasuitGetCastBar() --bored todo migrate danGetIcon to be with this in a
         castBar.textOfSpellName = textOfSpellName
         textOfSpellName:SetPoint("CENTER")
         
+        
+        local arenaNumberBox = castBar:CreateTexture(nil, "BACKGROUND") --just experimenting, not sure what's best but should do something like this for ranged kicks?
+        castBar.arenaNumberBox = arenaNumberBox
+        arenaNumberBox:SetPoint("LEFT", castBar, "RIGHT", 1, 0)
+        
+        local arenaNumberText = castBar:CreateFontString() --should make sure the pixels are good here. if everything is even they should be?
+        castBar.arenaNumberText = arenaNumberText
+        arenaNumberText:SetPoint("CENTER", arenaNumberBox, "CENTER")
+        
+        castBar.arenaNumberBoxShowing = true
+        
         -- local border = CreateFrame("Frame", nil, castBar, "BackdropTemplate")
         -- castBar.border = border
-        -- border:SetBackdrop(danBackdrop)
+        -- border:SetBackdrop(danBorderBackdrop)
         -- border:SetAllPoints()
         -- border:SetBackdropBorderColor(0,0,0)
         
@@ -34,65 +46,137 @@ function hasuitGetCastBar() --bored todo migrate danGetIcon to be with this in a
         
     end
 end
-hasuitLocal1(hasuitGetCastBar)
+hasuitMiddleCastBarsAllowChannelingForSpellId = {
+    [20578]=true,   --Cannibalize
+    [359073]=true,  --Eternity Surge
+    [382411]=true,  --Eternity Surge
+    [396286]=true,  --Upheaval
+    [408092]=true,  --Upheaval
+    [353128]=true,  --Arcanosphere
+    [436358]=true,  --Demolish
+    [115175]=true,  --Soothing Mist
+    [47757]=true,   --Penance
+    [47758]=true,   --Penance
+}
+hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = {
+    [118905]=true,  --Static Charge --doesn't work because it almost only shows up in cleu. unit_spellcast is rare for this
+    [6358]=true,    --Seduction
+}
+
+hasuitLocal1(hasuitMiddleCastBarsAllowChannelingForSpellId, hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId)
 
 
-hasuitCastBarFont20 = CreateFont("hasuitCastBarFont20")
-hasuitCastBarFont18 = CreateFont("hasuitCastBarFont18")
-hasuitCastBarFont15 = CreateFont("hasuitCastBarFont15")
+do --instanceType only arena
+    -- local enableMiddleCastBars
+    
+    local loadOn = {}
+    local function loadOnCondition()
+        -- if hasuitInstanceType=="arena" and enableMiddleCastBars then --should load
+        if hasuitInstanceType=="arena" then --should load
+            -- if not loadOn.shouldLoad then
+                loadOn.shouldLoad = true
+            -- end
+        else --should NOT load
+            -- if loadOn.shouldLoad then
+                loadOn.shouldLoad = false
+            -- end
+        end
+    end
+    tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, loadOnCondition)
+    loadOnCondition()
+    hasuitLoadOn_PvpEnemyMiddleCastBars = loadOn
+    
+    
+    
+end
+local hasuitLoadOn_PvpEnemyMiddleCastBars = hasuitLoadOn_PvpEnemyMiddleCastBars
 
-hasuitCastBarFont20:SetFont("Fonts/FRIZQT__.TTF", 20, "OUTLINE")
-hasuitCastBarFont18:SetFont("Fonts/FRIZQT__.TTF", 18, "OUTLINE")
-hasuitCastBarFont15:SetFont("Fonts/FRIZQT__.TTF", 15, "OUTLINE")
+
+
 
 
 -- most controllers are attached to individual unitFrames, but this one is separated from unitFrames and in the upper middle of the screen, and created differently. It allows things from multiple units to all be combined there, instead of on unitFrames
-hasuitController_Separate_UpperScreenCastBars = {} --middle castbars
+-- hasuitController_Separate_UpperScreenCastBars = {} --middle castbars
 local middleCastBarsController = CreateFrame("Frame", nil, hasuitFramesParent)
-local controllerOptions = hasuitController_Separate_UpperScreenCastBars --hasuitMiddleCastBarsGrow/hasuitSpellFunction_UnitCastingMiddleCastBars
-controllerOptions.controller = middleCastBarsController --controllerOptions seems pointless here, maybe for future separated controllers too, but it might be even better to get this system to be good and interchangeable with normal controllers somehow. should work on it again
+-- local controllerOptions = hasuitController_Separate_UpperScreenCastBars --hasuitSpellFunction_UnitCastingMiddleCastBars
+-- controllerOptions.controller = middleCastBarsController --controllerOptions seems pointless here, maybe for future separated controllers too, but it might be even better to get this system to be good and interchangeable with normal controllers somehow. should work on it again
 middleCastBarsController.frames = {}
-middleCastBarsController:SetFrameStrata("MEDIUM")
+-- middleCastBarsController:SetFrameStrata("MEDIUM")
 -- middleCastBarsController:SetFrameLevel(20)
-middleCastBarsController.grow = hasuitMiddleCastBarsGrow
-middleCastBarsController:SetPoint("TOP", UIParent, "CENTER", 0, 220)
 middleCastBarsController:SetSize(1,1)
-hasuitLocal2(middleCastBarsController)
-
-
-hasuitLoadOn_PvpEnemyMiddleCastBars = {}
-local hasuitLoadOn_PvpEnemyMiddleCastBars = hasuitLoadOn_PvpEnemyMiddleCastBars
-local hasuitSpellFunction_UnitCastingMiddleCastBars = hasuitSpellFunction_UnitCastingMiddleCastBars
 
 
 
 
-local danCommon = {controller=middleCastBarsController,    ["width"]=220,  ["height"]=36,  ["fontObject"]=hasuitCastBarFont20, r=1,    g=0,    b=0} --big red cc, width should stay even for all of these otherwise pixels can get ugly because of setpoint center in the grow function
+
+local middleCastBarsFrames = middleCastBarsController.frames
+function hasuitMiddleCastBarsGrow(controller) --hasuitSpellFunction_UnitCastingMiddleCastBars
+    local nonArenaCount = 0
+    for i=1, #middleCastBarsFrames do
+        local castBar = middleCastBarsFrames[i]
+        local arenaNumber = castBar.unitFrame and castBar.unitFrame.arenaNumber
+        if arenaNumber then
+            castBar:SetPoint("CENTER", controller, "TOP", 0, -arenaNumber*52)
+        else
+            castBar:SetPoint("CENTER", controller, "TOP", 0, 15+nonArenaCount*(castBar.height+1))
+            nonArenaCount = nonArenaCount+1
+        end
+    end
+end
+middleCastBarsController.grow = hasuitMiddleCastBarsGrow
+
+
+
+
+
+hasuitCastBarFont26 = CreateFont("hasuitCastBarFont26")
+hasuitCastBarFont24 = CreateFont("hasuitCastBarFont24")
+hasuitCastBarFont20 = CreateFont("hasuitCastBarFont20")
+hasuitCastBarFont18 = CreateFont("hasuitCastBarFont18")
+hasuitCastBarFont14 = CreateFont("hasuitCastBarFont14")
+hasuitCastBarFont26:SetFont("Fonts/FRIZQT__.TTF", 26, "OUTLINE")
+hasuitCastBarFont24:SetFont("Fonts/FRIZQT__.TTF", 24, "OUTLINE")
+hasuitCastBarFont20:SetFont("Fonts/FRIZQT__.TTF", 20, "OUTLINE")
+hasuitCastBarFont18:SetFont("Fonts/FRIZQT__.TTF", 18, "OUTLINE")
+hasuitCastBarFont14:SetFont("Fonts/FRIZQT__.TTF", 14, "OUTLINE")
+
+
+
+
+ --todo should have more options, also should keep an array of all of these spelloptions to be able to change them all depending on conditions, like activate and move important castbars in rbgs, activate all hostile tracking in pve and move to a third position, etc
+
+
+local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=36,  ["fontObject"]=hasuitCastBarFont20, ["fontObjectArenaBox"]=hasuitCastBarFont26, r=1,    g=0,    b=0} --big red cc, width should stay even for all of these otherwise pixels can get ugly because of setpoint center in the grow function
 hasuitBigRedMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 
-local danCommon = {controller=middleCastBarsController,    ["width"]=200,  ["height"]=30,  ["fontObject"]=hasuitCastBarFont18, r=0.5,  g=1,    b=0} --medium greenish defensive
+local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=30,  ["fontObject"]=hasuitCastBarFont18, ["fontObjectArenaBox"]=hasuitCastBarFont24, r=0.5,  g=1,    b=0} --medium greenish defensive
 hasuitGreenishDefensiveMiddleCastBarsSpellOptions = {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 
-local danCommon = {controller=middleCastBarsController,    ["width"]=200,  ["height"]=30,  ["fontObject"]=hasuitCastBarFont18, r=1,    g=0.4,  b=0} --medium orange, stuff like searing glare, maybe add things like turn undead here for dks until a better system is made for that
+local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=30,  ["fontObject"]=hasuitCastBarFont18, ["fontObjectArenaBox"]=hasuitCastBarFont24, r=1,    g=0.4,  b=0} --medium orange, stuff like searing glare, maybe add things like turn undead here for dks until a better system is made for that
 hasuitOrangeMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 
-local danCommon = {controller=middleCastBarsController,    ["width"]=180,  ["height"]=28,  ["fontObject"]=hasuitCastBarFont18, r=1,    g=1,    b=0} --medium yellow significant damage ability
+local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=28,  ["fontObject"]=hasuitCastBarFont18, ["fontObjectArenaBox"]=hasuitCastBarFont24, r=1,    g=1,    b=0} --medium yellow significant damage ability
 hasuitYellowMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 
-local danCommon = {controller=middleCastBarsController,    ["width"]=150,  ["height"]=20,  ["fontObject"]=hasuitCastBarFont15, r=0.7,  g=1,    b=0} --small yellowish misc
+local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=20,  ["fontObject"]=hasuitCastBarFont14, ["fontObjectArenaBox"]=hasuitCastBarFont20, r=0.7,  g=1,    b=0} --small yellowish misc
 hasuitSmallMiscMiddleCastBarsSpellOptions =         {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
+local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=20,  ["fontObject"]=hasuitCastBarFont14, ["fontObjectArenaBox"]=hasuitCastBarFont20, r=0.7,  g=1,    b=0} --small yellowish misc
+hasuitUntrackedMiddleCastBarsSpellOptions =         {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon} --for people with ranged kicks to see untracked casts, todo ignore list?
+if hasuitLocal7 then
+    hasuitLocal7(hasuitUntrackedMiddleCastBarsSpellOptions)
+end
 
-local danCommon = {controller=middleCastBarsController,    ["width"]=150,  ["height"]=20,  ["fontObject"]=hasuitCastBarFont15, r=0,    g=1,    b=0} --small green damage
+local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=20,  ["fontObject"]=hasuitCastBarFont14, ["fontObjectArenaBox"]=hasuitCastBarFont20, r=0,    g=1,    b=0} --small green damage
 hasuitSmallDamageMiddleCastBarsSpellOptions =       {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
@@ -104,9 +188,103 @@ hasuitSmallDamageMiddleCastBarsSpellOptions =       {hasuitSpellFunction_UnitCas
 
 
 
+-- tinsert(hasuitDoThis_Addon_Loaded, function()
+    -- hasuitSetupSpellOptionsMulti = {
+                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitBigRedMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitGreenishDefensiveMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitOrangeMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitYellowMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallMiscMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitUntrackedMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallDamageMiddleCastBarsSpellOptions["arena"]},
+    -- }
+    -- hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()  , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
+-- end)
 
--- hasuitSetupSpellOptionsMulti = {
-                          -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=danCommon},
--- }
--- hasuitFramesInitializeMulti(8936) --hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()
 
+
+
+
+
+
+
+
+tinsert(hasuitDoThis_UserOptionsLoaded, function() --useroptions stuff for positioning
+    local savedUserOptions = hasuitSavedUserOptions
+    local userOptionsOnChanged = hasuitUserOptionsOnChanged
+    
+    
+    local C_Timer_NewTimer= C_Timer.NewTimer
+    local hasuitCleanController = hasuitCleanController
+    local hasuitGetCastBar = hasuitGetCastBar
+    local hasuitAddToSeparateController = hasuitAddToSeparateController
+    local hasuitCastBarOnUpdateFunction = hasuitCastBarOnUpdateFunction
+    local hasuitCastBarFont20 = hasuitCastBarFont20
+    
+    local fakeCastBars
+    local testCastBarsTimer
+    local function testCastBarsTimerFunction()
+        for i=1,#fakeCastBars do
+            local fakeCastBar = fakeCastBars[i]
+            fakeCastBar.unitFrame = nil
+            fakeCastBar.active = false
+            fakeCastBar:SetAlpha(0)
+            fakeCastBar:SetScript("OnUpdate", nil)
+        end
+        hasuitCleanController(middleCastBarsController)
+        testCastBarsTimer = nil
+    end
+    local function updateControllerPosition()
+        middleCastBarsController:SetPoint("TOP", UIParent, "CENTER", savedUserOptions["middleCastBarsX"], savedUserOptions["middleCastBarsY"])
+    end
+    local function updateMiddleCastBarsFromUserOptions()
+        if not testCastBarsTimer then
+            fakeCastBars = {}
+            testCastBarsTimer = C_Timer_NewTimer(5, testCastBarsTimerFunction)
+            for i=1,3 do
+                local frameIsNew = #unusedCastBars==0
+                local fakeCastBar = hasuitGetCastBar()
+                if frameIsNew then
+                    fakeCastBar:SetSize(220, 36)
+                    
+                    local textOfSpellName = fakeCastBar.textOfSpellName
+                    textOfSpellName:SetFontObject(hasuitCastBarFont20)
+                    textOfSpellName:SetText("Cyclone")
+                    fakeCastBar:SetStatusBarColor(1,0,0)
+                    
+                    local arenaNumberBox = fakeCastBar.arenaNumberBox
+                    arenaNumberBox:SetSize(36, 36)
+                    arenaNumberBox:SetColorTexture(1,0.49,0.04)
+                    
+                    local arenaNumberText = fakeCastBar.arenaNumberText
+                    arenaNumberText:SetFontObject(hasuitCastBarFont20)
+                end
+                
+                fakeCastBar.arenaNumberText:SetText(i)
+                
+                fakeCastBar:SetAlpha(1)
+                fakeCastBar:SetParent(hasuitPlayerFrame)
+                fakeCastBar:SetFrameLevel(10)
+                fakeCastBar.active = true
+                hasuitAddToSeparateController(middleCastBarsController, fakeCastBar)
+                fakeCastBar.unitFrame = {arenaNumber=i}
+                tinsert(fakeCastBars, fakeCastBar)
+                
+                fakeCastBar:SetMinMaxValues(0, 5)
+                fakeCastBar.currentValue = 0
+                fakeCastBar:SetScript("OnUpdate", hasuitCastBarOnUpdateFunction)
+            end
+        else
+            testCastBarsTimer:Cancel()
+            testCastBarsTimer = C_Timer_NewTimer(5, testCastBarsTimerFunction)
+            for i=1,#fakeCastBars do
+                local fakeCastBar = fakeCastBars[i]
+                fakeCastBar.currentValue = 0
+            end
+        end
+        updateControllerPosition()
+    end
+    userOptionsOnChanged["middleCastBarsX"] = updateMiddleCastBarsFromUserOptions
+    userOptionsOnChanged["middleCastBarsY"] = updateMiddleCastBarsFromUserOptions
+    updateControllerPosition()
+end)

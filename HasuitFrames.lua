@@ -20,7 +20,7 @@ local danSortController
 local danAddToUnitFrameController
 
 -- local iconFramesCreated = 0
-local danBackdrop
+local danBorderBackdrop
 
 local danCurrentSpellOptions
 local danCurrentSpellOptionsCommon
@@ -559,7 +559,7 @@ updatedAuraSharedFunction = function()
     if danCurrentIcon.specialFunction then 
         danCurrentIcon.specialFunction()
     end
-    danSortController(danCurrentIcon.controller, true)
+    danSortController(danCurrentIcon.controller)
 end
 
 
@@ -1159,14 +1159,14 @@ do
             local icon = CreateFrame("Frame")
             if iconType=="optionalBorder" or iconType=="ccBreak" then
                 icon.border = CreateFrame("Frame", nil, icon, "BackdropTemplate")
-                icon.border:SetBackdrop(danBackdrop)
+                icon.border:SetBackdrop(danBorderBackdrop)
                 icon.border:SetAllPoints()
                 icon.border:SetAlpha(0)
             else
                 local colors = iconTypes[iconType]
                 if colors then
                     icon.border = CreateFrame("Frame", nil, icon, "BackdropTemplate")
-                    icon.border:SetBackdrop(danBackdrop)
+                    icon.border:SetBackdrop(danBorderBackdrop)
                     icon.border:SetBackdropBorderColor(colors.r, colors.g, colors.b)
                     icon.border:SetAllPoints()
                 end
@@ -1192,10 +1192,10 @@ do
             
             
             if iconType=="channel" then --todo make a better function to return icons that won't check this all the time for no reason?
-                icon.castingInfo = UnitChannelInfo
+                -- icon.castingInfo = UnitChannelInfo
                 
             elseif iconType=="unitCasting" then
-                icon.castingInfo = UnitCastingInfo
+                -- icon.castingInfo = UnitCastingInfo
                 
             elseif iconType=="ccBreak" then
                 icon.border:SetAlpha(1)
@@ -1290,6 +1290,20 @@ hasuitCooldownDoneRecycle = danCooldownDoneRecycle
 
     
 
+local function danSortControllerOnUpdate(controller)
+    controller:SetScript("OnUpdate", nil)
+    controller.doingSomething = false
+    
+    controller.grow(controller)
+end
+function danSortController(controller)
+    if not controller.doingSomething then 
+        controller:SetScript("OnUpdate", danSortControllerOnUpdate)
+        controller.doingSomething = danSortControllerOnUpdate
+    end
+end
+hasuitSortController = danSortController
+
 
 local function danCleanControllerOnUpdate(controller)
     local frames = controller.frames
@@ -1299,7 +1313,7 @@ local function danCleanControllerOnUpdate(controller)
             tinsert(frame.unusedTable, tremove(frames, i))
         end
     end
-    danSortController(controller)
+    danSortControllerOnUpdate(controller) --could copy the 3 things in this function here instead
 end
 
 function danCleanController(controller)
@@ -1350,7 +1364,7 @@ function danAddToUnitFrameController() --this was the very first system made for
     end
     danCurrentIcon.controller = controller
     tinsert(controller.frames, danCurrentIcon)
-    danSortController(controller, true)
+    danSortController(controller)
 end
 
 
@@ -1367,23 +1381,15 @@ local hasuitFramesParent = hasuitFramesParent
 local function danAddToSeparateController(controller, frame)
     frame.controller = controller
     tinsert(controller.frames, frame)
-    danSortController(controller, true) --todo improve
+    danSortController(controller) --todo improve
 end
--- hasuitAddToSeparateController = danAddToSeparateController
-function danSortController(controller, dan)
-    if dan==true then
-        if not controller.doingSomething then 
-            controller:SetScript("OnUpdate", danSortController)
-            controller.doingSomething = danSortController
-        end
-        return
-    end
-    controller:SetScript("OnUpdate", nil)
-    controller.doingSomething = false
-    
-    controller.grow(controller)
-end
-hasuitSortController = danSortController
+hasuitAddToSeparateController = danAddToSeparateController
+
+
+
+
+
+
 
 
 
@@ -1426,7 +1432,7 @@ function hasuitSortPriorityExpirationTime(a,b)
     end
 end
 hasuit1PixelBorderBackdrop = {edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 1}
-danBackdrop = hasuit1PixelBorderBackdrop
+danBorderBackdrop = hasuit1PixelBorderBackdrop
 
 
 
@@ -1532,7 +1538,7 @@ do
     end
     
     local floor = floor
-    function hasuitMiddleGrow(controller) --bored todo add check in ifUnitFramesSizeChangesFunction based on there being at least 1 middle icon active on any frame, (the condition to add a check for repositioning this that adds to hasuitDoThis_GroupUnitFramesUpdate)
+    function hasuitMiddleIconGrow(controller) --bored todo add check in ifUnitFramesSizeChangesFunction based on there being at least 1 middle icon active on any frame, (the condition to add a check for repositioning this that adds to hasuitDoThis_GroupUnitFramesUpdate)
         local frames = controller.frames
         sort(frames, controller.options["sort"])
         local middleIcon = frames[1]
@@ -1545,17 +1551,6 @@ do
         end
     end
     
-    
-    local middleCastBarsFrames
-    function hasuitLocal2(controller)
-        middleCastBarsFrames = controller.frames
-    end
-    function hasuitMiddleCastBarsGrow(controller) --hasuitSpellFunction_UnitCastingMiddleCastBars/hasuitController_Separate_UpperScreenCastBars
-        for i=1, #middleCastBarsFrames do
-            local castBar = middleCastBarsFrames[i]
-            castBar:SetPoint("CENTER", controller, "TOP", 0, -castBar.unitFrame.arenaNumber*37)
-        end
-    end
 end
 
 
@@ -1806,7 +1801,7 @@ hasuitSpellFunction_AuraHypoCooldownFunction = addMultiFunction(function()
                             affectedIcon.priority = 256
                             affectedIcon:SetAlpha(0.5)
                         end
-                        danSortController(affectedIcon.controller, true)
+                        danSortController(affectedIcon.controller)
                     end
                 end
             end
@@ -2394,7 +2389,7 @@ do
                     icon.cooldown:Clear()
                     -- icon.alpha = 1
                     icon:SetAlpha(icon.alpha)
-                    danSortController(icon.controller, true)
+                    danSortController(icon.controller)
                 end
             end
         end
@@ -2474,7 +2469,7 @@ function danCooldownReductionFunction() --could split this into multiple functio
                         startCooldownTimerText(icon)
                         
                     end
-                    danSortController(icon.controller, true)
+                    danSortController(icon.controller)
                 end
             end
         end
@@ -2639,7 +2634,7 @@ function danCleuCooldownStart(GriftahsEmbellishingPowder) --there's a ~0.2 secon
         end
     end
     
-    danSortController(danCurrentIcon.controller, true)
+    danSortController(danCurrentIcon.controller)
 end
 hasuitSpellFunction_CleuSuccessCooldownStart1 = addMultiFunction(function()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
@@ -2937,17 +2932,20 @@ hasuitSpellFunction_CleuCasting = addMultiFunction(function()
         if danCurrentFrame then
             danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
             if danCurrentSpellOptionsCommon then
-                if d2anCleuSubevent=="SPELL_EMPOWER_START" or d2anCleuSubevent=="SPELL_CAST_START" then
-                    if not activeCasts[d4anCleuSourceGuid] then
+                local spellCast = d2anCleuSubevent=="SPELL_CAST_START"
+                if d2anCleuSubevent=="SPELL_EMPOWER_START" or spellCast then
+                    local sourceCastTable = activeCasts[d4anCleuSourceGuid]
+                    if not sourceCastTable then
                         danCurrentIcon = danGetIcon(danCurrentSpellOptions["castType"])
-                        activeCasts[d4anCleuSourceGuid] = {danCurrentIcon}
-                        activeCasts[d4anCleuSourceGuid]["startTime"] = GetTime()
+                        sourceCastTable = {danCurrentIcon, castingInfo=spellCast and UnitCastingInfo or UnitChannelInfo}
+                        sourceCastTable["startTime"] = GetTime()
+                        activeCasts[d4anCleuSourceGuid] = sourceCastTable
                     else
-                        if activeCasts[d4anCleuSourceGuid]["startTime"]~=GetTime() then
+                        if sourceCastTable["startTime"]~=GetTime() then
                             return
                         end
                         danCurrentIcon = danGetIcon(danCurrentSpellOptions["castType"])
-                        tinsert(activeCasts[d4anCleuSourceGuid], danCurrentIcon)
+                        tinsert(sourceCastTable, danCurrentIcon)
                     end
                     
                     danSharedIconFunction()
@@ -2955,7 +2953,7 @@ hasuitSpellFunction_CleuCasting = addMultiFunction(function()
                     local duration
                     local _, _, texture, startTime, endTime
                     if sourceUnit then
-                        _, _, texture, startTime, endTime = danCurrentIcon.castingInfo(sourceUnit)
+                        _, _, texture, startTime, endTime = sourceCastTable.castingInfo(sourceUnit)
                         startTime = startTime/1000
                         endTime = endTime/1000
                         duration = endTime-startTime
@@ -3416,43 +3414,150 @@ end
 
 
 
-
-
--- hasuitGeneralCastFrame:RegisterEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
--- hasuitGeneralCastFrame:RegisterEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
-
 -- hasuitGeneralCastFrame:RegisterEvent("UNIT_SPELLCAST_RETICLE_TARGET")
 -- hasuitGeneralCastFrame:RegisterEvent("UNIT_SPELLCAST_RETICLE_CLEAR")
 
-
+local middleCastBarsTrackingAllHostile
 local danCurrentSpellId
-
-local hasuitCastSpellIdFunctions = {}
-hasuitFramesCenterAddToAllTable(hasuitCastSpellIdFunctions, "unitCasting")
-local hasuitGeneralCastStartFrame = CreateFrame("Frame")
-hasuitGeneralCastStartFrame:RegisterEvent("UNIT_SPELLCAST_START")
-hasuitGeneralCastStartFrame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
-hasuitGeneralCastStartFrame:RegisterEvent("UNIT_SPELLCAST_EMPOWER_START")
-
-local lastEventId
-hasuitGeneralCastStartFrame:SetScript("OnEvent", function(_, event, unit, castId, spellId)
-    local currentEventId = GetCurrentEventID()
-    if lastEventId == currentEventId then
-        return
-    end
-    lastEventId = currentEventId
+do
+    local hasuitCastSpellIdFunctions = {}
+    hasuitFramesCenterAddToAllTable(hasuitCastSpellIdFunctions, "unitCasting")
+    hasuitFramesCenterSetEventType("unitCasting")
+    hasuitGeneralCastStartFrame = CreateFrame("Frame")
+    local hasuitGeneralCastStartFrame = hasuitGeneralCastStartFrame
+    hasuitGeneralCastStartFrame:RegisterEvent("UNIT_SPELLCAST_START")
+    hasuitGeneralCastStartFrame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
+    hasuitGeneralCastStartFrame:RegisterEvent("UNIT_SPELLCAST_EMPOWER_START")
     
-    local stuff = hasuitCastSpellIdFunctions[spellId] or hasuitCastSpellIdFunctions[GetSpellName(spellId)] --todo get rid of name here?
-    if stuff then
-        danCurrentUnit = unit
-        danCurrentEvent = event
-        danCurrentSpellId = spellId
-        for i=1, #stuff do 
-            danCurrentSpellOptions = stuff[i]
-            danCurrentSpellOptions[1]()
+    
+    local lastEventId
+    local shouldSkip
+    local playerClass = hasuitPlayerClass
+    local rangedKickChanges = playerClass=="DRUID" or playerClass=="HUNTER" --can care or not depending on spec
+    if rangedKickChanges or playerClass=="MONK" or playerClass=="PALADIN" or playerClass=="PRIEST" or playerClass=="WARRIOR" then --melee or no kick
+        shouldSkip = true
+        
+        
+        
+        -- middleCastBarsTrackingAllHostile = false
+        function hasuitGeneralCastStartFrame_NoRangedKickForPlayer(_, event, unit, castId, spellId) --_NoRangedKickForPlayer
+            local currentEventId = GetCurrentEventID()
+            if lastEventId == currentEventId then
+                return
+            end
+            lastEventId = currentEventId
+            
+            local stuff = hasuitCastSpellIdFunctions[spellId] or hasuitCastSpellIdFunctions[GetSpellName(spellId)]
+            if stuff then
+                danCurrentUnit = unit
+                danCurrentEvent = event
+                danCurrentSpellId = spellId
+                for i=1, #stuff do 
+                    danCurrentSpellOptions = stuff[i]
+                    danCurrentSpellOptions[1]()
+                end
+            end
         end
+        
+        
+        
     end
-end)
+        
+    if not shouldSkip or rangedKickChanges then --DEATHKNIGHT/DEMONHUNTER/EVOKER/MAGE/ROGUE/SHAMAN/WARLOCK
+        local hasuitUntrackedMiddleCastBarsSpellOptions --_PlayerHasRangedKick
+        local untrackedMiddleCastBarsFunction
+        function hasuitLocal7(spellOptions)
+            hasuitUntrackedMiddleCastBarsSpellOptions = spellOptions
+            untrackedMiddleCastBarsFunction = spellOptions[1]
+        end
+        
+        
+        
+        -- middleCastBarsTrackingAllHostile = true
+        function hasuitGeneralCastStartFrame_PlayerHasRangedKick(_, event, unit, castId, spellId) --_PlayerHasRangedKick
+            local currentEventId = GetCurrentEventID()
+            if lastEventId == currentEventId then
+                return
+            end
+            lastEventId = currentEventId
+            
+            local stuff = hasuitCastSpellIdFunctions[spellId] or hasuitCastSpellIdFunctions[GetSpellName(spellId)] --todo get rid of name here?
+            if stuff then
+                danCurrentUnit = unit
+                danCurrentEvent = event
+                danCurrentSpellId = spellId
+                for i=1, #stuff do 
+                    danCurrentSpellOptions = stuff[i]
+                    danCurrentSpellOptions[1]()
+                end
+            else
+                danCurrentUnit = unit
+                danCurrentEvent = event
+                danCurrentSpellId = spellId
+                danCurrentSpellOptions = hasuitUntrackedMiddleCastBarsSpellOptions
+                untrackedMiddleCastBarsFunction() --todo improve this
+            end
+        end
+        
+        
+        
+    end
+    
+    if not rangedKickChanges then
+        hasuitGeneralCastStartFrame:SetScript("OnEvent", hasuitGeneralCastStartFrame_NoRangedKickForPlayer or hasuitGeneralCastStartFrame_PlayerHasRangedKick)
+    
+    else --druid or hunter
+    
+        hasuitGeneralCastStartFrame:SetScript("OnEvent", hasuitGeneralCastStartFrame_NoRangedKickForPlayer) --i haven't played something with a ranged kick in like 12 years so idk what the best plan is for this, or how people normally see casts in their ui
+        tinsert(hasuitDoThis_Player_Login, function()
+            local hasuitGeneralCastStartFrame_NoRangedKickForPlayer = hasuitGeneralCastStartFrame_NoRangedKickForPlayer
+            local hasuitGeneralCastStartFrame_PlayerHasRangedKick = hasuitGeneralCastStartFrame_PlayerHasRangedKick
+            local lastSpecId
+            if playerClass=="DRUID" then
+                function hasuitPlayerCaresAboutRangedKickSometimes(unitFrame)
+                    local specId = unitFrame.specId
+                    if specId and specId==105 then --Restoration
+                        if lastSpecId~=specId then
+                            lastSpecId = specId
+                            -- middleCastBarsTrackingAllHostile = false, --todo make stuff for these? they don't belong here
+                            hasuitGeneralCastStartFrame:SetScript("OnEvent", hasuitGeneralCastStartFrame_NoRangedKickForPlayer) --todo skull bash talent taken as resto, need to make full talent inspect system first
+                        end
+                    else
+                        if lastSpecId~=specId then
+                            lastSpecId = specId
+                            -- middleCastBarsTrackingAllHostile = true
+                            hasuitGeneralCastStartFrame:SetScript("OnEvent", hasuitGeneralCastStartFrame_PlayerHasRangedKick)
+                        end
+                    end
+                end
+            elseif playerClass=="HUNTER" then
+                function hasuitPlayerCaresAboutRangedKickSometimes(unitFrame)
+                    local specId = unitFrame.specId
+                    if specId and specId==255 then --Survival
+                        if lastSpecId~=specId then
+                            lastSpecId = specId
+                            -- middleCastBarsTrackingAllHostile = true
+                            hasuitGeneralCastStartFrame:SetScript("OnEvent", hasuitGeneralCastStartFrame_NoRangedKickForPlayer)
+                        end
+                    else
+                        if lastSpecId~=specId then
+                            lastSpecId = specId
+                            -- middleCastBarsTrackingAllHostile = false
+                            hasuitGeneralCastStartFrame:SetScript("OnEvent", hasuitGeneralCastStartFrame_PlayerHasRangedKick)
+                        end
+                    end
+                end
+            end
+            
+            local customDanInspectedUnitFrame = hasuitPlayerFrame.customDanInspectedUnitFrame
+            if not customDanInspectedUnitFrame then
+                customDanInspectedUnitFrame = {}
+                hasuitPlayerFrame.customDanInspectedUnitFrame = customDanInspectedUnitFrame
+            end
+            tinsert(customDanInspectedUnitFrame, hasuitPlayerCaresAboutRangedKickSometimes)
+        end)
+    end
+end
 
 
 
@@ -3476,27 +3581,59 @@ do
         local sourceCastTable = activeCasts[sourceGUID]
         if sourceCastTable then
             for i=1,#sourceCastTable do
-                local cooldown = sourceCastTable[i].cooldown
+                local unitFrame = sourceCastTable[i]
+                local cooldown = unitFrame.cooldown
                 cooldown:Clear()
                 danCooldownDoneRecycle(cooldown)
             end
-            activeCasts[sourceGUID] = nil
-        end
-        
-        local unitFrame = hasuitUnitFrameForUnit[sourceGUID] --todo maybe combine with the table that was already used above
-        if unitFrame then
-            local castBar = unitFrame.castBar
+            local castBar = sourceCastTable.middleCastBar
             if castBar then
                 castBar.active = false
                 castBar.timer:Cancel()
                 castBar:SetAlpha(0)
                 castBar:SetScript("OnUpdate", nil)
                 danCleanController(castBar.controller)
-                castBar.unitFrame.castBar = nil
+            end
+            activeCasts[sourceGUID] = nil
+        end
+    end)
+end
+
+
+
+
+
+
+do
+    local lastEventId
+    local danFrame = CreateFrame("Frame")
+    danFrame:RegisterEvent("UNIT_SPELLCAST_INTERRUPTIBLE")
+    danFrame:RegisterEvent("UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
+    danFrame:SetScript("OnEvent", function(_, event, unit)
+        local currentEventId = GetCurrentEventID() --untested
+        if lastEventId == currentEventId then
+            return
+        end
+        lastEventId = currentEventId
+        
+        local sourceCastTable = activeCasts[UnitGUID(unit)]
+        if sourceCastTable then
+            local castBar = sourceCastTable.middleCastBar
+            if castBar then
+                if event=="UNIT_SPELLCAST_INTERRUPTIBLE" then
+                    local spellOptionsCommon = castBar.spellOptionsCommon
+                    castBar:SetStatusBarColor(spellOptionsCommon.r, spellOptionsCommon.g, spellOptionsCommon.b)
+                else
+                    castBar:SetStatusBarColor(0.5,0.5,0.5)
+                end
             end
         end
     end)
 end
+
+
+
+
 
 
 local function castBarTimersUp(timer) --backup plan instead of checking in the onupdate function. The game won't reliably send a cast stopped event i don't think, although not 100% sure, todo re-add hasuitDoThis_EasySavedVariables outside and see whether this ever does anything
@@ -3505,14 +3642,14 @@ local function castBarTimersUp(timer) --backup plan instead of checking in the o
     castBar:SetAlpha(0)
     castBar:SetScript("OnUpdate", nil)
     danCleanController(castBar.controller)
-    castBar.unitFrame.castBar = nil
-    -- print("timer's up") --happens but doesn't break it
+    castBar.sourceCastTable.middleCastBar = nil
+    castBar.sourceCastTable = nil
 end
 do
     local castBarTimersUp = castBarTimersUp --? added to the big list of random things like this waiting to test. I think this does nothing
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("UNIT_SPELLCAST_DELAYED")
-    danFrame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE")
+    danFrame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_UPDATE") --todo system where castbars don't hide for a bit until the actual stopcast event? or at least make it where they can be resurrected for a bit because sometimes on eu they time out and then a delayed event happens afterward but the castbar is already gone
     danFrame:RegisterEvent("UNIT_SPELLCAST_EMPOWER_UPDATE")
     local lastEventId
     danFrame:SetScript("OnEvent", function(_, event, unit) --could do based on castid too
@@ -3521,38 +3658,40 @@ do
             return
         end
         
-        local sourceGUID = UnitGUID(unit)
-        local sourceCastTable = activeCasts[sourceGUID]
+        local sourceCastTable = activeCasts[UnitGUID(unit)]
         if sourceCastTable then
-            lastEventId = currentEventId
+            local _, _, _, startTime, endTime = sourceCastTable.castingInfo(unit)
+            if startTime then --startTime was nil once
+                startTime = startTime/1000
+                endTime = endTime/1000
+            else
+                return --todo
+            end
+            local duration = endTime-startTime
             for i=1,#sourceCastTable do
                 local icon = sourceCastTable[i]
-                
-                local _, _, _, startTime, endTime = icon.castingInfo(unit) --bored todo
-                if startTime then --startTime was nil once
-                    startTime = startTime/1000
-                    endTime = endTime/1000
-                    local duration = endTime-startTime
-                    icon.startTime = startTime
-                    icon.expirationTime = endTime
-                    icon.cooldown:SetCooldown(startTime, duration)
-                end
+                icon.startTime = startTime
+                icon.expirationTime = endTime
+                icon.cooldown:SetCooldown(startTime, duration)
             end
-        end
-        
-        local unitFrame = hasuitUnitFrameForUnit[sourceGUID] --todo maybe combine with the table that was already used above, also do something about pet casts like seduction. Could do it where this gets combined with above and sorted to predictable positions in the grow function based on whether it's an actual arena unit, and fill in the gaps with other units like pets or other units in other instance types, or probably put those above or below during arena
-        if unitFrame then
-            local castBar = unitFrame.castBar
-            if castBar then
-                local _, _, _, _, endTime = castBar.castingInfo(unit)
-                endTime = endTime/1000
-                -- castBar:SetMinMaxValues(castBar.startTime, endTime)
-                castBar:SetMinMaxValues(0, endTime-castBar.startTime)
+            
+            local middleCastBar = sourceCastTable.middleCastBar
+            if middleCastBar then
+                -- middleCastBar:SetMinMaxValues(0, duration) --doesn't update?
+                -- middleCastBar:SetMinMaxValues(0, endTime-middleCastBar.startTime) --works but default castbars go backwards more
                 
-                castBar.timer:Cancel()
-                local timer = C_Timer_NewTimer(endTime-GetTime(), castBarTimersUp) --will see if this ever hides a cast bar early. could also maybe just set one at the start with like 3 seconds more than its duration and not update it here
-                timer.castBar = castBar
-                castBar.timer = timer
+                -- local endDifference = endTime-middleCastBar.endTime
+                middleCastBar.currentValue = middleCastBar.currentValue-endTime+middleCastBar.endTime --bis?
+                middleCastBar.endTime = endTime
+                
+                
+                -- middleCastBar:SetMinMaxValues(0, duration) --working with gettime
+                -- middleCastBar.startTime = startTime
+                
+                middleCastBar.timer:Cancel()
+                local timer = C_Timer_NewTimer(endTime-GetTime(), castBarTimersUp)
+                timer.castBar = middleCastBar
+                middleCastBar.timer = timer
             end
         end
         
@@ -3576,103 +3715,142 @@ do
 end
 
 
-hasuitFramesCenterSetEventType("unitCasting")
-
 
 
 
 
 
 do
+    local UnitReaction = UnitReaction
+    local danRAID_CLASS_COLORS = hasuitRAID_CLASS_COLORS
     local castBarTimersUp = castBarTimersUp
     local danGetCastBar
-    function hasuitLocal1(func)
-        danGetCastBar = func
+    local hasuitMiddleCastBarsAllowChannelingForSpellId
+    local hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId
+    function hasuitLocal1(asd1, asd2)
+        danGetCastBar = hasuitGetCastBar
+        hasuitMiddleCastBarsAllowChannelingForSpellId = asd1
+        hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = asd2
     end
     local function castBarOnUpdateFunction(castBar, elapsed)
-        -- castBar:SetValue(GetTime()) --problem when GetTime value is kind of high?, value gets rounded or something and only actually changes once every other onupdate. worked fine when I made it like this
-        -- castBar:SetValue(GetTime()-castBar.startTime) --easy fix
-        local currentValue = castBar.currentValue+elapsed --more efficient fix? hopefully no problems associated with it
+        -- castBar:SetValue(GetTime()-castBar.startTime) --works
+        
+        local currentValue = castBar.currentValue+elapsed
         castBar.currentValue = currentValue
-        castBar:SetValue(currentValue) --just doing GetValue might actually be better here, we'll see later. assuming this is best. also GetValue might have an extra problem of rounding things and getting incorrect value drifting over time, but the drift would probably be way too small to ever matter here if that's even a thing
-        -- print(currentValue==castBar:GetValue(), currentValue) --false majority of the time
+        castBar:SetValue(currentValue)
         -- if not castBar.active then
             -- print(hasuitRed, "castbar not active")
         -- end
     end
-    hasuitMiddleCastBarsAllowChannelingForSpellId = {
-        [20578]=true, --Cannibalize
-        [359073]=true, --Eternity Surge
-        [382411]=true, --Eternity Surge
-        [396286]=true, --Upheaval
-        [408092]=true, --Upheaval
-    }
-    local hasuitMiddleCastBarsAllowChannelingForSpellId = hasuitMiddleCastBarsAllowChannelingForSpellId
-    -- hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = { --todo at the same time as merging with activeCasts[sourceGUID], --hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId[danCurrentSpellId] and UnitReaction("player", unit)<5
-        -- [118905]=true, --Static Charge
-    -- }
-    -- local hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId
+    hasuitCastBarOnUpdateFunction = castBarOnUpdateFunction
     
-    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function() --todo test to make sure the pixels are good. They look good. I'm assuming width needs to stay even for setpoint center here
+    
+    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function() --should split this function up into different smaller conditions that call the main one if passed?
         local sourceGUID = UnitGUID(danCurrentUnit)
         if sourceGUID~=hasuitPlayerGUID then
         -- if sourceGUID==hasuitPlayerGUID then
             -- if not hasuitPlayerFrame.arenaNumber then
                 -- hasuitPlayerFrame.arenaNumber = 1
             -- end
-            local unitFrame = hasuitUnitFrameForUnit[sourceGUID]
+            local sourceCastTable = activeCasts[sourceGUID]
+            if sourceCastTable and sourceCastTable.middleCastBar then --game sends startcasting events for the same unit while already casting so this is needed
+                return
+            end
+            local unitFrame = hasuitUnitFrameForUnit[sourceGUID] or (middleCastBarsTrackingAllHostile or hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId[danCurrentSpellId]) and UnitReaction("player", danCurrentUnit)<5 and {unitType="arena", fakeUnitFrame=true}
             if unitFrame then
                 local spellOptionsCommon = danCurrentSpellOptions[unitFrame.unitType]
                 if spellOptionsCommon then
-                    if not unitFrame.castBar then --game sends startcasting events for the same unit while already casting so this is needed
-                        local spellCast = danCurrentEvent=="UNIT_SPELLCAST_START"
-                        if not spellCast and not hasuitMiddleCastBarsAllowChannelingForSpellId[danCurrentSpellId] then --channeling or empower
-                            return
+                    local spellCast = danCurrentEvent=="UNIT_SPELLCAST_START"
+                    if not spellCast and not hasuitMiddleCastBarsAllowChannelingForSpellId[danCurrentSpellId] then --channeling or empower
+                        return
+                    end
+                    
+                    -- local asd, spellNameText, _, startTime, endTime = (spellCast and UnitCastingInfo(danCurrentUnit)) or UnitChannelInfo(danCurrentUnit) --won't work, only returns 1 thing instead of 5
+                    
+                    local castingInfo = spellCast and UnitCastingInfo or UnitChannelInfo
+                    local _, spellNameText, _, startTime, endTime, _, arg7, arg8 = castingInfo(danCurrentUnit) --spellName is first arg
+                    
+                    
+                    if startTime then --i remember getting an error from not having this check once in the function below. not 100% sure if needed
+                        endTime = endTime/1000
+                        local castBar = danGetCastBar()
+                        local duration = endTime-startTime/1000
+                        castBar.endTime = endTime
+                        
+                        local timer = C_Timer_NewTimer(duration, castBarTimersUp)
+                        timer.castBar = castBar
+                        castBar.timer = timer
+                        
+                        castBar:SetMinMaxValues(0, duration)
+                        castBar.currentValue = 0
+                        castBar:SetScript("OnUpdate", castBarOnUpdateFunction)
+                        
+                        castBar.spellOptionsCommon = spellOptionsCommon
+                        if spellCast then
+                            castBar:SetReverseFill(false)
+                            if arg8 then --not interruptible
+                                castBar:SetStatusBarColor(0.5,0.5,0.5)
+                            else
+                                castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
+                            end
+                        else
+                            castBar:SetReverseFill(true)
+                            if arg7 then --not interruptible
+                                castBar:SetStatusBarColor(0.5,0.5,0.5)
+                            else
+                                castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
+                            end
                         end
                         
-                        -- local asd, spellNameText, _, startTime, endTime = (spellCast and UnitCastingInfo(danCurrentUnit)) or UnitChannelInfo(danCurrentUnit) --won't work, only returns 1 thing instead of 5
+                        local height = spellOptionsCommon["height"]
+                        castBar.height = height
+                        castBar:SetSize(spellOptionsCommon["width"], height)
                         
-                        local castingInfo = spellCast and UnitCastingInfo or UnitChannelInfo
-                        local _, spellNameText, _, startTime, endTime = castingInfo(danCurrentUnit) --spellName is first arg
-                        
-                        
-                        if startTime then --i remember getting an error from not having this check once in the function below. not 100% sure if needed
-                            startTime = startTime/1000
-                            endTime = endTime/1000
-                            local castBar = danGetCastBar()
-                            castBar.startTime = startTime
-                            unitFrame.castBar = castBar
-                            local duration = endTime-startTime
-                            
-                            local timer = C_Timer_NewTimer(duration, castBarTimersUp)
-                            timer.castBar = castBar
-                            castBar.timer = timer
-                            
-                            castBar:SetMinMaxValues(0, duration)
-                            castBar.currentValue = 0
-                            castBar:SetScript("OnUpdate", castBarOnUpdateFunction)
-                            
-                            castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
-                            castBar:SetReverseFill(not spellCast)
-                            castBar.castingInfo = castingInfo
-                            
-                            local width = spellOptionsCommon["width"]
-                            local height = spellOptionsCommon["height"]
-                            -- castBar.width = width
-                            -- castBar.height = height
-                            castBar:SetSize(width, height)
-                            
+                        if not unitFrame.fakeUnitFrame then
                             castBar.unitFrame = unitFrame
                             castBar:SetParent(unitFrame)
-                            castBar.active = true
-                            castBar:SetAlpha(1)
-                            
-                            local textOfSpellName = castBar.textOfSpellName
-                            textOfSpellName:SetFontObject(spellOptionsCommon["fontObject"]) --SetTextColor
-                            textOfSpellName:SetText(spellNameText)
-                            
-                            danAddToSeparateController(spellOptionsCommon.controller, castBar)
+                        else
+                            castBar:SetParent(hasuitFramesParent) --ideally this goes on nameplate or something to show range(?, idk if it works like that but maybe) but complicates stuff a lot until maybe nameplates get made
                         end
+                        if not sourceCastTable then
+                            sourceCastTable = {["startTime"]=GetTime(), castingInfo=castingInfo} --could put a lot more work into the unitcasting/cleu casting section
+                            activeCasts[sourceGUID] = sourceCastTable
+                        end
+                        sourceCastTable.middleCastBar = castBar
+                        castBar.sourceCastTable = sourceCastTable
+                        castBar.active = true
+                        castBar:SetAlpha(1)
+                        
+                        local textOfSpellName = castBar.textOfSpellName
+                        textOfSpellName:SetFontObject(spellOptionsCommon["fontObject"]) --SetTextColor
+                        textOfSpellName:SetText(spellNameText)
+                        
+                        local arenaNumber = unitFrame.arenaNumber
+                        if arenaNumber then
+                            local arenaNumberBox = castBar.arenaNumberBox --probably would have been worth doing the same thing as icons and splitting castBars up so that a lot of this/above only needs to be done on frame creation
+                            arenaNumberBox:SetSize(height, height)
+                            local classColors = danRAID_CLASS_COLORS[unitFrame.unitClass]
+                            arenaNumberBox:SetColorTexture(classColors.r,classColors.g,classColors.b)
+                            
+                            local arenaNumberText = castBar.arenaNumberText
+                            arenaNumberText:SetFontObject(spellOptionsCommon["fontObjectArenaBox"])
+                            arenaNumberText:SetText(arenaNumber)
+                            
+                            if not castBar.arenaNumberBoxShowing then
+                                arenaNumberBox:SetAlpha(1)
+                                arenaNumberText:SetAlpha(1)
+                                castBar.arenaNumberBoxShowing = true
+                            end
+                            
+                        elseif castBar.arenaNumberBoxShowing then
+                            castBar.arenaNumberBox:SetAlpha(0)
+                            castBar.arenaNumberText:SetAlpha(0)
+                            castBar.arenaNumberBoxShowing = false
+                            
+                        end
+                        
+                        
+                        danAddToSeparateController(spellOptionsCommon.controller, castBar)
                     end
                 end
             end
@@ -3689,6 +3867,7 @@ end
 hasuitSpellFunction_UnitCasting = addMultiFunction(function()
     local sourceGUID = UnitGUID(danCurrentUnit)
     if sourceGUID~=hasuitPlayerGUID then
+    -- if sourceGUID==hasuitPlayerGUID then
         local destGUID = UnitGUID(danCurrentUnit.."target")
         if destGUID then
             danCurrentFrame = hasuitUnitFrameForUnit[destGUID]
@@ -3701,36 +3880,46 @@ hasuitSpellFunction_UnitCasting = addMultiFunction(function()
                         end
                     end
                     
-                    if not activeCasts[sourceGUID] then
-                        if danCurrentEvent=="UNIT_SPELLCAST_START" then
+                    local spellCast = danCurrentEvent=="UNIT_SPELLCAST_START"
+                    local sourceCastTable = activeCasts[sourceGUID]
+                    if not sourceCastTable then
+                        if spellCast then
                             danCurrentIcon = danGetIcon("unitCasting")
+                            sourceCastTable = {danCurrentIcon, castingInfo=UnitCastingInfo}
                         else
                             danCurrentIcon = danGetIcon("channel")
+                            sourceCastTable = {danCurrentIcon, castingInfo=UnitChannelInfo}
                         end
-                        activeCasts[sourceGUID] = {danCurrentIcon}
-                        activeCasts[sourceGUID]["startTime"] = GetTime()
+                        sourceCastTable["startTime"] = GetTime()
+                        activeCasts[sourceGUID] = sourceCastTable
                     else
-                        if activeCasts[sourceGUID]["startTime"]~=GetTime() then
+                        if sourceCastTable["startTime"]~=GetTime() then
                             return
                         end
-                        if danCurrentEvent=="UNIT_SPELLCAST_START" then
-                            danCurrentIcon = danGetIcon("unitCasting")
-                        else
-                            danCurrentIcon = danGetIcon("channel")
-                        end
-                        tinsert(activeCasts[sourceGUID], danCurrentIcon)
+                        danCurrentIcon = spellCast and danGetIcon("unitCasting") or danGetIcon("channel")
+                        tinsert(sourceCastTable, danCurrentIcon)
                     end
                     
                     danSharedIconFunction()
                     
-                    local _, _, texture, startTime, endTime = danCurrentIcon.castingInfo(danCurrentUnit)
+                    local _, _, texture, startTime, endTime = sourceCastTable.castingInfo(danCurrentUnit)
                     
                     if not startTime then
-                        for i=#activeCasts[sourceGUID], 1, -1 do
-                            local icon = activeCasts[sourceGUID][i]
+                        for i=#sourceCastTable, 1, -1 do
+                            local icon = sourceCastTable[i]
                             icon.cooldown:Clear()
                             danCooldownDoneRecycle(icon.cooldown)
                         end
+                        
+                        -- local castBar = sourceCastTable.middleCastBar
+                        -- if castBar then
+                            -- castBar.active = false
+                            -- castBar.timer:Cancel()
+                            -- castBar:SetAlpha(0)
+                            -- castBar:SetScript("OnUpdate", nil)
+                            -- danCleanController(castBar.controller)
+                        -- end
+                        
                         activeCasts[sourceGUID] = nil
                         return
                     end
@@ -3770,7 +3959,7 @@ function hideCooldown(icon)
     icon.priority = icon.basePriority+800
     icon:SetAlpha(0)
     icon.alpha = 0
-    danSortController(icon.controller, true)
+    danSortController(icon.controller)
 end
 
 
@@ -3807,7 +3996,7 @@ do
                                 icon.priority = icon.basePriority
                                 icon:SetAlpha(1)
                                 icon.alpha = 1
-                                danSortController(icon.controller, true)
+                                danSortController(icon.controller)
                             end
                         elseif not icon.expirationTime or icon.expirationTime<GetTime() then
                             icon:SetAlpha(1)
@@ -3831,7 +4020,7 @@ do
                         icon.expirationTime = milliseconds1+milliseconds2
                         icon.cooldown:SetCooldown(milliseconds1, milliseconds2)
                         
-                        danSortController(icon.controller, true)
+                        danSortController(icon.controller)
                         
                         startCooldownTimerText(icon)
                         icon:SetAlpha(0.5)

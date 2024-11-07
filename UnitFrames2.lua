@@ -201,7 +201,7 @@ local danUpdateFrameRole
 
 local danUpdateHealthAndAbsorbValues
 
-local danBorder = {edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = 1}
+local danBorderBackdrop = hasuit1PixelBorderBackdrop
 
 local danIsRaidUnit
 
@@ -243,7 +243,7 @@ local danCurrentUnitHealth
 local updateArena
 
 local danClassColors = hasuitClassColorsHexList
-local danRAID_CLASS_COLORS = {}
+local danRAID_CLASS_COLORS = hasuitRAID_CLASS_COLORS
 
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 for unitClass in pairs(danClassColors) do
@@ -584,7 +584,7 @@ function danGetHealthBar()
         border:SetPoint("TOPLEFT", frame, "TOPLEFT", -1, 1)
         border:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 1, 1)
         border:SetFrameLevel(27)
-        border:SetBackdrop(danBorder)
+        border:SetBackdrop(danBorderBackdrop)
         border:SetBackdropBorderColor(0, 0, 0)
         border.frame = frame
         
@@ -887,6 +887,7 @@ end
 
 
 local danHideUnitFrame2
+local hideTimerFinished
 local danHideInactiveFrames
 
 local danGetUnit_HealthFunctionLines
@@ -1065,6 +1066,15 @@ function danHideUnitFrame2(frame)
         frame.unitGUID = nil
     end
     
+    if hasuitUnitFrameForUnit[frame.unit]==frame then --todo check and see if this always gets set nil in updateexistingunit, if it's even possible to tell something for sure in there
+        hasuitUnitFrameForUnit[frame.unit] = nil
+    end
+    if frame.hideTimer then
+        frame.hideTimer:Cancel()
+        frame.hideTimer = nil
+    end
+    frame.updated = nil
+    
     frame.unit = nil
     frame:SetScript("OnUpdate", nil)
     
@@ -1119,7 +1129,7 @@ function danHideUnitFrame2(frame)
             frame.arenaSpec = nil
         end
         frame.arenaNumber = nil
-        frame.arenaStuff = nil --bored todo replace with arenaNumber probably
+        frame.arenaStuff = nil
     end
     frame.specId = nil
     frame.cooldowns = nil
@@ -1177,8 +1187,6 @@ function danHideUnitFrame2(frame)
         disableColorBackgroundForFrame()
     end
     
-    frame.hideTimer = nil
-    frame.updated = nil
     frame.unitClass = nil
     frame.unitRace = nil
     frame.seen = nil
@@ -1620,6 +1628,7 @@ do
     end)
 end
 
+local UIParent = UIParent
 
 local hasuitCooldownTextFonts = hasuitCooldownTextFonts
 local hasuitFrameTypeUpdateCount = hasuitFrameTypeUpdateCount
@@ -1721,6 +1730,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
             
             button:RegisterForClicks("AnyDown")
             button:SetAttribute("*type1", "target")
+            button:SetAttribute("toggleForVehicle", true) --trying this out
             button:SetAttribute("unit", unit)
             button:SetScript("OnMouseDown", function()
                 danOnUpdateMouseUpCheckFrame:SetScript("OnUpdate", danOnUpdateMouseUpCheck)
@@ -1850,7 +1860,14 @@ do
         danCurrentUnitType = "group"
         danCurrentUnitTable = groupUnitFrames
         
-        playerRaidUnit = playerRaidUnit or "raid1"
+        if playerRaidUnit then
+            if not UnitIsUnit(playerRaidUnit, "player") then --not totally sure what was going on or whether this fixed it, group test leaving gaps/putting things in weird places
+                playerRaidUnit = "raid1"
+            end
+        else
+            playerRaidUnit = "raid1"
+        end
+        
         local actualGroupSize = GetNumGroupMembers()
         if actualGroupSize == 0 then
             actualGroupSize = 1
@@ -1891,7 +1908,7 @@ do
         hasuitFrameTypeUpdateCount["group"] = updatedPlus1
         
         
-        if targetGUID and targetGUID~=true then --made first fake frame "target" to be able to test things on a dummy easily like root/root ccbreakbar/loadon switching text around/unloading ccbreakbar on roots only etc. can test a bunch of stuff super easily this way, might be misleading for other people though because some stuff won't get tracked if spell is from player or things like that. not sure if ideal because of that? todo maybe disable for release and only use fake raid units. also probably get rid of the party broken text for tests? that'll probably just be confusing
+        if targetGUID and targetGUID~=true then --made first fake frame "target" to be able to test things on a dummy easily like root/root ccbreakbar/loadon switching text around/unloading ccbreakbar on roots only etc. can test a bunch of stuff super easily this way, might be misleading for other people though because some stuff won't get tracked if spell is from player or things like that. not sure if ideal because of that?
             local unitGUID = targetGUID
             if unitGUID then
                 for i=1,#groupUnitFrames do
@@ -1919,9 +1936,13 @@ do
         danHideInactiveFrames()
         for i=1,#lastFrames do --to skip the 10 second hide/recycle timer if calling test function multiple times. could have something that auto skips it if there are too many frames made, like if dropping a 40man raid, joining a different one with different unitguids, and repeating as many times in 10 seconds could end up with a big excess of frames that will never get used
             local frame = lastFrames[i]
-            if frame.updated ~= updatedPlus1 then
-                danHideUnitFrame2(frame)
-                frame.specialAuraInstanceIDsRemove = {}
+            -- if frame.updated ~= updatedPlus1 then
+                -- danHideUnitFrame2(frame)
+                -- frame.specialAuraInstanceIDsRemove = {}
+            -- end
+            if frame.hideTimer then
+                hideTimerFinished(frame.hideTimer)
+                -- frame.specialAuraInstanceIDsRemove = {}
             end
         end
         
@@ -1955,6 +1976,7 @@ do
     end
 end
 
+local hasuitArenaTestNumber = hasuitArenaTestNumber
 local hasuitSpecIsHealerTable = hasuitSpecIsHealerTable
 
 local GetArenaOpponentSpec = GetArenaOpponentSpec
@@ -1991,10 +2013,12 @@ do
         danHideInactiveFrames()
         for i=1,#arenaUnitFrames do
             local frame = arenaUnitFrames[i]
-            if not UnitExists(frame.unit) then
-                danHideUnitFrame2(frame)
-                frame.specialAuraInstanceIDsRemove = {}
+            if frame.hideTimer then
+                hideTimerFinished(frame.hideTimer)
             end
+            hasuitUnitFrameForUnit["arena"..i] = nil 
+            -- danHideUnitFrame2(frame)
+            -- frame.specialAuraInstanceIDsRemove = {}
         end
         
         danUpdateArenaFramesUnsafe()
@@ -2312,6 +2336,7 @@ function danUpdateExistingUnit()
             if danCurrentFrame.arenaSpecIcon then
                 danCurrentFrame.arenaSpecIcon:SetAlpha(0)
             end
+            danCurrentFrame.arenaNumber = nil
             
         elseif danCurrentUnitType=="arena" then
             if danCurrentFrame.arenaSpecIcon then
@@ -2728,8 +2753,8 @@ do
                 icon.priority = icon.basePriority
             end
             local controller = icon.controller
-            if controller.doingSomething then
-                controller.doingSomething(controller) --todo some kind of reliable way to do this once after everything has happened and without waiting until the next frame?
+            if controller.doingSomething then --bored todo this shouldn't be like this?
+                controller.doingSomething(controller)
             else
                 controller.grow(controller)
             end
@@ -2750,6 +2775,7 @@ do
     local cooldownsControllers = hasuitController_CooldownsControllers
     local hasuitInitializeController = hasuitInitializeController
     function danAddSpecializationCooldowns(specId, isClassUpdate)
+        local controllers = {}
         for i=1,#cooldownsControllers do
             local controllerOptions = cooldownsControllers[i]
             local unitTypeStuff = controllerOptions[danCurrentUnitType]
@@ -2762,6 +2788,7 @@ do
                     if not controller then
                         controller = hasuitInitializeController(danCurrentFrame, controllerOptions)
                     end
+                    tinsert(controllers, controller)
                     local defaultSize = unitTypeStuff["size"]
                     controller.unitTypeStuff = unitTypeStuff
                     for j=1,#specCooldowns do
@@ -2887,7 +2914,7 @@ do
                             danCurrentFrame.cooldownOptions[spellId] = cooldownOptions
                         end
                     end
-                    hasuitSortController(controller, true)
+                    -- hasuitSortController(controller)
                 end
                 if oldSpecCooldowns then
                     for j=1,#oldSpecCooldowns do
@@ -2915,6 +2942,14 @@ do
                         danCurrentFrame.cooldownPriorities[priority] = nil
                     end
                 end
+            end
+        end
+        for i=1,#controllers do --to skip having to wait until next gettime since this usually gets called during onupdate, although that delay might be better anyway to minimize load time for new unitframes. idk
+            local controller = controllers[i]
+            if controller.doingSomething then
+                controller.doingSomething(controller)
+            else
+                controller.grow(controller)
             end
         end
     end
@@ -3045,6 +3080,12 @@ do
                     danCurrentFrame.cooldownsDisabled = true
                 end
                 danCurrentFrame.specId = specId
+            end
+            local customDanInspectedUnitFrame = danCurrentFrame.customDanInspectedUnitFrame
+            if customDanInspectedUnitFrame then
+                for i=1,#customDanInspectedUnitFrame do
+                    customDanInspectedUnitFrame[i](danCurrentFrame)
+                end
             end
             if danIsInspecting==0 then
                 C_Timer_After(0, danClearInspectPlayer)
@@ -3200,6 +3241,8 @@ function danUpdateArenaFramesUnsafe()
                 
             end
             danCurrentFrame.updated = updateCount
+        else
+            hasuitUnitFrameForUnit[danCurrentUnit] = nil
         end
     end
     
@@ -3226,6 +3269,17 @@ function danUpdateOtherUnits(groupType, number, lastNumber)
 end
 
 
+function hideTimerFinished(timer)
+    local frame = timer.frame
+    if frame.hideTimer then
+        frame.hideTimer = nil
+        if frame.updated ~= hasuitFrameTypeUpdateCount[frame.unitType] then --probably doesn't do anything anymore here
+            danHideUnitFrame2(frame)
+        else
+            print("hideTimerFinished(timer) 2")
+        end
+    end
+end
 function danHideInactiveFrames()
     for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do
         for i=#unitTable,1,-1 do
@@ -3244,11 +3298,9 @@ function danHideInactiveFrames()
                     hasuitUnitFrameForUnit[unit] = nil
                 end
                 frame:Hide()
-                frame.hideTimer = C_Timer_NewTimer(10, function()
-                    if frame.updated ~= hasuitFrameTypeUpdateCount[frame.unitType] then --doesn't do anything now i think
-                        danHideUnitFrame2(frame)
-                    end
-                end)
+                local hideTimer = C_Timer_NewTimer(10, hideTimerFinished)
+                frame.hideTimer = hideTimer
+                hideTimer.frame = frame
             end
         end
     end
@@ -3676,13 +3728,13 @@ local function gatesOpeningFunction()
                 if icon and icon.spellId~=0 then
                     icon:SetAlpha(0)
                 end
-            else
-                C_Timer_After(0, function()
-                    local icon = frame.cooldowns and frame.cooldowns["pvpTrinket"]
-                    if icon and icon.spellId~=0 then
-                        icon:SetAlpha(0)
-                    end
-                end)
+            -- else
+                -- C_Timer_After(0, function() --was like this
+                    -- local icon = frame.cooldowns and frame.cooldowns["pvpTrinket"]
+                    -- if icon and icon.spellId~=0 then
+                        -- icon:SetAlpha(0)
+                    -- end
+                -- end)
             end
         end
     end
@@ -3809,6 +3861,9 @@ danArenaUpdateFrame:RegisterEvent("PLAYER_ENTERING_BATTLEGROUND")
 function updateArena(_, event, arg1, arg2) --bored todo this should be remade, one of the few things that survived from UnitFrames1
     if event=="PLAYER_ENTERING_BATTLEGROUND" then --fixing/avoiding potential problems with an arena frame with the wrong class getting used, can happen if frames fail to hide like a wargame that ended 3v1 in the starting gates and then the 1 frame persisted and caused the next game to show 2 ferals when it should've been 1 feral 1 pally
         if #arenaUnitFrames~=0 then
+            for i=1,#arenaUnitFrames do
+                hasuitUnitFrameForUnit["arena"..i] = nil
+            end
             hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
             danHideInactiveFrames() --should make a more specific version of this?
         end
@@ -3888,10 +3943,9 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
     elseif event=="LOADING_SCREEN_ENABLED" or event=="LOADING_SCREEN_DISABLED" then --arena ended
         firstSeen = nil
         hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
-        -- for i=1,#arenaUnitFrames do --not sure this is needed anymore
-            -- hasuitUnitFrameForUnit[arenaUnitFrames[i].unit] = nil
-            -- hasuitUnitFrameForUnit["arena"..i] = nil
-        -- end
+        for i=1,#arenaUnitFrames do
+            hasuitUnitFrameForUnit["arena"..i] = nil
+        end
         danHideInactiveFrames() --shouldn't need to go through every unit type table here? todo
         
         danHideTargetLines()

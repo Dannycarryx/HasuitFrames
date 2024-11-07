@@ -79,6 +79,16 @@ split up the big grow function
 
 clean up some more naming to make things that are global obvious? or actually that's kind of pointless and the thing that will matter is the explanations/examples from guides
 
+something to indicate unit in vehicle
+
+arena frames might not hide after arena is over sometimes?
+
+
+
+
+
+
+
 
 
 
