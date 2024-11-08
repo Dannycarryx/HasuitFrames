@@ -262,8 +262,8 @@ hasuitSetupSpellOptionsMulti = {
 initializeMultiPlusDiminish(33786) --Cyclone
 initializeMultiPlusDiminish(710) --Banish
 
-
 hasuitFramesCenterSetDrType("incapacitate") --sheep
+hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initializePlusDiminish(221527) --imprison immune
 initializePlusDiminish(203337) --freezing trap
 
@@ -717,6 +717,7 @@ hasuitSetupSpellOptionsMulti = {
     hasuitGreenishDefensiveMiddleCastBarsSpellOptions,
 }
 initializeMulti(421453) --Ultimate Penitence absorb(cc immunity?) todo improve this since basing this on the absorb buff isn't perfect
+initializeMulti(382440) --Shifting Power, not as important as ultimate penitence but has the same look atm, both are hybrid offensive abilities i guess and cs coming up early can be stronger or weaker than ultimate penitence so idk
 -- initialize(436358) --Demolish, immune to stuns/knockbacks? todo there's no unit_aura for this. it gets cleu applied though for some reason, along with channel start and cast success
 -- initialize("Adaptation") --adapted is the debuff, todo maybe? no unitaura for this
 initialize(354610) --glimpse
@@ -1197,10 +1198,12 @@ initializeMulti(199786) --Glacial Spike cast
 initializeMulti(116858) --Chaos Bolt
 initializeMulti(370965) --The Hunt
 hasuitSetupSpellOptionsMulti[3] = hasuitOrangeMiddleCastBarsSpellOptions
-initializeMulti(410126, 2) --Searing Glare cast --showing on unitframes, ?
+initializeMulti(410126, 2) --Searing Glare cast --showing on unitframes, should it be?
 initializeMulti(357208, 2) --fire breath cast --todo
 initializeMulti(382266, 2) --fire breath cast2? --todo
-initializeMulti(198100, 2) --Kleptomania, todo update target based on cleu spellsteal
+initializeMulti(198100, 3) --Kleptomania, todo update target based on cleu spellsteal then track this as a fake debuff too
+initializeMulti(352278, 3) --Ice Wall
+
 
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initialize(280719) --Secret Technique, success

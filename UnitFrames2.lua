@@ -1849,14 +1849,25 @@ do
     local targetGUID
     local lastFrames = {}
     function hasuitMakeTestGroupFrames(number)
-        if hasuitInstanceType=="arena" then
+        
+        local actualGroupSize = GetNumGroupMembers()
+        if actualGroupSize == 0 then
+            actualGroupSize = 1
+        end
+        
+        
+        if number<=actualGroupSize then
+            number = actualGroupSize
+            
+        elseif hasuitInstanceType=="arena" then
             return
-        end
-        if number>40 then
+            
+        elseif number>40 then
             number = 40
-        elseif number<1 then
-            number = 1
+            
         end
+        
+        
         danCurrentUnitType = "group"
         danCurrentUnitTable = groupUnitFrames
         
@@ -1866,15 +1877,6 @@ do
             end
         else
             playerRaidUnit = "raid1"
-        end
-        
-        local actualGroupSize = GetNumGroupMembers()
-        if actualGroupSize == 0 then
-            actualGroupSize = 1
-        end
-        
-        if number<actualGroupSize then
-            number = actualGroupSize
         end
         
         
@@ -3855,6 +3857,9 @@ local function arenaUnitSeen()
     end
 end
 
+local hasuitMakeTestGroupFrames = hasuitMakeTestGroupFrames
+local GetInstanceInfo = GetInstanceInfo
+
 danArenaUpdateFrame:RegisterEvent("PVP_MATCH_STATE_CHANGED")
 danArenaUpdateFrame:RegisterEvent("PVP_MATCH_INACTIVE") --leaving a skirmish didn't do PVP_MATCH_STATE_CHANGED, and PVP_MATCH_INACTIVE happened after loading screen enabled
 danArenaUpdateFrame:RegisterEvent("PLAYER_ENTERING_BATTLEGROUND")
@@ -3867,6 +3872,12 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
             hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
             danHideInactiveFrames() --should make a more specific version of this?
         end
+        local _, instanceType = GetInstanceInfo()
+        if instanceType=="arena" then
+            hasuitMakeTestGroupFrames(0)
+        end
+        -- print(hasuitGreen, "enteringbg", instanceType==hasuitInstanceType)
+        
     end
     if event=="ARENA_OPPONENT_UPDATE" then
         if tempTrackedArenaUnits[arg1] then

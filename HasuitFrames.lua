@@ -2398,11 +2398,11 @@ do
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("UNIT_PET")
     danFrame:SetScript("OnEvent", function(_,_,unit)
-        local currentEventId = GetCurrentEventID()
-        if lastEventId == currentEventId then
-            return
-        end
-        lastEventId = currentEventId
+        -- local currentEventId = GetCurrentEventID() --need to get to the end to get to arenapet15
+        -- if lastEventId == currentEventId then
+            -- return
+        -- end
+        -- lastEventId = currentEventId
         
         local unitPet = unit.."pet"
         local unitPetGUID = UnitGUID(unitPet)

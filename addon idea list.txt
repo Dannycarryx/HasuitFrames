@@ -5,7 +5,6 @@ biggest thing right now:
 enabling people to track their own abilities? might be the last thing before a release
 ability to disable some or all class specific abilities tracked for player to let people make their own setup easily
 clean this file up
-adjust new middle cast bars position a bit, probably finish making them good for people with ranged kicks at least
 make a variable like d12 or d13 and set it for non-cleu so that people can initialize a spellname or spellid and have it not get ignored or however that works. should be able to use spellnames or spellids and not worry about it
 
 
@@ -82,6 +81,14 @@ clean up some more naming to make things that are global obvious? or actually th
 something to indicate unit in vehicle
 
 arena frames might not hide after arena is over sometimes?
+
+red leftover icon for lifeblooms that got stolen? since that still counts toward the limit of 2
+
+probably move stuff like spell reflect into same area as cc abilities for arena units
+
+
+
+
 
 
 

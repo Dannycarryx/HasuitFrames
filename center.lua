@@ -1,6 +1,8 @@
 
 
 
+
+
 local CreateFrame = CreateFrame
 local hasuitFramesParent = CreateFrame("Frame", "hasuitFramesParent", UIParent)
 hasuitFramesParent:SetIgnoreParentScale(true)
@@ -76,8 +78,9 @@ hasuitSavedVariables = {} --for things in the future like keeping track of how l
 
 
 
-
 hasuitDoThis_Addon_Loaded = {} --not accessible from external addons
+hasuitDoThis_UserOptionsLoaded = {} --not accessible from external addons, happens early on addon_loaded
+
 hasuitDoThis_Player_Login = hasuitDoThis_Player_Login or {} --can sync any addons together here, give them these or other functions/run things in certain orders, other addon should do the same thing with hasuitDoThis_Player_Login = hasuitDoThis_Player_Login or {} so that it doesn't matter which addon loads first
 hasuitDoThis_Player_Entering_WorldFirstOnly = {} --other stuff is accessible but you need to do it inside of the function you put into hasuitDoThis_Player_Login to make sure it doesn't matter which addon loads first. basically anything external should be 100% wrapped in the function you tinsert into hasuitDoThis_Player_Login and from there everything global made in my addon will be loaded and can be grabbed and used locally before it gets set nil. (Setting nil only removes the global pointer, anything grabbed to use locally will stay and can continue to be used.)
 hasuitDoThis_Player_Entering_WorldSkipsFirst = {}
@@ -93,7 +96,6 @@ hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = {}
 
 hasuitDoThis_Player_Target_Changed = {}
 
-hasuitDoThis_UserOptionsLoaded = {} --not accessible from external addons, happens early on addon_loaded
 
 -- hasuitDoThis_OnUpdate(func)
 -- hasuitDoThis_OnUpdatePosition1(func)

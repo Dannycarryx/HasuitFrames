@@ -52,7 +52,6 @@ do --cooldowns loadon
     
     
     
-    
     local loadOn = {}
     local function loadOnCondition()
         local instanceType = hasuitInstanceType
@@ -303,7 +302,7 @@ do
                         local frame = groupUnitFrames[i]
                         if not frame.cooldownsDisabled then
                             if frame.cooldownPriorities then
-                                for _, icon in pairs(frame.cooldownPriorities) do
+                                for _, icon in pairs(frame.cooldownPriorities) do --todo can break if arena units already set before group and test function is still active with 4-5 fake frames from outside, when joining arena, gonna try a simple fix on joining arena to clear fake frames
                                     if icon.recycle then
                                         recycleCooldownIcon(icon)
                                     end
