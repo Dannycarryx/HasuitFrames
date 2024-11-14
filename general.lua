@@ -291,7 +291,7 @@ hasuitSetupSpellOptionsMulti = { --CC can break threshold *1
                           {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-63,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1]}, --STUNS
                           hasuitBigRedMiddleCastBarsSpellOptions,
 }
-initializeMultiPlusDiminish(118905) --Static Charge
+initializeMultiPlusDiminish(118905) --Static Charge, todo?
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initializePlusDiminish(202244) --Overrun
 initializePlusDiminish(203123) --Maim
@@ -1587,6 +1587,7 @@ initialize(GetSpellName(8326)) --Ghost, todo bigger/15 sec timer in rbgs?
 -- hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=3,["loadOn"]=loadOnNone,["group"]=danCommonTopRightGroupDebuffs[5],        } --deserter
 -- initialize(GetSpellName(26013)) --Deserter --todo these need to get removed when entering instance since they're so long, then can uncomment, surprised it's needed, seems like it'll work itself out after getting the order of loadons/everything else right?
 -- initialize(GetSpellName(71041)) --Dungeon Deserter
+-- initialize(368798) --No-Show, Solo Shuffle or Battleground Blitz deserter
 -- initialize(158263) --Craven (arena deserter)
 
 

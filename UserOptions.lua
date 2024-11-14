@@ -86,9 +86,13 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
     savedUserOptions = hasuitSavedUserOptions
     local welcomeMessage = "Welcome to HasuitFrames. If you're new I recommend looking at welcome.txt in the HasuitFrames addon folder. glhf"
     if not savedUserOptions then --will need to have checks for any new options added after release, maybe there's a better way to set this up
-        C_Timer.After(0, function()
-            print(welcomeMessage)
-        end)
+        if hasuitScriptProfileWasWrong then
+            hasuitSavedVariables["repeatWelcomeMessage"] = welcomeMessage
+        else
+            C_Timer.After(0, function()
+                print(welcomeMessage)
+            end)
+        end
         savedUserOptions = { --defaults ___
             ["partyX"]=-381,
             ["partyY"]=127, --old comment: number-hasuitRaidFrameHeightForGroupSize[5]-3?
@@ -114,13 +118,6 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
             -- ["usePixelPerfectModifier"]=false, --this exists, default is off, won't show as an option if screen height is 1080 because it'd be irrelevant
         }
         hasuitSavedUserOptions = savedUserOptions
-        
-    elseif hasuitSavedVariables.repeatWelcomeMessage then
-        C_Timer.After(0, function()
-            print(welcomeMessage)
-        end)
-        hasuitSavedVariables.repeatWelcomeMessage = nil
-        
     end
     savedUserOptions["partyTest"] = 3 --need to fix cds for party of 5, todo would also be nice to show them in test mode, very bored todo don't save this to savedvariables?
     savedUserOptions["arenaTest"] = 3

@@ -59,11 +59,21 @@ hasuitCommonBackdrop = {
 hasuitUnitFrameForUnit = {}
 hasuitFrameTypeUpdateCount = {}
 
-hasuitUnitFramesForUnitType = {
-    ["group"] = {},
-    ["pet"] = {},
-    ["arena"] = {},
+hasuitUnitFramesForUnitType_Array = {
+    {unitType="group"},
+    {unitType="arena"},
+    -- {unitType="pet"},
 }
+hasuitUnitFramesForUnitType = {} --pairs table pointing to unitTable s in hasuitUnitFramesForUnitType_Array, exists to set local groupUnitFrames etc in other files easier
+do
+    local hasuitUnitFramesForUnitType_Array = hasuitUnitFramesForUnitType_Array
+    local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
+    for i=1,#hasuitUnitFramesForUnitType_Array do
+        local unitTable = hasuitUnitFramesForUnitType_Array[i]
+        hasuitUnitFramesForUnitType[unitTable.unitType] = unitTable
+    end
+end
+
 hasuitUpdateAllUnitsForUnitType = {}
 
 hasuitFramesCenterNamePlateGUIDs = {}
@@ -313,7 +323,7 @@ do
             end)
         end
     end)
-    local function groupRosterUpdateFunction()
+    local function groupRosterUpdateFunction() --why wasn't group test function just changing local GetNumGroupMembers to return fake number and then doing this? for the part that's copied that looks like this at least, hasuitMakeTestGroupFrames
         local groupSize = GetNumGroupMembers()
         if groupSize == 0 then
             groupSize = 1
@@ -1067,13 +1077,15 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitDanCommonTopRightGroupDebuffs = nil
         hasuitDanCommonTopLeftArenaDebuffs = nil
         
+        
         hasuitLocal1 = nil --inaccessible from outside, todo
         
         hasuitLocal3 = nil
-        hasuitLocal4 = nil
+        
         hasuitLocal5 = nil
         hasuitLocal6 = nil
         hasuitLocal7 = nil
+        
         
         hasuitResetCooldowns = nil
         hasuitSetIconText = nil
@@ -1085,6 +1097,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitPlayerClass = nil
         hasuitSpecIsHealerTable = nil
         hasuitFrameTypeUpdateCount = nil
+        hasuitUnitFramesForUnitType_Array = nil
         hasuitUnitFramesForUnitType = nil
         hasuitStartCooldownTimerText = nil
         hasuitVanish96 = nil

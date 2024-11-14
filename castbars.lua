@@ -233,6 +233,7 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function() --useroptions stuff for posit
             fakeCastBar:SetScript("OnUpdate", nil)
         end
         hasuitCleanController(middleCastBarsController)
+        fakeCastBars = nil
         testCastBarsTimer = nil
     end
     local function updateControllerPosition()

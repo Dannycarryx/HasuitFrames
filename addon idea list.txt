@@ -6,6 +6,8 @@ enabling people to track their own abilities? might be the last thing before a r
 ability to disable some or all class specific abilities tracked for player to let people make their own setup easily
 clean this file up
 make a variable like d12 or d13 and set it for non-cleu so that people can initialize a spellname or spellid and have it not get ignored or however that works. should be able to use spellnames or spellids and not worry about it
+recommendation about /click d1-1 macros
+
 
 
 other important:
@@ -34,7 +36,6 @@ option to disable all in pve or whatever
 track healer dispel cds
 if alt f4ing player can log in and no group units will exist until after combat so have to do something to position buttons preemptively. for now you can reload after logging in and the game will give the correct numbers. eventually should make system for buttons always being in correct positions for different group sizes and then the preemptive thing would work itself out but that's (a lot?) more involved
 option to just have normal frames instead of click-through to move, option to disable targeting when frame is clicked and only move camera/player, rely on mouseover for spells and never target, more for pvers, option to enable/disable this depending on instancetype or groupsize?
-fix new 4/5 cd system. problem is cds reset when groupsize leaves 4 or 5. could be fixed more easily with a savedvariables system for remembering cooldowns for short logouts/reloads/unitframe hides and comes back?
 improve/figure out scale. whole system needs to be made for size stuff and idk what i'm doing with other people's screen sizes
 initialize(198034) --Divine Hammer, todo 1 Holy Power per sec, use same system as blessingofautumn for this?
 better display for forbearance. right now you can only see if forbearance is preventing an affected ability like lay on hands from being used on the paladin, not if it can't be used on teammate. Technically people will be able to add forbearance as a dot or something if they want but that's not ideal. maybe that's a better temporary solution for the main addon though too. idk
@@ -86,7 +87,7 @@ red leftover icon for lifeblooms that got stolen? since that still counts toward
 
 probably move stuff like spell reflect into same area as cc abilities for arena units
 
-
+should change priorities everywhere to not go into the negative to make things just a little less confusing
 
 
 

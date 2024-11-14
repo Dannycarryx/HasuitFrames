@@ -25,7 +25,6 @@ local groupColoredBackgroundMinimum
 local arenaColoredBackgroundMinimum
 
 
-local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
 local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
 local arenaUnitFrames = hasuitUnitFramesForUnitType["arena"]
 local changeUnitTypeColorBackgrounds
@@ -1872,7 +1871,7 @@ do
         danCurrentUnitTable = groupUnitFrames
         
         if playerRaidUnit then
-            if not UnitIsUnit(playerRaidUnit, "player") then --not totally sure what was going on or whether this fixed it, group test leaving gaps/putting things in weird places
+            if not UnitIsUnit(playerRaidUnit, "player") then --not totally sure what was going on or whether this fixed it, group test leaving gaps/putting things in weird places --pretty sure this fixed it
                 playerRaidUnit = "raid1"
             end
         else
@@ -1943,6 +1942,7 @@ do
                 -- frame.specialAuraInstanceIDsRemove = {}
             -- end
             if frame.hideTimer then
+                frame.hideTimer:Cancel()
                 hideTimerFinished(frame.hideTimer)
                 -- frame.specialAuraInstanceIDsRemove = {}
             end
@@ -2016,6 +2016,7 @@ do
         for i=1,#arenaUnitFrames do
             local frame = arenaUnitFrames[i]
             if frame.hideTimer then
+                frame.hideTimer:Cancel()
                 hideTimerFinished(frame.hideTimer)
             end
             hasuitUnitFrameForUnit["arena"..i] = nil 
@@ -2712,7 +2713,6 @@ do
         hasuitCleanController(icon.controller)
     end
     hasuitLocal3(danRecycleCooldownIcon)
-    hasuitLocal4(danRecycleCooldownIcon)
     local hasuitStartCooldownTimerText = hasuitStartCooldownTimerText
     local function cooldownOnCooldownDone(cooldown)
         local icon = cooldown.parentIcon
@@ -3273,23 +3273,26 @@ end
 
 function hideTimerFinished(timer)
     local frame = timer.frame
-    if frame.hideTimer then
-        frame.hideTimer = nil
-        if frame.updated ~= hasuitFrameTypeUpdateCount[frame.unitType] then --probably doesn't do anything anymore here
-            danHideUnitFrame2(frame)
-        else
-            print("hideTimerFinished(timer) 2")
-        end
+    frame.hideTimer = nil
+    if frame.updated ~= hasuitFrameTypeUpdateCount[frame.unitType] then --probably doesn't do anything anymore here
+        danHideUnitFrame2(frame)
+    -- else
+        -- print("hideTimerFinished(timer) 2")
     end
 end
+local hasuitUnitFramesForUnitType_Array = hasuitUnitFramesForUnitType_Array
 function danHideInactiveFrames()
-    for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do
-        for i=#unitTable,1,-1 do
-            local frame = unitTable[i]
+    -- for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do --not 100% sure this is worse. it probably is. will test some time
+    for i=1,#hasuitUnitFramesForUnitType_Array do
+        local unitTable = hasuitUnitFramesForUnitType_Array[i]
+        local unitType = unitTable.unitType --and not totally sure this is better than having a separate table to get correct unitType/keep hasuitUnitFramesForUnitType_Array a pure array. ^. could maybe keep .updated in this instead of hasuitFrameTypeUpdateCount
+        local updated = hasuitFrameTypeUpdateCount[unitType] --should unitType be replaced with the table it belongs to? no string "arena" just memory address of table arenaUnitFrames? idk would probably make it harder to follow for no good reason, although might be microscopically more efficient. also would be a lot of work switching things
+        for j=#unitTable,1,-1 do
+            local frame = unitTable[j] --frame should be renamed to unitFrame/unique name everywhere some time, except in controllers that can control multiple things like icon/castbar
             if frame.unitType~=unitType then
-                tremove(unitTable, i)
-            elseif frame.updated ~= hasuitFrameTypeUpdateCount[unitType] then
-                tremove(unitTable, i)
+                tremove(unitTable, j)
+            elseif frame.updated ~= updated then
+                tremove(unitTable, j)
                 frame.inspected = false
                 if frame.updatingColor then
                     frame.updatingColor = nil
@@ -3300,13 +3303,14 @@ function danHideInactiveFrames()
                     hasuitUnitFrameForUnit[unit] = nil
                 end
                 frame:Hide()
-                local hideTimer = C_Timer_NewTimer(10, hideTimerFinished)
+                local hideTimer = C_Timer_NewTimer(10, hideTimerFinished) --should check to see if there are too many frames made already maybe? if unimportant unit like raid21+, idk maybe just worse to check for that. The only way that'll happen atm (I think) is if leaving a big raid group and joining another, and especially if repeating that going to different raid groups multiple times within 10 sec. Is that worth caring about? maybe just instantly recycle units that don't exist when leaving anything bigger than a 10man raid or something, bored todo
                 frame.hideTimer = hideTimer
                 hideTimer.frame = frame
             end
         end
     end
 end
+
 local danRunAfterCombat = hasuitDoThis_AfterCombat
 function hasuitUpdateGroupRosterUnsafe()
     updatingGroupRoster = false

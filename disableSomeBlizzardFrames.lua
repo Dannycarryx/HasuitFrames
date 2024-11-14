@@ -61,7 +61,7 @@ tinsert(hasuitDoThis_Player_Login, function()
                 danDisableBlizzardUnitFrame2(CompactPartyFrameMember2)
                 danDisableBlizzardUnitFrame2(CompactPartyFrameMember3)
                 danDisableBlizzardUnitFrame2(CompactPartyFrameMember4)
-                danDisableBlizzardUnitFrame2(CompactPartyFrameMember5)
+                danDisableBlizzardUnitFrame2(CompactPartyFrameMember5) --maybe best to disable pet frames too?
                 danDisableBlizzardUnitFrame2(PartyFrame.MemberFrame1) --raid-style party frames turned off
                 danDisableBlizzardUnitFrame2(PartyFrame.MemberFrame2)
                 danDisableBlizzardUnitFrame2(PartyFrame.MemberFrame3)
@@ -78,6 +78,11 @@ tinsert(hasuitDoThis_Player_Login, function()
                 danDisableBlizzardUnitFrame2(CompactArenaFrameMember3)
                 danDisableBlizzardUnitFrame2(CompactArenaFrameMember4)
                 danDisableBlizzardUnitFrame2(CompactArenaFrameMember5)
+                danDisableBlizzardUnitFrame2(CompactArenaFramePet1)
+                danDisableBlizzardUnitFrame2(CompactArenaFramePet2)
+                danDisableBlizzardUnitFrame2(CompactArenaFramePet3)
+                danDisableBlizzardUnitFrame2(CompactArenaFramePet4)
+                danDisableBlizzardUnitFrame2(CompactArenaFramePet5) --maybe better to change cvar pvpOptionDisplayPets? raidOptionDisplayPets showArenaEnemyPets showPartyPets
                 danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame1)
                 danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame2)
                 danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame3)
@@ -85,6 +90,7 @@ tinsert(hasuitDoThis_Player_Login, function()
                 danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame5)
                 danDisableBlizzardUnitFrame2(CompactArenaFrame.PreMatchFramesContainer)
                 danDisableBlizzardUnitFrame2(CompactArenaFrameTitle)
+                danDisableBlizzardUnitFrame2(CompactArenaFrameBorderFrame)
             end
         end
         

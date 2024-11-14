@@ -27,4 +27,4 @@ UnitFrames2.lua
 UserOptions.lua
 disableSomeBlizzardFrames.lua
 testingExternalAddon.lua
-misc.lua
+temporary.lua

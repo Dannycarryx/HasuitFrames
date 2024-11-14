@@ -25,14 +25,18 @@ hasuitBlessingOfAutumnIgnoreList = { --how would this interact with time stop? o
     [31616]=true, --Nature's Guardian?, what about warlock spell lock vs actual pet cd?
 }
 
-local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
+
 local tinsert = tinsert
-local recycleCooldownIcon
-function hasuitLocal3(func)
-    recycleCooldownIcon = func
-end
 
 do --cooldowns loadon
+    
+    local hasuitUnitFramesForUnitType_Array = hasuitUnitFramesForUnitType_Array
+
+    local recycleCooldownIcon
+    function hasuitLocal3(func)
+        recycleCooldownIcon = func
+    end
+    
     local danDoThisOnUpdate = hasuitDoThis_OnUpdate
     local arenaCrowdControlSpellUpdateFrame = hasuitArenaCrowdControlSpellUpdateFrame
     hasuitArenaCrowdControlSpellUpdateFrame = nil
@@ -43,9 +47,10 @@ do --cooldowns loadon
     end)
     
     local function danRestoreCooldowns2()
-        for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do
-            for i=#unitTable,1,-1 do
-                danRestoreCooldowns1(unitTable[i])
+        for i=1,#hasuitUnitFramesForUnitType_Array do
+            local unitTable = hasuitUnitFramesForUnitType_Array[i]
+            for j=#unitTable,1,-1 do
+                danRestoreCooldowns1(unitTable[j])
             end
         end
     end
@@ -55,7 +60,7 @@ do --cooldowns loadon
     local loadOn = {}
     local function loadOnCondition()
         local instanceType = hasuitInstanceType
-        if hasuitGroupSize<=5 and (instanceType=="none" or instanceType=="arena" or instanceType=="party" or instanceType=="scenario") then --should load
+        if hasuitGroupSize<=5 and (instanceType=="none" or instanceType=="arena" or instanceType=="party" or instanceType=="scenario") then --should load, --hasuitGroupSize and hasuitInstanceType should probably both get set even from the other event happening, or put every loadOnCondition on a delay to make sure everything is always set correctly when there are checks for multiple things like this? I don't think this will actually break here but it could probably load and instantly unload or the other way around for no good reason
             if not loadOn.shouldLoad then
                 loadOn.shouldLoad = true
                 arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
@@ -70,9 +75,10 @@ do --cooldowns loadon
                 loadOn.shouldLoad = false
                 if hasuitCooldownDisplayActiveGroup then
                     arenaCrowdControlSpellUpdateFrame:UnregisterAllEvents()
-                    for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do --bored todo make hasuitUnitFramesForUnitType an array? with a pairs table as well
-                        for i=#unitTable,1,-1 do
-                            local frame = unitTable[i]
+                    for i=1,#hasuitUnitFramesForUnitType_Array do
+                        local unitTable = hasuitUnitFramesForUnitType_Array[i]
+                        for j=#unitTable,1,-1 do
+                            local frame = unitTable[j]
                             if frame.cooldownPriorities then
                                 for _, icon in pairs(frame.cooldownPriorities) do
                                     if icon.recycle then
@@ -143,8 +149,7 @@ do
     end
     
     
-    
-    
+
     local function cooldownGrow(controller)
         local u = controller.unitTypeStuff
         local xDirection = u["xDirection"]
@@ -157,35 +162,26 @@ do
         
         local frames = controller.frames
         sort(frames, controller.options["sort"])
-        for i=1, #frames do 
-            local icon = frames[i]
-            icon:SetPoint(ownPoint, setPointOn, targetPoint, currentXPlacement*xDirection, yOffset)
-            currentXPlacement = currentXPlacement+1+icon.size
-        end
-    end
-
-    local function cooldownGrowLimited(controller)
-        local u = controller.unitTypeStuff
-        local xDirection = u["xDirection"]
-        local yOffset = u["yOffset"]
-        local currentXPlacement = (xDirection+u["xOffset"])*xDirection
-        
-        local ownPoint = u["ownPoint"]
-        local setPointOn = controller.setPointOn
-        local targetPoint = u["targetPoint"]
         
         local limit = u["limit"]
-        
-        local frames = controller.frames
-        sort(frames, controller.options["sort"])
-        for i=1, #frames do 
-            local icon = frames[i]
-            if i<=limit then
+        if limit then
+            for i=1, #frames do 
+                local icon = frames[i]
+                if i<=limit then
+                    icon:SetPoint(ownPoint, setPointOn, targetPoint, currentXPlacement*xDirection, yOffset)
+                    currentXPlacement = currentXPlacement+1+icon.size
+                else
+                    icon:SetPoint(ownPoint, setPointOn, targetPoint, 0, -10000) --a lot easier than hiding cooldown text/managing icon opacity when showing it again/whatever else, can any problems come from the -10000 here? could it just be -1000000 or something and not make any difference?
+                end
+            end
+            
+        else
+            for i=1, #frames do 
+                local icon = frames[i]
                 icon:SetPoint(ownPoint, setPointOn, targetPoint, currentXPlacement*xDirection, yOffset)
                 currentXPlacement = currentXPlacement+1+icon.size
-            else
-                icon:SetPoint(ownPoint, setPointOn, targetPoint, 0, -10000) --a lot easier than hiding cooldown text/managing icon opacity when showing it again/whatever else
             end
+            
         end
     end
 
@@ -197,9 +193,9 @@ do
     hasuitDefensiveCooldowns={}
     hasuitInterruptCooldowns={}
     hasuitCrowdControlCooldowns={}
-    hasuitController_CooldownsControllers = {
+    hasuitController_CooldownsControllers = { --some stuff here gets changed around with hardcoded numbers when groupsize goes to 4/5, just below the end of this table
         { --trinket
-            ["grow"]=cooldownGrowLimited,
+            ["grow"]=cooldownGrow,
             ["sort"]=danSortCooldowns,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
@@ -208,7 +204,7 @@ do
         },
         
         { --defensive
-            ["grow"]=cooldownGrowLimited,
+            ["grow"]=cooldownGrow,
             ["sort"]=danSortCooldowns,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
@@ -217,7 +213,7 @@ do
         },
         
         { --interrupt
-            ["grow"]=cooldownGrowLimited,
+            ["grow"]=cooldownGrow,
             ["sort"]=danSortCooldowns,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
@@ -235,89 +231,68 @@ do
         },
     }
     
-    do
-        function hasuitLocal4(func)
-            recycleCooldownIcon = func
-        end
-        local function cleanController(controller)
-            if controller then
-                local frames = controller.frames
-                for i=1,#frames do
-                    local icon = frames[i]
-                    if icon.recycle then
-                        recycleCooldownIcon(icon)
-                    end
-                end
-            end
-        end
-        local danRestoreCooldowns
-        tinsert(hasuitDoThis_Addon_Loaded, function()
-            danRestoreCooldowns = hasuitRestoreCooldowns
-        end)
+    do --groupsize 4/5 changes
         local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
         local lastSize
+        local hasuitController_CooldownsControllers = hasuitController_CooldownsControllers
+        
         local trinketControllerOptions = hasuitController_CooldownsControllers[1]
         local defensiveControllerOptions = hasuitController_CooldownsControllers[2]
         local interruptControllerOptions = hasuitController_CooldownsControllers[3]
         local crowdControlControllerOptions = hasuitController_CooldownsControllers[4]
-        local trinketControllerOptionsGroupUnitTypeStuff = trinketControllerOptions["group"]
-        local defensiveControllerOptionsGroupUnitTypeStuff = defensiveControllerOptions["group"]
-        local interruptControllerOptionsGroupUnitTypeStuff = interruptControllerOptions["group"]
-        local crowdControlControllerOptionsGroupUnitTypeStuff = crowdControlControllerOptions["group"]
-        tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, function() --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size forgot about that, --todo make this more efficient interacting with the loadon condition, broke going from (fake) groupsize 5 to 3 i think? outside with test function into arena
-            local groupSize = hasuitGroupSize
-            if groupSize==4 or groupSize==5 then
-                if lastSize~=4 then
-                    lastSize = 4
-                    trinketControllerOptionsGroupUnitTypeStuff["xOffset"] = -5
-                    defensiveControllerOptionsGroupUnitTypeStuff["xOffset"] = -34
-                    defensiveControllerOptionsGroupUnitTypeStuff["limit"] = 5
-                    interruptControllerOptions["group"] = nil
-                    crowdControlControllerOptions["group"] = nil
+        
+        local trinketControllerOptions_GroupUnitTypeStuff = trinketControllerOptions["group"]
+        local defensiveControllerOptions_GroupUnitTypeStuff = defensiveControllerOptions["group"]
+        local interruptControllerOptions_GroupUnitTypeStuff = interruptControllerOptions["group"]
+        local crowdControlControllerOptions_GroupUnitTypeStuff = crowdControlControllerOptions["group"]
+        
+        tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, function() --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size, if doing that don't forget about yOffsets
+            local groupSize = hasuitGroupSize --doesn't matter: could be delayed or something. this will be active and changing things sometimes where cooldowns aren't even loaded like battlegrounds when group is forming or disbanding, or no1 is online and bg can't fill. Ideally just check the loadon variable for whether cooldowns are shown. could do that better if hasuitDoThis_Group_Roster_UpdateGroupSize_5 came before hasuitDoThis_Group_Roster_UpdateGroupSizeChanged. even better use new hasuitDoThis_GroupUnitFramesUpdate system too
+            if groupSize==4 or groupSize==5 then --bored todo cooldowns hidden by 4/5 system should really be disabled completely so they aren't using any resources, and reenabled to the correct time based on savedvariables system when that gets made. As is this is especially inefficient for m+/anything where groupsize is 4 or 5 and won't change
+                if lastSize~="fourOrFive" then
+                    lastSize = "fourOrFive"
+                    trinketControllerOptions_GroupUnitTypeStuff["xOffset"] = -5
+                    defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -34
+                    defensiveControllerOptions_GroupUnitTypeStuff["limit"] = 5
+                    interruptControllerOptions_GroupUnitTypeStuff["limit"] = 0
+                    crowdControlControllerOptions_GroupUnitTypeStuff["limit"] = 0
                     for i=1,#groupUnitFrames do
-                        local frame = groupUnitFrames[i]
-                        if not frame.cooldownsDisabled then
-                            local controller1 = frame.controllersPairs[trinketControllerOptions]
-                            if controller1 then
-                                hasuitSortController(controller1)
-                            end
-                            local controller2 = frame.controllersPairs[defensiveControllerOptions]
-                            if controller2 then
-                                hasuitSortController(controller2)
-                            end
-                            cleanController(frame.controllersPairs[interruptControllerOptions])
-                            cleanController(frame.controllersPairs[crowdControlControllerOptions])
-                        end
-                    end
-                end
-            elseif groupSize<4 then
-                if lastSize~=3 then
-                    lastSize = 3
-                    trinketControllerOptionsGroupUnitTypeStuff["xOffset"] = -44
-                    defensiveControllerOptionsGroupUnitTypeStuff["xOffset"] = -73
-                    defensiveControllerOptionsGroupUnitTypeStuff["limit"] = 7
-                    interruptControllerOptions["group"] = interruptControllerOptionsGroupUnitTypeStuff
-                    crowdControlControllerOptions["group"] = crowdControlControllerOptionsGroupUnitTypeStuff
-                    for i=1,#groupUnitFrames do
-                        local frame = groupUnitFrames[i]
-                        if not frame.cooldownsDisabled then
-                            if frame.cooldownPriorities then
-                                for _, icon in pairs(frame.cooldownPriorities) do --todo can break if arena units already set before group and test function is still active with 4-5 fake frames from outside, when joining arena, gonna try a simple fix on joining arena to clear fake frames
-                                    if icon.recycle then
-                                        recycleCooldownIcon(icon)
-                                    end
+                        local controllersPairs = groupUnitFrames[i].controllersPairs
+                        if controllersPairs then --shouldn't be needed?
+                            for j=1,#hasuitController_CooldownsControllers do
+                                local controller = controllersPairs[hasuitController_CooldownsControllers[j]]
+                                if controller then --shouldn't need this
+                                    hasuitSortController(controller)
                                 end
-                                frame.cooldowns = {}
-                                frame.cooldownOptions = {}
-                                frame.cooldownPriorities = {}
-                                frame.cooldownsDisabled = true
-                                danRestoreCooldowns(frame)
                             end
                         end
                     end
                 end
+                
+            elseif groupSize<4 then
+                if lastSize~="threeOrLess" then
+                    lastSize = "threeOrLess"
+                    trinketControllerOptions_GroupUnitTypeStuff["xOffset"] = -44 --will need to be changed some when cooldowns get updated to allow more customization, but that might be a while from now
+                    defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -73
+                    defensiveControllerOptions_GroupUnitTypeStuff["limit"] = 7
+                    interruptControllerOptions_GroupUnitTypeStuff["limit"] = 1
+                    crowdControlControllerOptions_GroupUnitTypeStuff["limit"] = nil
+                    for i=1,#groupUnitFrames do
+                        local controllersPairs = groupUnitFrames[i].controllersPairs
+                        if controllersPairs then
+                            for j=1,#hasuitController_CooldownsControllers do
+                                local controller = controllersPairs[hasuitController_CooldownsControllers[j]]
+                                if controller then
+                                    hasuitSortController(controller) --controller:sortController() ?
+                                end
+                            end
+                        end
+                    end
+                end
+                
             else
                 lastSize = nil
+                
             end
         end)
     end
@@ -382,19 +357,19 @@ do
         
         do --shouldTrackUndead
             local playerClass = hasuitPlayerClass
-            if playerClass=="PRIEST" or playerClass=="WARLOCK" or playerClass=="EVOKER" or playerClass=="WARRIOR" or playerClass=="DEMONHUNTER" then --todo or playerClass=="MONK" if playing sleep
+            if playerClass=="PRIEST" or playerClass=="WARLOCK" or playerClass=="EVOKER" or playerClass=="WARRIOR" or playerClass=="DEMONHUNTER" then --todo or playerClass=="MONK" if playing sleep, if updating for classic might need to add hunter here for wyvern, and preferrably only if actually playing wyvern. Is anything missing?
                 hasuitTrackedRaceCooldowns["Scourge"] = true --undead
                 trinketCooldowns["Scourge"]={
-                    {cdCleR, ["spellId"]=7744,["priority"]=-9,  ["duration"]=120,--Will of the Forsaken, --gets initialized at the bottom of the file the same way as a hasuitSetupSpellOptions, along with everything else that looks like this
+                    {cdCleR, ["spellId"]=7744,["priority"]=-9,  ["duration"]=120,--Will of the Forsaken, --gets initialized at the bottom of the file the same way as a hasuitSetupSpellOptions, along with everything else that looks like this. the point here is that trinket icon only shows 1 spell max at a time, and don't want will of the forsaken to take that spot if player doesn't care as much about it. example: if player is a warlock then real pvp trinket will show next to arena frames if it's off-cooldown and usable, but if it's on cooldown and will of the forsaken is usable then the icon will show will of the forsaken instead. Or whichever of the 2 will be available first. It works like that for human racial too but I figure every class cares about being able to remove stuns, and only some care about being able to remove fears/sleeps/charms. ps you can Will sleep walk right?
                         ["minimumDuration"]=30,["differenceFromNormalDuration"]=-90},
                 }
                 
             else
-                hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedRacialNotTrackedAffectingPvpTrinket,["loadOn"]=hasuitLoadOn_CooldownDisplay, --Will of the Forsaken
+                hasuitSetupSpellOptions = {hasuitSpellFunction_CleuAppliedRacialNotTrackedAffectingPvpTrinket,["loadOn"]=hasuitLoadOn_CooldownDisplay, --Will of the Forsaken --the point is player doesn't care as much about will but still wants to see its effect on real trinket's cd if used
                     ["minimumDuration"]=30,["differenceFromNormalDuration"]=-90}
                 initialize(7744) --Will of the Forsaken
                 
-            end
+            end --ps there's a known bug (i know about it at least) with dwarf/darkiron being able to get 90 sec trinket cds as a dps but i'm not going to bother coding that into the addon. hopefully blizzard fixes it some time
         end
     end
     
