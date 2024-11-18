@@ -877,13 +877,15 @@ initialize(55342)   --Mirror Image
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=60,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,}
 initialize(209426)  --Darkness --todo make a timer for stuff like this barrier and beam etc, like normal aura icons
-initialize(145629) --Anti-Magic Zone
 initialize(81782) --Power Word: Barrier
 initialize(354704) --Grove Protection
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=62,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,}
-initialize(201633)  --Earthen Wall
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=61,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,}
 initialize(212640)  --Mending Bandage
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=62,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,}
+initialize(201633)  --Earthen Wall
+initialize(145629) --Anti-Magic Zone
 
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=65,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
@@ -955,8 +957,10 @@ initialize(377088) --Rush of Vitality
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=105,               ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
 initialize(205655) --Dome of Mist
 initialize(353503) --Counteract Magic
-initialize(97463) --Rallying Cry
 -- initialize(33891) --Incarnation: Tree of Life, todo show timer of 117679 somehow, could do something like icon turns red if actual tree is missing but incarn is up, todo show which is the main 30 sec duration and which is a proc?
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=106,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommonTopLeftGroup,["arena"]=danCommonTopRightArena,} 
+initialize(97463) --Rallying Cry, should this be party only? todo stuff like this and earthen should show on the player that cast it in groupsize>5, just not spam 20 frames at once
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=107,               ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
 initialize(17) --Power Word: Shield
@@ -1344,7 +1348,7 @@ initializeMulti(342938) --Unstable Affliction cast arena
 initializeMulti(316099) --Unstable Affliction cast arena
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCasting,             ["priority"]=-74,               ["group"]=danCommonTopRightGroupDebuffs[3],     } --special cast-only priority_0 for unstable affliction, smaller but higher priority todo?: should be less important for people who have no ability to dispel it, but maybe hard to get that exactly right and keep it right over time
-initialize(342938) --Unstable Affliction cast group
+initialize(342938) --Unstable Affliction cast group --not sure what happened but i saw 2 of these from 1 lock? these are unique spellids though. I added both because a ua didn't show once before. Not sure what's up with this. It didn't show 2 of other casts from that lock. It didn't even show 2 uas every time
 initialize(316099) --Unstable Affliction cast group, todo guess target based on combat log and show even when unit not seen. could base target on what was more recent between a cleu event or a unit_target event to try to guess focus casts? not perfect, but ya knowing a ua is coming in an rbg is especially important
 
 
@@ -1517,7 +1521,7 @@ initialize(343527) --Execution Sentence
 initialize(208086) --Colossus Smash
 -- initialize("Warbreaker") --? seems like the debuff for this is colossus smash? but the cast/damage is named this
 initialize(397364) --Thunderous Roar
-initialize(356995) --Disintegrate
+initialize(356995) --Disintegrate --todo somehow this bugged and showed on the evoker that cast it instead of on the right target, and then didn't clear until arena was over. The disintegrate was from arena1 and it was on player, also auto-target from the disintegrate from no target
 initialize(198590) --Drain Soul
 initialize(234153) --Drain Life
 initialize(117952) --Crackling Jade Lightning --does this belong here?
@@ -1578,6 +1582,7 @@ initialize(27243) --Seed of Corruption
 initialize(411038) --Sphere of Despair
 initialize(164812) --Moonfire
 initialize(164815) --Sunfire
+initialize(403695) --Truth's Wake
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=270,                   ["group"]=danCommonTopRightGroupDebuffs[5], ["arena"]=danCommonTopLeftArenaDebuffs[5],} --todo 370817 shocking disclosure preventing vanish/meld?
 initialize(1079) --Rip
@@ -1594,6 +1599,7 @@ initialize(115994) --Unholy Blight
 initialize(124280) --touch of karma dot
 initialize(434473) --Bombardments, maybe should be higher?
 initialize(441172) --Melt Armor, from deep breath, dot+20 damage from dev evoker's essences/bombardments?
+initialize(431380) --Dawnlight
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=271,                   ["group"]=danCommonTopRightGroupDebuffs[5], ["arena"]=danCommonTopLeftArenaDebuffs[5],}
 initialize(353759) --deep breath dot

@@ -49,6 +49,8 @@ function hasuitGetCastBar() --bored todo migrate danGetIcon to be with this in a
 end
 hasuitMiddleCastBarsAllowChannelingForSpellId = { --should this be an ignore list instead?
     [20578]=true,   --Cannibalize
+    [357208]=true,  --Fire Breath
+    [382266]=true,  --Fire Breath
     [359073]=true,  --Eternity Surge
     [382411]=true,  --Eternity Surge
     [396286]=true,  --Upheaval

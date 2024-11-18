@@ -93,7 +93,10 @@ initialize(391889)  --Adaptive Swarm dot
 
 
 
-
+-- hasuitFramesCenterSetEventType("cleu")
+-- hasuitSetupSpellOptions = {hasuitTempSwiftmend}
+-- initialize(18562)
+-- hasuitFramesCenterSetEventType("aura")
 
 
 

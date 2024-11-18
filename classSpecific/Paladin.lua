@@ -83,7 +83,6 @@ initialize(25771)   --Forbearance
 
 
 --------------------------------dots/debuffs from you, shown bottom left on enemy frames, subject to change
--- hasuitSetupSpellOptions = hasuitDots_
--- initialize(1111)    --
-
---wake of ashes dot might be worth dispelling? not sure, truth's wake
+hasuitSetupSpellOptions = hasuitDots_
+initialize(431380)  --Dawnlight
+initialize(403695)  --Truth's Wake

@@ -113,7 +113,38 @@ end
 
 
 
-
+--[[
+do --hasuitTempSwiftmend
+    local hasuitDoThis_OnUpdate = hasuitDoThis_OnUpdate
+    local GetSpellCooldown = C_Spell.GetSpellCooldown
+    local GetTickTime = GetTickTime
+    local GetTime = GetTime --gonna test stuff like this, whether it makes any difference. Doubt it does
+    local format = format
+    local print = print
+    local hasuitPlayerGUID = hasuitPlayerGUID
+    local function hasuitTempSwiftmend2()
+        local asd = GetSpellCooldown("Swiftmend")
+        if asd then
+            -- local swiftmendCdTime = GetTickTime()-0.005+asd["duration"]+asd["startTime"]-GetTime() --oh this is the same thing as cds being ~0.0167 inaccurate? or not. what's up with this not just being 15?
+            -- if swiftmendCdTime>15 then
+                -- swiftmendCdTime = 15
+            -- end
+            local swiftmendCdTime = asd["duration"]+asd["startTime"]-GetTime()
+            print("Swiftmend cd: "..format("%.2f", swiftmendCdTime))
+        end
+    end
+    function hasuitTempSwiftmend()
+        if d4anCleuSourceGuid==hasuitPlayerGUID then
+            if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
+                hasuitDoThis_OnUpdate(hasuitTempSwiftmend2)
+            end
+        end
+    end
+    C_Timer_After(0, function()
+        hasuitTempSwiftmend = nil
+    end)
+end
+--]]
 
 
 local pveAuraSpellOptions
