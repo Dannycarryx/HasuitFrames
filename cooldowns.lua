@@ -470,8 +470,8 @@ do
                 {cdCle2,["spellId"]=203651, ["priority"]=22,    ["duration"]=60},--Overgrowth
                 -- {cleAurR,["spellId"]=132158,["priority"]=23, ["duration"]=60},--Nature's Swiftness, todo -12 sec? can tell if 35% talent is taken from points
                 -- {cdCle2,["spellId"]=18562,   ["priority"]=24,    ["duration"]=15},--Swiftmend
-                {cdCle2,["spellId"]=102693, ["priority"]=25,    ["duration"]=20, --Grove Guardians, todo? there's a -3 sec talent
-                    ["charges"]=3},
+                -- {cdCle2,["spellId"]=102693, ["priority"]=25,    ["duration"]=20, --Grove Guardians, todo? there's a -3 sec talent
+                    -- ["charges"]=3},
                 {cdCle1,["spellId"]=102342, ["priority"]=28,    ["duration"]=90},--Ironbark
             }
             

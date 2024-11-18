@@ -1341,10 +1341,10 @@ local function initializeController(controllerOptions)
         end
     end
     
-    if controllerOptions["controlsOther"] then
-        local controller2 = danCurrentFrame.controllersPairs[controllerOptions["controlsOther"]]
+    if controllerOptions["pushesOtherController"] then
+        local controller2 = danCurrentFrame.controllersPairs[controllerOptions["pushesOtherController"]]
         if not controller2 then
-            controller.controller2 = initializeController(controllerOptions["controlsOther"])
+            controller.controller2 = initializeController(controllerOptions["pushesOtherController"])
         else
             controller.controller2 = controller2
         end
@@ -3750,7 +3750,7 @@ do
         if sourceGUID~=hasuitPlayerGUID then
         -- if sourceGUID==hasuitPlayerGUID then
             -- if not hasuitPlayerFrame.arenaNumber then
-                -- hasuitPlayerFrame.arenaNumber = 1
+                -- hasuitPlayerFrame.arenaNumber = 5
             -- end
             local sourceCastTable = activeCasts[sourceGUID]
             if sourceCastTable and sourceCastTable.middleCastBar then --game sends startcasting events for the same unit while already casting so this is needed

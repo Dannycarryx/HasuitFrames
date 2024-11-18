@@ -1,5 +1,6 @@
 
-do --Thanks to Ghost from WoWUIDev discord for helping figure out why GetCurrentEventID wasn't working on test wow client --wouldn't have made things like this if i knew GetCurrentEventID() relied on scriptProfile. This solution is kind of awful but the cvar requirement will get removed soon tm so it kind of makes sense to just force a reload asap regardless of anything else until then. A huge amount of testing has been done with the current system and seems like things work fine, so cba changing the way it works for now. Maybe Blizzard could update things and make a separate cvar that GetCurrentEventID relies on that follows whatever scriptProfile gets set to unless specifically changed? Or have some way of watching for events from any unit without needing to worry about being inefficient with duplicates, like ideally register an event for any unitguid, then it gives the unitguid as a payload and only fires once, and then you can registerunitGUIDevent if you want and not have to go way out of your way to keep track of something like raid2 changed to raid3. tracking units like they're the only thing that matters is so dumb because then you can't follow specific things that happened like that unit has things on cooldown like barkskin/skull bash, or something like a chaos bolt is inc on that unit. Tracking things based on unitGUID instead of unit is also just way more efficient because you can set a bunch of things for a frame like unit class/color/spec etc (very long list that should include auras and mostly get rid of full aura updates, unithealth etc) and then not care that their unit token changed from raid2 to raid3. Make it happen @Blizzard
+do --Thanks to Ghost from WoWUIDev discord for helping figure out why GetCurrentEventID wasn't working on test wow client --wouldn't have made things like this if i knew GetCurrentEventID() relied on scriptProfile. This solution is kind of awful but the cvar requirement will get removed soon tm so it kind of makes sense to just force a reload asap regardless of anything else until then. A huge amount of testing has been done with the current system and seems like things work fine, so cba changing the way it works for now. Maybe Blizzard could update things and make a separate cvar that GetCurrentEventID relies on that follows whatever scriptProfile gets set to unless specifically changed? Or have some way of watching for events from any unit without needing to worry about being inefficient with duplicates, like ideally register an event for any unitguid, then it gives the unitguid as a payload and only fires once, and then you can registerunitGUIDevent if you want and not have to go way out of your way to keep track of something like raid2 changed to raid3. tracking units like they're the only thing that matters is so dumb because then you can't follow specific things that happened like that unit has things on cooldown like barkskin/skull bash, or something like a chaos bolt is inc on that unit. Tracking things based on unitGUID instead of unit is also just way more efficient because you can set a bunch of things for a frame like unit class/color/spec etc (very long list that should include auras and mostly get rid of full aura updates, unithealth etc) and then not care that their unit token changed from raid2 to raid3
+    local print = print
     local SetCVar = C_CVar.SetCVar
     local GetCVar = C_CVar.GetCVar
     local asd = GetCVar("scriptProfile")~="1"
@@ -48,7 +49,8 @@ do --Thanks to Ghost from WoWUIDev discord for helping figure out why GetCurrent
                 
                 local reload = C_UI.Reload
                 local function forcedReloadFunction()
-                    hasuitSavedVariables["scriptProfileMessage"] = "HasuitFrames caused the reload to change cvar scriptProfile to 1. Without this the addon would not work. This requirement will be removed in the future."
+                    -- hasuitSavedVariables["scriptProfileMessage"] = "HasuitFrames reloaded to change cvar scriptProfile to 1. Without this the addon would not work. This requirement will be removed in the future."
+                    hasuitSavedVariables["scriptProfileMessage"] = "HasuitFrames reloaded to change cvar scriptProfile to 1."
                     SetCVar("scriptProfile", "1")
                     reloadButton:SetScript("OnClick", nil)
                     reloadButton:SetScript("OnKeyDown", nil)
@@ -72,9 +74,17 @@ do --Thanks to Ghost from WoWUIDev discord for helping figure out why GetCurrent
             print(scriptProfileMessage)
             hasuitSavedVariables["scriptProfileMessage"] = nil
             
+            
             if hasuitSavedVariables["repeatWelcomeMessage"] then
-                print(hasuitSavedVariables["repeatWelcomeMessage"])
-                hasuitSavedVariables["repeatWelcomeMessage"] = nil
+                
+                local C_Timer_After = C_Timer.After
+                hasuitDoThis_OnUpdate(function()
+                    C_Timer_After(0, function()
+                        print(hasuitSavedVariables["repeatWelcomeMessage"])
+                        hasuitSavedVariables["repeatWelcomeMessage"] = nil
+                    end)
+                end)
+                
             end
             
         end
@@ -85,7 +95,7 @@ do --Thanks to Ghost from WoWUIDev discord for helping figure out why GetCurrent
         danFrame:SetScript("OnEvent", function()
             if GetCVar("scriptProfile")~="1" then
                 if not hasuitSavedVariables["scriptProfileMessage"] then
-                    hasuitSavedVariables["scriptProfileMessage"] = "HasuitFrames set cvar scriptProfile to 1"
+                    hasuitSavedVariables["scriptProfileMessage"] = "HasuitFrames changed cvar scriptProfile to 1"
                 end
                 SetCVar("scriptProfile", "1")
             end

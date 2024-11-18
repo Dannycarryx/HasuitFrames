@@ -1,37 +1,50 @@
 if hasuitPlayerClass~="DEATHKNIGHT" then
 	return
 end
-
-hasuitDiminishSpellOptionsTable["stun"] = { --available dr types: stun, fear, root, sheep, silence, disarm, showing more than 4 isn't a good idea for now
-	["arena"] = 1, --position of the icon on arena frames, right to left
-	["texture"] = 538558, --Asphyxiate
-}
-hasuitDiminishSpellOptionsTable["silence"] = {
-	["arena"] = 2,
-	["texture"] = 136214, --Strangulate
-}
-hasuitDiminishSpellOptionsTable["disorient"] = {
-	["arena"] = 3,
-	["texture"] = 135836, --Blinding Sleet
-}
-hasuitDiminishSpellOptionsTable["root"] = { --to hide a DR you can remove it here, just don't leave a gap on ["arena"] = x, if you remove 3 then change the next one's ["arena"] = 4 to 3 etc
-	["arena"] = 4,
-	["texture"] = 135842, --Deathchill
-}
-
-
-
-
-hasuitSetupSpellOptions = hasuitFramesSpellOptionsClassSpecificHarmful --dots/debuffs from you, shown bottom left on enemy frames
-hasuitFramesInitialize(1111)
+local initialize = hasuitFramesInitialize
+local trackDiminishTypeAndTexture = hasuitFramesTrackDiminishTypeAndTexture
 
 
 
 
 
 
+--Diminishing returns, goes in order right to left on arena frames, available DR types: stun, disorient, root, incapacitate, silence, disarm
+trackDiminishTypeAndTexture("stun", 538558) --Asphyxiate
+trackDiminishTypeAndTexture("silence", 136214) --Strangulate
+trackDiminishTypeAndTexture("disorient", 135836) --Blinding Sleet, you can add/delete or move drs around depending on what you want, just copy paste a line with the values you want, or remove the whole line for whatever you don't want to track
+trackDiminishTypeAndTexture("root", 135842) --Deathchill, you can put a spell name in quotes instead of the number as long as it's in your spellbook. capitalization matters. example: trackDiminishTypeAndTexture("stun", "Mighty Bash"), if using a number here it needs to be the spell texture, not a spellId
 
 
-hasuitSetupSpellOptions = hasuitFramesSpellOptionsClassSpecificHelpful --hots/buffs from you, shown bottom right on friendly frames
-hasuitFramesInitialize(1111)
+--todo more dk dots maybe?
+
+
+
+-- hots from you are shown bottom right on friendly frames
+
+--------------------------------hots 1
+hasuitSetupSpellOptions = hasuitHots_1
+initialize(48707)  --Anti-Magic Shell, these show top-left already
+initialize(410358)  --Anti-Magic Shell external
+
+
+
+--------------------------------hots 2
+hasuitSetupSpellOptions = hasuitHots_2
+initialize(444741)  --Anti-Magic Shell external, guardian?
+initialize(454863)  --Lesser Anti-Magic Shell?
+
+
+--end hots
+
+
+
+
+
+
+
+--------------------------------dots/debuffs from you, shown bottom left on enemy frames, subject to change
+hasuitSetupSpellOptions = hasuitDots_
+initialize(194310)    --Festering Wound
+
 

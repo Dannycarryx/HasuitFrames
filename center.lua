@@ -568,6 +568,7 @@ local function mainLoadOnFunction()
         end
     end
 end
+hasuitMainLoadOnFunction = mainLoadOnFunction
 local GetTime = GetTime
 local lastTime
 local danPriorityOnUpdate = hasuitDoThis_OnUpdatePosition1
@@ -689,6 +690,7 @@ hasuitTrackedDiminishSpells = {
 }
 
 do
+    local print = print
     local GetSpellTexture = C_Spell.GetSpellTexture
     local diminishOptionsTable = hasuitDiminishSpellOptionsTable
     local drCount = 0
@@ -929,9 +931,6 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitFramesCenterSetDrType = nil
         hasuitFramesInitializePlusDiminish = nil
         
-        hasuitFramesSpellOptionsClassSpecificHarmful = nil
-        hasuitFramesSpellOptionsClassSpecificHelpful = nil
-        
         
         hasuitLoadOn_EnablePve = nil
         hasuitLoadOn_InstanceTypeNone = nil
@@ -1046,6 +1045,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitSortController = nil
         hasuitAddToSeparateController = nil
         
+        
         hasuitController_TopRight_TopRight = nil
         hasuitController_TopLeft_TopLeft = nil
         hasuitController_TopLeft_TopRight = nil
@@ -1054,11 +1054,28 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitController_BottomRight_BottomLeft = nil
         hasuitController_Middle_Middle = nil
         
-        hasuitController_BottomRight_BottomRight = nil
-        hasuitController_BottomLeft_BottomLeft = nil
-        
         -- hasuitController_Separate_UpperScreenCastBars = nil
         hasuitController_CooldownsControllers = nil
+        
+        -- hasuitController_BottomRight_BottomRight = nil
+        
+        hasuitController_Hots1_BottomRight_BottomRight = nil
+        hasuitController_Hots2_BottomRight_BottomRight = nil
+        hasuitController_Hots3_BottomRight_BottomRight = nil
+        hasuitController_Hots4_BottomRight_BottomRight = nil
+        hasuitController_Hots5_BottomRight_BottomRight = nil
+        hasuitController_Hots6_BottomRight_BottomRight = nil
+        hasuitHots_1 = nil
+        hasuitHots_2 = nil
+        hasuitHots_3 = nil
+        hasuitHots_4 = nil
+        hasuitHots_5 = nil
+        hasuitHots_6 = nil
+        
+        hasuitController_BottomLeft_BottomLeft = nil
+        hasuitDots_ = nil
+        
+        
         
         hasuitBigRedMiddleCastBarsSpellOptions = nil
         hasuitGreenishDefensiveMiddleCastBarsSpellOptions = nil
@@ -1104,6 +1121,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitVanish120 = nil
         hasuitNpcIds = nil
         hasuitMainLoadOnFunctionSpammable = nil
+        hasuitMainLoadOnFunction = nil
         hasuitUnitAuraIsFullUpdate = nil
         
         hasuitCooldownTextFonts = nil

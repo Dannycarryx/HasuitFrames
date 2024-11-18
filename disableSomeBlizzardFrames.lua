@@ -10,6 +10,7 @@ tinsert(hasuitDoThis_Player_Login, function()
     local userOptionsOnChanged = hasuitUserOptionsOnChanged
     
     
+    local print = print
     local function printAboutReloading()
         print("hiding blizzard frames requires reload")
     end
@@ -43,7 +44,7 @@ tinsert(hasuitDoThis_Player_Login, function()
         local function hookScriptFunction(frame)
             frame:UnregisterAllEvents()
         end
-        local function danDisableBlizzardUnitFrame2(frame)
+        local function danDisableBlizzardUnitFrame(frame)
             if type(frame)=="table" then
                 if not frame.danSeen then
                     frame.danSeen = true
@@ -57,45 +58,45 @@ tinsert(hasuitDoThis_Player_Login, function()
         if hideBlizzardParty then
             local PartyFrame = PartyFrame
             if type(PartyFrame)=="table" then
-                danDisableBlizzardUnitFrame2(CompactPartyFrameMember1) --raid-style party frames turned on
-                danDisableBlizzardUnitFrame2(CompactPartyFrameMember2)
-                danDisableBlizzardUnitFrame2(CompactPartyFrameMember3)
-                danDisableBlizzardUnitFrame2(CompactPartyFrameMember4)
-                danDisableBlizzardUnitFrame2(CompactPartyFrameMember5) --maybe best to disable pet frames too?
-                danDisableBlizzardUnitFrame2(PartyFrame.MemberFrame1) --raid-style party frames turned off
-                danDisableBlizzardUnitFrame2(PartyFrame.MemberFrame2)
-                danDisableBlizzardUnitFrame2(PartyFrame.MemberFrame3)
-                danDisableBlizzardUnitFrame2(PartyFrame.MemberFrame4)
-                danDisableBlizzardUnitFrame2(PartyFrame)
+                danDisableBlizzardUnitFrame(CompactPartyFrameMember1) --raid-style party frames turned on
+                danDisableBlizzardUnitFrame(CompactPartyFrameMember2)
+                danDisableBlizzardUnitFrame(CompactPartyFrameMember3)
+                danDisableBlizzardUnitFrame(CompactPartyFrameMember4)
+                danDisableBlizzardUnitFrame(CompactPartyFrameMember5) --todo best to disable pet frames too? and anything else still getting events
+                danDisableBlizzardUnitFrame(PartyFrame.MemberFrame1) --raid-style party frames turned off
+                danDisableBlizzardUnitFrame(PartyFrame.MemberFrame2)
+                danDisableBlizzardUnitFrame(PartyFrame.MemberFrame3)
+                danDisableBlizzardUnitFrame(PartyFrame.MemberFrame4)
+                danDisableBlizzardUnitFrame(PartyFrame)
             end
         end
         
         if hideBlizzardArena then
-            local CompactArenaFrame = CompactArenaFrame --do not disable this frame. Some arena events stop working and there's no fix for it other than to leave this frame untouched. You can't even try to unregister events and then reregister the specific ones that break
-            if type(CompactArenaFrame)=="table" then --todo check to see if some frames are still getting events here, like debuff frames/castbars etc, maybe slight performance gain available
-                danDisableBlizzardUnitFrame2(CompactArenaFrameMember1)
-                danDisableBlizzardUnitFrame2(CompactArenaFrameMember2)
-                danDisableBlizzardUnitFrame2(CompactArenaFrameMember3)
-                danDisableBlizzardUnitFrame2(CompactArenaFrameMember4)
-                danDisableBlizzardUnitFrame2(CompactArenaFrameMember5)
-                danDisableBlizzardUnitFrame2(CompactArenaFramePet1)
-                danDisableBlizzardUnitFrame2(CompactArenaFramePet2)
-                danDisableBlizzardUnitFrame2(CompactArenaFramePet3)
-                danDisableBlizzardUnitFrame2(CompactArenaFramePet4)
-                danDisableBlizzardUnitFrame2(CompactArenaFramePet5) --maybe better to change cvar pvpOptionDisplayPets? raidOptionDisplayPets showArenaEnemyPets showPartyPets
-                danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame1)
-                danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame2)
-                danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame3)
-                danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame4)
-                danDisableBlizzardUnitFrame2(CompactArenaFrame.StealthedUnitFrame5)
-                danDisableBlizzardUnitFrame2(CompactArenaFrame.PreMatchFramesContainer)
-                danDisableBlizzardUnitFrame2(CompactArenaFrameTitle)
-                danDisableBlizzardUnitFrame2(CompactArenaFrameBorderFrame)
+            local CompactArenaFrame = CompactArenaFrame --do not disable this frame. Some arena events stop working and there's no fix for it other than to leave this frame untouched. You can't even try to unregister events and then reregister the specific ones that break, although could maybe surgically unregister everything except the ones that break, or some things at least, by trial and error
+            if type(CompactArenaFrame)=="table" then --todo check to see if some frames are still getting events, like debuff frames/castbars etc
+                danDisableBlizzardUnitFrame(CompactArenaFrameMember1)
+                danDisableBlizzardUnitFrame(CompactArenaFrameMember2)
+                danDisableBlizzardUnitFrame(CompactArenaFrameMember3)
+                danDisableBlizzardUnitFrame(CompactArenaFrameMember4)
+                danDisableBlizzardUnitFrame(CompactArenaFrameMember5)
+                danDisableBlizzardUnitFrame(CompactArenaFramePet1)
+                danDisableBlizzardUnitFrame(CompactArenaFramePet2)
+                danDisableBlizzardUnitFrame(CompactArenaFramePet3)
+                danDisableBlizzardUnitFrame(CompactArenaFramePet4)
+                danDisableBlizzardUnitFrame(CompactArenaFramePet5) --maybe better to change cvar pvpOptionDisplayPets? raidOptionDisplayPets showArenaEnemyPets showPartyPets, todo? Not a fan of changing things that don't change back after uninstalling the addon, like scriptProfile. maybe there should be a small uninstall addon that just sets everything back the way it was. That might be good to just go ahead and change a bunch of stuff. The addon should also keep track of things changed while addon is installed and change back to things appropriately if uninstalling.
+                danDisableBlizzardUnitFrame(CompactArenaFrame.StealthedUnitFrame1)
+                danDisableBlizzardUnitFrame(CompactArenaFrame.StealthedUnitFrame2)
+                danDisableBlizzardUnitFrame(CompactArenaFrame.StealthedUnitFrame3)
+                danDisableBlizzardUnitFrame(CompactArenaFrame.StealthedUnitFrame4)
+                danDisableBlizzardUnitFrame(CompactArenaFrame.StealthedUnitFrame5)
+                danDisableBlizzardUnitFrame(CompactArenaFrame.PreMatchFramesContainer)
+                danDisableBlizzardUnitFrame(CompactArenaFrameTitle)
+                danDisableBlizzardUnitFrame(CompactArenaFrameBorderFrame)
             end
         end
         
         if hideBlizzardRaid then
-            UIParent:UnregisterEvent("GROUP_ROSTER_UPDATE")
+            UIParent:UnregisterEvent("GROUP_ROSTER_UPDATE") --might break blizzard party frames if player is trying to track those but hide raid frames?
             local CompactRaidFrameContainer = CompactRaidFrameContainer
             if type(CompactRaidFrameContainer)=="table" then
                 local groupMode = CompactRaidFrameContainer.groupMode
@@ -106,7 +107,7 @@ tinsert(hasuitDoThis_Player_Login, function()
                             local frame = flowFrames[i]
                             if type(frame)=="table" then
                                 if frame.optionTable then
-                                    danDisableBlizzardUnitFrame2(frame)
+                                    danDisableBlizzardUnitFrame(frame)
                                 end
                             end
                         end
@@ -121,7 +122,7 @@ tinsert(hasuitDoThis_Player_Login, function()
                                     local frame = memberUnitFrames[i]
                                     if type(frame)=="table" then
                                         if frame.optionTable then
-                                            danDisableBlizzardUnitFrame2(frame)
+                                            danDisableBlizzardUnitFrame(frame)
                                         end
                                     end
                                 end
@@ -132,7 +133,7 @@ tinsert(hasuitDoThis_Player_Login, function()
                     -- hasuitDoThis_EasySavedVariables("groupMode: "..tostring(groupMode)) --can be nil sometimes
                 end
                 
-                danDisableBlizzardUnitFrame2(CompactRaidFrameContainer)
+                danDisableBlizzardUnitFrame(CompactRaidFrameContainer)
                 
                 -- local danDoThisOnUpdate = hasuitDoThis_OnUpdate
                 -- hooksecurefunc("CompactUnitFrame_OnLoad", function(frame)
@@ -146,7 +147,7 @@ tinsert(hasuitDoThis_Player_Login, function()
             end
         end
         for i=1,#ignoredFramesList do
-            ignoredFramesList[i].danSeen = nil --freeing microscopic amount of memory/making frames the way they were before in case there are any pairs( things that go on them that could break from this still being there. .danSeen probably does nothing to begin with but definitely nothing after this
+            ignoredFramesList[i].danSeen = nil --making frames the way they were before in case there are any pairs( things that go on them that could break from this still being there. .danSeen probably does nothing to begin with but definitely nothing after this
         end
     end
 end) --ps no frame for arenapet15?

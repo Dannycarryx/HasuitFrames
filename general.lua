@@ -93,23 +93,22 @@ local loadOnNotArenaOnly = hasuitLoadOn_NotArenaOnly
 
 
 
-local normalGrow = hasuitNormalGrow
-local danSort = hasuitSort
+local hasuitNormalGrow = hasuitNormalGrow
+local hasuitSort = hasuitSort
 
 
-hasuitController_TopRight_TopRight           =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0.49,["yLimit"]=0.45,["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPRIGHT",     ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow}
-hasuitController_TopLeft_TopLeft             =      {["xDirection"]=1,  ["yDirection"]= -1, ["xMinimum"]=2, ["yMinimum"]=2, ["xLimit"]=0.49,["yLimit"]=0.45,["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow}
+hasuitController_TopRight_TopRight           =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0.49,["yLimit"]=0.45,["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPRIGHT",     ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=hasuitSort,   ["grow"]=hasuitNormalGrow}
+hasuitController_TopLeft_TopLeft             =      {["xDirection"]=1,  ["yDirection"]= -1, ["xMinimum"]=2, ["yMinimum"]=2, ["xLimit"]=0.49,["yLimit"]=0.45,["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=hasuitSort,   ["grow"]=hasuitNormalGrow}
 
--- hasuitController_BottomRight_BottomRight at the bottom of file
--- hasuitController_BottomLeft_BottomLeft ^
+-- several controllers at the bottom of the file for hots/dots, hasuitController_Hots1_BottomRight_BottomRight etc, hasuitController_BottomLeft_BottomLeft
 
-hasuitController_TopLeft_TopRight            =      {["xDirection"]=1,  ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT",     ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
-hasuitController_BottomLeft_BottomRight      =      {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
+hasuitController_TopLeft_TopRight            =      {["xDirection"]=1,  ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT",     ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=hasuitSort,   ["grow"]=hasuitNormalGrow,  ["setPointOnBorder"]=true}
+hasuitController_BottomLeft_BottomRight      =      {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=hasuitSort,   ["grow"]=hasuitNormalGrow,  ["setPointOnBorder"]=true}
 
-hasuitController_TopRight_TopLeft            =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
-hasuitController_BottomRight_BottomLeft      =      {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=danSort,   ["grow"]=normalGrow,    ["setPointOnBorder"]=true}
+hasuitController_TopRight_TopLeft            =      {["xDirection"]=-1, ["yDirection"]= -1, ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",      ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=hasuitSort,   ["grow"]=hasuitNormalGrow,  ["setPointOnBorder"]=true}
+hasuitController_BottomRight_BottomLeft      =      {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=2,   ["yLimit"]=0.6, ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=20,  ["sort"]=hasuitSort,   ["grow"]=hasuitNormalGrow,  ["setPointOnBorder"]=true}
 
-hasuitController_Middle_Middle               =      {                                                                                                                                                                                                   ["frameLevel"]=22,  ["sort"]=danSort,   ["grow"]=hasuitMiddleIconGrow} --limited to 1 icon showing in the middle
+hasuitController_Middle_Middle               =      {                                                                                                                                                                                                   ["frameLevel"]=22,  ["sort"]=hasuitSort,   ["grow"]=hasuitMiddleIconGrow} --limited to 1 icon showing in the middle
 
 
 
@@ -249,6 +248,11 @@ local danCommonBigBottomLeftArenaDefensivesSize25 = {["controllerOptions"]=hasui
 --anything else?
 
 
+local hasuitSpellFunction_AuraMainFunction = hasuitSpellFunction_AuraMainFunction
+local hasuitSpellFunction_AuraSourceIsNotPlayer = hasuitSpellFunction_AuraSourceIsNotPlayer
+local hasuitSpellFunction_AuraSourceIsPlayer = hasuitSpellFunction_AuraSourceIsPlayer
+
+
 
 
 
@@ -272,6 +276,7 @@ initialize(378441) --time stop (friendly buff)
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-72,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1]} --BIG BUFFS ___
 initialize(456574) --Cinder Nectar
+initialize(461063) --Quiet Contemplation --earthen drink racial
 initialize(GetSpellName(216339)) --Drink
 initialize(GetSpellName(167152)) --Refreshment
 initialize(GetSpellName(216338)) --Food
@@ -595,6 +600,7 @@ hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priori
 initialize(394119) --Blackjack (30%)
 initialize(410598) --Soul Rip (25%)
 initialize(77606) --Dark Simulacrum stealing next
+initialize(415246) --Divine Plea, -30% healing/damage for 20 sec to regain 750k mana. can't click it off, todo? no1 plays this though
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-24,                       ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7],["specialAuraFunction"]=hasuitSpecialAuraFunction_DarkSimShowingWhatGotStolen,["specialIconType"]="greenBorder"}
 initialize(77616) --Dark Simulacrum has something stolen, untested, not sure exactly where to show this, should probably just make a controller for stuff to show in the mi ddle of the screen? and probably not care about friendly stolen, but this for now, todo
 
@@ -611,8 +617,7 @@ hasuitSetupSpellOptionsMulti = {
     hasuitSetupSpellOptions,
     hasuitSmallMiscMiddleCastBarsSpellOptions,
 }
-initializeMulti(2812) --Denounce, can't crit
--- initialize("Divine Plea")
+initializeMulti(2812) --Denounce, can't crit, this should show as unitcasting icon?
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints1Required,     ["priority"]=258,   ["points1"]=-20,    ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7], ["textKey"]="KICKRbg", ["actualText"]="20%"}
 initialize(1714) --Curse of Tongues only 20% casting speed (ignore 10%) --todo improve dispellable debuffs display, stuff like tongues/wound/whatever that might not be worth to dispel alone but knowing multiple different things are there can change things. should make some kind of display for % healing reduction too
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints2Required,     ["priority"]=258,   ["points2"]=-100,   ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7], ["textKey"]="KICKRbg", ["actualText"]="100%"}
@@ -681,15 +686,17 @@ initialize(408558) --Phase Shift
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-17,                       ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonBigBottomLeftArenaDefensivesSize35}
 initialize(353319) --Peaceweaver
-initialize(48707) --Anti-Magic Shell
-initialize(410358) --Anti-Magic Shell, external from pvp talent?
-initialize(444741) --Anti-Magic Shell, from unit type: guardian?
 initialize(204018) --Blessing of Spellwarding
 initialize(8178) --Grounding Totem
 initialize(248519)--Interlope, does this belong here?
 initialize("Guided Meditation") --?
 initialize(212295) --Nether Ward
 initialize(23920) --spell reflection --can stack twice? from rebound
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=-17,                       ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonBigBottomLeftArenaDefensivesSize35}
+initialize(48707) --Anti-Magic Shell
+initialize(410358) --Anti-Magic Shell, external from pvp talent?
+initialize(444741) --Anti-Magic Shell, from unit type: guardian?
 
 -- hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-16,                       ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonBigBottomLeftArenaDefensivesSize35}
 -- initialize("Ethereal Form") --?
@@ -767,7 +774,7 @@ initialize(232708) --Ray of Hope, todo
 initialize(232707) --Ray of Hope
 initialize(47585) --Dispersion
 initialize(363916) --Obsidian Scales, labeled friendly only?
-initialize(370984) --Emerald Communion
+initialize(370960) --Emerald Communion
 initialize(45182) --Cheating Death
 initialize(86659) --Guardian of Ancient Kings
 initialize(393108) --Guardian of Ancient Kings, 4 sec proc? the other spellid has 4 sec procs though too
@@ -798,7 +805,7 @@ initialize(389539) --Sentinel
 -- initialize("Eye for an Eye") --?, doesn't exist anymore?
 initialize(55233) --Vampiric Blood
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-2,                    ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonBigBottomLeftArenaDefensivesSize25}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=-2,                    ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonBigBottomLeftArenaDefensivesSize25}
 initialize(454863) --Lesser Anti-Magic Shell --30% partial_cc reduction 
 
 
@@ -840,7 +847,7 @@ initialize("Avert Harm") --?
 initialize(49039) --Lichborne
 initialize(116849) --Life Cocoon
 initialize(184662) --Shield of Vengeance
-initialize(22842) --Frenzied Regeneration
+initialize(22842) --Frenzied Regeneration --should move back to bottom left outside of arena frames maybe?
 initialize(326808) --Rune of Sanguination, todo cooldown, is Shroud of Purgatory related?
 initialize(388013) --Blessing of Spring, 30% healing taken/15% healing increased, todo could do something to show summer like a dot? maybe show winter similarly with innervate? not sure it should be shown at all though. it isn't purgable
 
@@ -874,6 +881,11 @@ initialize(145629) --Anti-Magic Zone
 initialize(81782) --Power Word: Barrier
 initialize(354704) --Grove Protection
 
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=62,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,}
+initialize(201633)  --Earthen Wall
+initialize(212640)  --Mending Bandage
+
+
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=65,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
 initialize(124682) --enveloping mist
 
@@ -884,7 +896,6 @@ initialize(102351) --40% alpha idle cenarion Ward
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=75,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
 initialize(115175) --soothing mist
-initialize(200652) --tyr's deliverance
 initialize(148039) --Barrier of Faith
 initialize(188550) --lifebloom
 initialize(33763) --lifebloom
@@ -903,9 +914,6 @@ hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priori
 initialize(139) --Renew
 initialize(290754) --Lifebloom from Full Bloom (early spring), todo show the difference between this and normal lifebloom? either green border or smaller not sure
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=84,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,["specialAuraFunction"]=hasuitSpecialAuraFunction_BlessingOfAutumn} 
-initialize(388010) --Blessing of Autumn, 30% cd reduction on all abilities for 30 sec? not sure if this should be showing or to make something to put the timer on something other than an aura icon
-
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=85,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} --329267 or 385391 20% magic damage reduction from spell reflect?
 initialize(185311) --Crimson Vial
 initialize(194679) --Rune Tap
@@ -917,11 +925,19 @@ initialize(GetSpellName(59547)) --Gift of the Naaru
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=90,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,}
 initialize(114052)  --resto ascendance, should track stuff like this in a different way probably? or add more
 initialize(31884) --Avenging Wrath
+initialize(200652) --tyr's deliverance
 initialize(47536) --Rapture
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=95,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,}
 initialize(378081) --Nature's Swiftness shaman
 initialize(132158) --Nature's Swiftness Druid
+initialize(414273) --Hand of Divinity
+initialize(370537) --Stasis, copying 3 spells, should this be shown?
+initialize(370553) --Tip the Scales
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=95,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,["specialIconType"]="greenBorder"}
+initialize(370562) --Stasis, ready
+
+
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=97,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena, ["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulOfTheForest}
 initialize(114108) --Soul of the Forest
@@ -943,7 +959,6 @@ initialize(97463) --Rallying Cry
 -- initialize(33891) --Incarnation: Tree of Life, todo show timer of 117679 somehow, could do something like icon turns red if actual tree is missing but incarn is up, todo show which is the main 30 sec duration and which is a proc?
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=107,               ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
-initialize(370889) --Twin Guardian (rescue absorb)
 initialize(17) --Power Word: Shield
 -- initialize(235450) --Prismatic Barrier, todo something for -24% magic duration or whatever it is?
 -- initialize(414663) --Prismatic Barrier
@@ -951,6 +966,12 @@ initialize(17) --Power Word: Shield
 -- initialize(414661) --Ice Barrier
 -- initialize(235313) --Blazing Barrier, todo something to show big thorns pvp talent 800%?
 -- initialize(414662) --Blazing Barrier, todo smaller icons for these and in general
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=108,               ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
+initialize(370889) --Twin Guardian (rescue absorb)
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=109,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,["specialAuraFunction"]=hasuitSpecialAuraFunction_BlessingOfAutumn} 
+initialize(388010) --Blessing of Autumn, 30% cd reduction on all abilities for 30 sec? not sure if this should be showing or to make something to put the timer on something other than an aura icon
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=110,               ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,}
 initialize(381755) --earth elemental 15% bonus health
@@ -1432,7 +1453,7 @@ initialize(436344) --Azerite Surge from new race earthen
 
 hasuitFramesCenterSetEventType("aura")
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-73,                   ["group"]=danCommonTopRightGroupDebuffs[4],     } --DOTs/damage debuffs ___ todo different priority for dispel protection stuff if player actually has dispel
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=-73,                   ["group"]=danCommonTopRightGroupDebuffs[4],     } --DOTs/damage debuffs ___ todo different priority for dispel protection stuff if player actually has dispel
 initialize(316099)--unstable affliction dot group
 initialize(342938)--unstable affliction dot group
 
@@ -1499,6 +1520,7 @@ initialize(397364) --Thunderous Roar
 initialize(356995) --Disintegrate
 initialize(198590) --Drain Soul
 initialize(234153) --Drain Life
+initialize(117952) --Crackling Jade Lightning --does this belong here?
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=241,                   ["group"]=danCommonTopRightGroupDebuffs[3], ["arena"]=danCommonTopLeftArenaDebuffs[3],} --mortal strike effect, healing reduction
 initialize(356528) --Necrotic Wound
@@ -1571,6 +1593,7 @@ initialize(207407) --?, Soul Carver, dh dot? never seen
 initialize(115994) --Unholy Blight
 initialize(124280) --touch of karma dot
 initialize(434473) --Bombardments, maybe should be higher?
+initialize(441172) --Melt Armor, from deep breath, dot+20 damage from dev evoker's essences/bombardments?
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=271,                   ["group"]=danCommonTopRightGroupDebuffs[5], ["arena"]=danCommonTopLeftArenaDebuffs[5],}
 initialize(353759) --deep breath dot
@@ -1583,6 +1606,7 @@ initialize(198688) --Dagger in the Dark
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=280,                   ["group"]=danCommonTopRightGroupDebuffs[5], ["arena"]=danCommonTopLeftArenaDebuffs[5],}
 initialize(GetSpellName(8326)) --Ghost, todo bigger/15 sec timer in rbgs?
+initialize(2096) --Mind Vision
 
 -- hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=3,["loadOn"]=loadOnNone,["group"]=danCommonTopRightGroupDebuffs[5],        } --deserter
 -- initialize(GetSpellName(26013)) --Deserter --todo these need to get removed when entering instance since they're so long, then can uncomment, surprised it's needed, seems like it'll work itself out after getting the order of loadons/everything else right?
@@ -1610,22 +1634,65 @@ initialize(GetSpellName(8326)) --Ghost, todo bigger/15 sec timer in rbgs?
 
 
 
+--class specific stuff below, stuff here gets changed around as needed in class files based on class of player, to try to make a good/unique display for tracking hots for every class. Hopefully the way this is set up will be somewhat easy to make changes to all classes at once while keeping unique stuff per class, whether that's combining all of these controllers into 1 or doing something with icon sizes/changing grow functions etc
+
+hasuitController_Hots1_BottomRight_BottomRight =    {["xDirection"]=-1, ["yDirection"]=1,   ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]= 0, ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSort,    ["grow"]=hasuitNormalGrow}
+hasuitController_Hots2_BottomRight_BottomRight =    {["xDirection"]=-1, ["yDirection"]=1,   ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.45,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-19,["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSort,    ["grow"]=hasuitNormalGrow}
+hasuitController_Hots3_BottomRight_BottomRight =    {["xDirection"]=-1, ["yDirection"]=1,   ["xMinimum"]=2, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.45,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-35,["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSort,    ["grow"]=hasuitNormalGrow}
+hasuitController_Hots4_BottomRight_BottomRight =    {["xDirection"]=-1, ["yDirection"]=1,   ["xMinimum"]=0, ["yMinimum"]=0, ["xLimit"]=1,   ["yLimit"]=0.45,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-59,["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSort,    ["grow"]=hasuitNormalGrow}
+
+hasuitController_Hots5_BottomRight_BottomRight =    {["xDirection"]=-1, ["yDirection"]=1,   ["xMinimum"]=3, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.45,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]= 0, ["yOffset"]=19, ["frameLevel"]=21,  ["sort"]=hasuitSort,    ["grow"]=hasuitNormalGrow}
+hasuitController_Hots6_BottomRight_BottomRight =    {["xDirection"]=-1, ["yDirection"]=1,   ["xMinimum"]=2, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.45,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=-15,["yOffset"]=19, ["frameLevel"]=21,  ["sort"]=hasuitSort,    ["grow"]=hasuitNormalGrow}
+
+
+
+hasuitController_BottomLeft_BottomLeft      =       {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=2, ["yMinimum"]=3, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=hasuitNormalGrow}
+--^ is for dots from player, will make major changes to the way dots work probably
+
+
+
+
+
 
 hasuitFramesCenterSetEventType("aura")
 
 
-hasuitController_BottomLeft_BottomLeft      =       {["xDirection"]=1,  ["yDirection"]= 1,  ["xMinimum"]=2, ["yMinimum"]=3, ["xLimit"]=0,   ["yLimit"]=0,   ["ownPoint"]="BOTTOMLEFT",  ["targetPoint"]="BOTTOMLEFT",   ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
-local danCommonHarmful = {["controllerOptions"]=hasuitController_BottomLeft_BottomLeft,["size"]=15,   ["hideCooldownText"]=true,  ["alpha"]=1}
-hasuitFramesSpellOptionsClassSpecificHarmful = {hasuitSpellFunction_AuraSourceIsPlayer,["priority"]=1, ["arena"]=danCommonHarmful, ["loadOn"]=loadOnArenaOnly} --i'm thinking about not showing debuffs bottom left at all and doing something different/using that space to show another dr like typhoon, so this is subject to change
+local danCommon = {["controllerOptions"]=hasuitController_Hots1_BottomRight_BottomRight,["size"]=18,["alpha"]=1}
+hasuitHots_1 = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=danCommon}
 
 
-hasuitController_BottomRight_BottomRight    =       {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=0,  ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
-local danCommonHelpful = {["controllerOptions"]=hasuitController_BottomRight_BottomRight,["size"]=15, ["hideCooldownText"]=true,["alpha"]=1}
-hasuitFramesSpellOptionsClassSpecificHelpful = {hasuitSpellFunction_AuraSourceIsPlayer,["priority"]=1, ["group"]=danCommonHelpful} --pretty awful for any healer i think, a specific setup per class/spec is preferred. might make something new to show hots with fixed position based on spellid but only need 1 controller, although maybe the current setup like i use on druid is fine
-
+local danCommon = {["controllerOptions"]=hasuitController_Hots2_BottomRight_BottomRight,["size"]=15,["alpha"]=1,    ["hideCooldownText"]=true}
+hasuitHots_2 = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=danCommon}
 
 
 
+local danCommon = {["controllerOptions"]=hasuitController_Hots3_BottomRight_BottomRight,["size"]=15,["alpha"]=1,    ["hideCooldownText"]=true}
+hasuitHots_3 = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=danCommon}
+
+
+
+local danCommon = {["controllerOptions"]=hasuitController_Hots4_BottomRight_BottomRight,["size"]=14,["alpha"]=1,    ["hideCooldownText"]=true}
+hasuitHots_4 = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=danCommon}
+
+
+
+local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=14,["alpha"]=1,    ["hideCooldownText"]=true}
+hasuitHots_5 = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=danCommon}
+
+
+
+local danCommon = {["controllerOptions"]=hasuitController_Hots6_BottomRight_BottomRight,["size"]=14,["alpha"]=1,    ["hideCooldownText"]=true}
+hasuitHots_6 = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=danCommon}
+
+
+
+
+
+
+
+
+local danCommonHarmful = {["controllerOptions"]=hasuitController_BottomLeft_BottomLeft, ["size"]=15,["alpha"]=1,    ["hideCooldownText"]=true}
+hasuitDots_ = {hasuitSpellFunction_AuraSourceIsPlayer,                  ["priority"]=1, ["arena"]=danCommonHarmful, ["loadOn"]=loadOnArenaOnly}
 
 
 

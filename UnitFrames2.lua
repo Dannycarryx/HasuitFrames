@@ -1710,7 +1710,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
         local GetMouseButtonClicked = GetMouseButtonClicked
         local IsMouseButtonDown = IsMouseButtonDown
         local MouselookStop = MouselookStop
-        local MouselookStart = MouselookStart
+        local MouselookStart = MouselookStart --MoveAndSteerStart won't work, same with MoveForwardStart --SetMouselookOverrideBinding?  CameraOrSelectOrMoveStart? this seems like the thing but probably can't be used here, CameraOrSelectOrMoveStop also restricted
         local danOnUpdateMouseUpCheckFrame = CreateFrame("Frame")
         local function danOnUpdateMouseUpCheck()
             if not IsMouseButtonDown() then
@@ -2774,12 +2774,12 @@ do
     hasuitLocal5(hasuitHypoCooldownTimerDone)
     local hasuitSortController = hasuitSortController
     hasuitLocal6(cooldownOnCooldownDone)
-    local cooldownsControllers = hasuitController_CooldownsControllers
+    local hasuitController_CooldownsControllers = hasuitController_CooldownsControllers
     local hasuitInitializeController = hasuitInitializeController
     function danAddSpecializationCooldowns(specId, isClassUpdate)
         local controllers = {}
-        for i=1,#cooldownsControllers do
-            local controllerOptions = cooldownsControllers[i]
+        for i=1,#hasuitController_CooldownsControllers do
+            local controllerOptions = hasuitController_CooldownsControllers[i]
             local unitTypeStuff = controllerOptions[danCurrentUnitType]
             if unitTypeStuff then
                 local specCooldowns = unitTypeStuff["specCooldowns"][specId]

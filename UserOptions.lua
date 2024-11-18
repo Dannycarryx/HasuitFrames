@@ -84,13 +84,16 @@ local userOptionsOnChanged = {} --or just clicked/pressed enter, value doesn't h
 hasuitUserOptionsOnChanged = userOptionsOnChanged
 tinsert(hasuitDoThis_Addon_Loaded, 1, function()
     savedUserOptions = hasuitSavedUserOptions
-    local welcomeMessage = "Welcome to HasuitFrames. If you're new I recommend looking at welcome.txt in the HasuitFrames addon folder. glhf"
     if not savedUserOptions then --will need to have checks for any new options added after release, maybe there's a better way to set this up
+        local welcomeMessage = "Welcome to HasuitFrames. If you're new I recommend typing /hf to run test functions and move things around as needed. There's a longer introduction in the addon folder if you want, HasuitFrames\\welcome.txt. glhf"
         if hasuitScriptProfileWasWrong then
             hasuitSavedVariables["repeatWelcomeMessage"] = welcomeMessage
         else
-            C_Timer.After(0, function()
-                print(welcomeMessage)
+            local C_Timer_After = C_Timer.After
+            hasuitDoThis_OnUpdate(function()
+                C_Timer_After(0, function()
+                    print(welcomeMessage)
+                end)
             end)
         end
         savedUserOptions = { --defaults ___
@@ -104,7 +107,7 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
             ["raidY"]=-215,
             
             ["middleCastBarsX"]=0,
-            ["middleCastBarsY"]=220,
+            ["middleCastBarsY"]=275,
             
             
             ["groupColoredBackgroundMinimum"]=4, --todo option for pve only?
@@ -116,6 +119,17 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
             
             ["scale"]=1,
             -- ["usePixelPerfectModifier"]=false, --this exists, default is off, won't show as an option if screen height is 1080 because it'd be irrelevant
+            
+            
+            --nothing below does anything yet but placeholders in case I make these options, nvm
+            -- ["showNonArenaTargetCounts"]=40, --max groupsize? by far the most inefficient thing in the addon, could also probably make it more efficient based on unit_target for units that get that event
+            -- ["replaceNameplatesHostile"]=true,
+            -- ["replaceNameplatesFriendly"]=true,
+            -- ["audioWarningsForCCCasts"]=true, --? not sure if this should even be a thing because the middle cast bars jump out so much
+            -- ["audioWarningsForDamageCasts"]=true, --^
+            -- ["audioWarningsForHealCasts"]=true, --^
+            -- ["audioWarningsForOffensiveBuffs"]=true,
+            -- -- ["showFewerThings"]=false, ?
         }
         hasuitSavedUserOptions = savedUserOptions
     end

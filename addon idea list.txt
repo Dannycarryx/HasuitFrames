@@ -1,26 +1,26 @@
 
 
 
-biggest thing right now:
-enabling people to track their own abilities? might be the last thing before a release
-ability to disable some or all class specific abilities tracked for player to let people make their own setup easily
-clean this file up
-make a variable like d12 or d13 and set it for non-cleu so that people can initialize a spellname or spellid and have it not get ignored or however that works. should be able to use spellnames or spellids and not worry about it
-recommendation about /click d1-1 macros
-
+biggest thing right now: 
+license?
 
 
 other important:
+enabling people to track their own abilities/custom setups
+make a variable like d12 or d13 and set it for non-cleu so that people can initialize a spellname or spellid and have it not get ignored or however that works. should be able to use spellnames or spellids and not worry about it
+
 clean up the rest of the globals that might have been missed. Make function that compares _G before and after loading the addon and then check after most stuff gets deleted for what's missing
 display for purgable buffs for people that have purge
 pet frames
 way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
 make party interrupt display for m+
-interrupt duration modifiers from buffs that reduce them, are there passives like a talent that reduces by 10%?
+interrupt duration modifiers from buffs that reduce them, are there passives like a talent that reduces by 10%? --concentration aura
 skip yellow text on target counts
 improve cleuINC to be the same way as how bossauras get decided, maybe that could make it good in pve and not need as much specific tracking in pvp?
-eternity surge/upheaval middle castbars
 option to show fewer abilities. Playing with the addon for the first bit might be overwhelming, and some people might prefer to just keep the option for showing less enabled permanently
+always track sheep dr for pandarens?
+option to show friendly cc casts in the middle somewhere?, maybe smaller/green and to the left of middlecastbars
+
 
 less important:
 audio warnings for things or some way of knowing when offensive cds get pressed at least without needing to rely on another addon
@@ -39,6 +39,7 @@ option to just have normal frames instead of click-through to move, option to di
 improve/figure out scale. whole system needs to be made for size stuff and idk what i'm doing with other people's screen sizes
 initialize(198034) --Divine Hammer, todo 1 Holy Power per sec, use same system as blessingofautumn for this?
 better display for forbearance. right now you can only see if forbearance is preventing an affected ability like lay on hands from being used on the paladin, not if it can't be used on teammate. Technically people will be able to add forbearance as a dot or something if they want but that's not ideal. maybe that's a better temporary solution for the main addon though too. idk
+do something to make light of the martyr better for holy paladins? the red text display is probably not great for that
 
 even less important:
 summon/rez/phase indicators
@@ -89,9 +90,24 @@ probably move stuff like spell reflect into same area as cc abilities for arena 
 
 should change priorities everywhere to not go into the negative to make things just a little less confusing
 
+premonition of insight, disc priest -9sec cd from next 3 casts
+also todo symbol of hope aoe -30 sec cd of a "major defensive ability".. if ever doing anything about this need to make sure it's 30 sec in pvp, for every ability? surely some aren't randomly 20 sec in pvp instead of 30
+blessing of the bronze for movement cds
+
+wing buffet cd for dracthyr, tail swipe for evoker?
+track lightning lasso cd
+track cauterizing flame? especially for feral/similar
+
+--todo show aura mastery from obsidian scales if taken? along with all other aura mastery effects if player cares about them
+
+track 368415 Time of Need as an 8 second defensive buff from spell_summon? has 60 sec cd
+should track rewind as a cd for pres?
 
 
+next xpac should probably try to combine class specific hot/dot spells with the same spells that show from other players somehow to lower the amount of spells that need to be changed in different places
 
+warning about gear needing to be repaired? I'll never forget the time the armor guy never showed up and my gear was just broken in a shuffle randomly
+change icon of freezing trap cd to immune version if the hunter is playing that?
 
 
 

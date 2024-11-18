@@ -6,6 +6,7 @@ local hasuitSpellFunction_UnitCastingMiddleCastBars = hasuitSpellFunction_UnitCa
 local tremove = tremove
 local CreateFrame = CreateFrame
 -- local danBorderBackdrop = hasuit1PixelBorderBackdrop
+local hasuitFramesParent = hasuitFramesParent
 
 local unusedCastBars = {}
 function hasuitGetCastBar() --bored todo migrate danGetIcon to be with this in a file, maybe with initializeController and stuff like that too, leaving hasuitSpellFunction_ stuff together in HasuitFrames.lua? not sure if that should be split further into eventtypes. either way probably not worth the effort to do any of this
@@ -117,7 +118,7 @@ function hasuitMiddleCastBarsGrow(controller) --hasuitSpellFunction_UnitCastingM
         local castBar = middleCastBarsFrames[i]
         local arenaNumber = castBar.unitFrame and castBar.unitFrame.arenaNumber
         if arenaNumber then
-            castBar:SetPoint("CENTER", controller, "TOP", 0, -arenaNumber*52)
+            castBar:SetPoint("CENTER", controller, "TOP", 0, -arenaNumber*70)
         else
             castBar:SetPoint("CENTER", controller, "TOP", 0, 15+nonArenaCount*(castBar.height+1))
             nonArenaCount = nonArenaCount+1
@@ -188,20 +189,20 @@ hasuitSmallDamageMiddleCastBarsSpellOptions =       {hasuitSpellFunction_UnitCas
 
 
 
-
--- tinsert(hasuitDoThis_Addon_Loaded, function()
-    -- hasuitSetupSpellOptionsMulti = {
-                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitBigRedMiddleCastBarsSpellOptions["arena"]},
+--[[
+tinsert(hasuitDoThis_Addon_Loaded, function()
+    hasuitSetupSpellOptionsMulti = {
+                              {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitBigRedMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitGreenishDefensiveMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitOrangeMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitYellowMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallMiscMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitUntrackedMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallDamageMiddleCastBarsSpellOptions["arena"]},
-    -- }
-    -- hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()  , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
--- end)
-
+    }
+    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()  , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
+end)
+--]]
 
 
 
@@ -260,12 +261,27 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function() --useroptions stuff for posit
                     
                     local arenaNumberText = fakeCastBar.arenaNumberText
                     arenaNumberText:SetFontObject(hasuitCastBarFont20)
+                
+                elseif not fakeCastBar.arenaNumberBoxShowing then
+                    local arenaNumberBox = fakeCastBar.arenaNumberBox
+                    local arenaNumberText = fakeCastBar.arenaNumberText
+                    
+                    arenaNumberBox:SetAlpha(1)
+                    arenaNumberText:SetAlpha(1)
+                    fakeCastBar.arenaNumberBoxShowing = true
+                    
+                    if not arenaNumberText:GetFontObject() then
+                        arenaNumberBox:SetSize(36, 36)
+                        arenaNumberBox:SetColorTexture(1,0.49,0.04)
+                        arenaNumberText:SetFontObject(hasuitCastBarFont20)
+                    end
+                    
                 end
                 
                 fakeCastBar.arenaNumberText:SetText(i)
                 
                 fakeCastBar:SetAlpha(1)
-                fakeCastBar:SetParent(hasuitPlayerFrame)
+                fakeCastBar:SetParent(hasuitFramesParent)
                 fakeCastBar:SetFrameLevel(10)
                 fakeCastBar.active = true
                 hasuitAddToSeparateController(middleCastBarsController, fakeCastBar)
