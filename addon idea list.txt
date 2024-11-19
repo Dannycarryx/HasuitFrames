@@ -20,6 +20,11 @@ improve cleuINC to be the same way as how bossauras get decided, maybe that coul
 option to show fewer abilities. Playing with the addon for the first bit might be overwhelming, and some people might prefer to just keep the option for showing less enabled permanently
 always track sheep dr for pandarens?
 option to show friendly cc casts in the middle somewhere?, maybe smaller/green and to the left of middlecastbars
+mind control never got fixed like i thought it might have. When that breaks it's a pretty big bug
+
+maybe put precog in text on a middle cast bar if they have it?
+could make a unit_aura function that puts a max timer on the aura and will get rid of it regardless of removed event for (new?) disintegrate bug. not ideal but easy fix
+saw ua show 2 cast bars from the same warlock for some reason. That might get fixed after reworking the way unit events work for the addon?
 
 
 less important:
@@ -108,6 +113,8 @@ next xpac should probably try to combine class specific hot/dot spells with the 
 
 warning about gear needing to be repaired? I'll never forget the time the armor guy never showed up and my gear was just broken in a shuffle randomly
 change icon of freezing trap cd to immune version if the hunter is playing that?
+
+different levels of uninterruptible cast? just cast immunity vs all immunity? probably not good that way, but the grey could be based on player actually having something to stop the cast with like typhoon, and then the grey should be based on whether the target can be knocked back or not, not whether the cast is interruptible according to the game. But that's too much work probably
 
 
 

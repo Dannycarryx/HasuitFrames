@@ -125,7 +125,7 @@ do --hasuitTempSwiftmend
     local function hasuitTempSwiftmend2()
         local asd = GetSpellCooldown("Swiftmend")
         if asd then
-            -- local swiftmendCdTime = GetTickTime()-0.005+asd["duration"]+asd["startTime"]-GetTime() --oh this is the same thing as cds being ~0.0167 inaccurate? or not. what's up with this not just being 15?
+            -- local swiftmendCdTime = GetTickTime()-0.005+asd["duration"]+asd["startTime"]-GetTime()
             -- if swiftmendCdTime>15 then
                 -- swiftmendCdTime = 15
             -- end
@@ -168,7 +168,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     local pveCleuINCSpellOptions
     local pveUnitCastSpellOptions
     
-    local isChanneled
+    -- local isChanneled --forgot how this was supposed to work 100% of the time without setting it to nil more than needed but I think something changed. Pretty sure it was the reason a couple errors happened in a dungeon earlier
     local band = bit.band
     local COMBATLOG_OBJECT_CONTROL_PLAYER = COMBATLOG_OBJECT_CONTROL_PLAYER
     local COMBATLOG_OBJECT_CONTROL_MASK = COMBATLOG_OBJECT_CONTROL_MASK
@@ -192,6 +192,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
                 trackedPveSpells[d12anCleuSpellId] = true
             else
                 
+                local isChanneled
                 if d8anCleuDestGuid=="" then
                     danCurrentUnit = hasuitFramesCenterNamePlateGUIDs[d4anCleuSourceGuid] --todo boss units/target/focus? won't work at all for someone with nameplates disabled although who would play seriously with no nameplates? todo recommend nameplates if they aren't enabled probably
                     if danCurrentUnit then
@@ -199,8 +200,8 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
                             if select(8, UnitChannelInfo(danCurrentUnit))==d12anCleuSpellId then
                                 isChanneled = true
                                 d8anCleuDestGuid = UnitGUID(danCurrentUnit.."target") or ""
-                            else
-                                isChanneled = false
+                            -- else
+                                -- isChanneled = false
                             end
                         else
                             d8anCleuDestGuid = UnitGUID(danCurrentUnit.."target") or ""

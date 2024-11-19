@@ -296,6 +296,7 @@ hasuitSetupSpellOptionsMulti = { --CC can break threshold *1
                           {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-63,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1]}, --STUNS
                           hasuitBigRedMiddleCastBarsSpellOptions,
 }
+initializeMultiPlusDiminish(30283) --Shadowfury
 initializeMultiPlusDiminish(118905) --Static Charge, todo?
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initializePlusDiminish(202244) --Overrun
@@ -314,7 +315,6 @@ initializePlusDiminish(64044) --Psychic Horror
 initializePlusDiminish(1833) --Cheap Shot
 initializePlusDiminish(408) --Kidney Shot
 initializePlusDiminish(89766) --axe toss stun
-initializePlusDiminish(30283) --Shadowfury
 -- initializePlusDiminish("Warpath") --?
 initializePlusDiminish(385954) --Shield Charge
 initializePlusDiminish(199085) --Warpath
@@ -325,8 +325,8 @@ initializePlusDiminish(91797) --Monstrous Blow
 initializePlusDiminish(212337) --Powerful Smash, haven't seen
 initializePlusDiminish(212336) --Smash, haven't seen
 initializePlusDiminish(118345) --Pulverize
-initializePlusDiminish(287712) --Haymaker
 initializePlusDiminish(255723) --Bull Rush
+initializePlusDiminish(287712) --Haymaker, should this/war stomp cast show? the cast should at least show on nameplate castbars when/if that gets made?
 initializePlusDiminish(20549) --War Stomp
 initializePlusDiminish(24394) --Intimidation
 initializePlusDiminish(163505) --Rake
@@ -371,7 +371,7 @@ hasuitSetupSpellOptionsMulti = {
                           hasuitSetupSpellOptions,
                           hasuitBigRedMiddleCastBarsSpellOptions,
 }
-initializeMultiPlusDiminish(605) --Mind Control
+initializeMultiPlusDiminish(605) --Mind Control, not sure whether to ignore the channel part of this or not
 
 
 
@@ -1279,8 +1279,9 @@ initializeMulti(48181) --Haunt
 initializeMulti(228260) --Void Eruption --does this have a travel time?
 initializeMulti(6353) --Soul Fire
 initializeMulti(104316) --Call Dreadstalkers cast
-initializeMulti(193331, 2) --Call Dreadstalkers spell_summon
+initializeMulti(193331, 2) --Call Dreadstalkers spell_summon, todo i don't think spell_summon does anything here? but should try to remake this function anyway
 initializeMulti(193332, 2) --Call Dreadstalkers spell_summon
+initializeMulti(210128, 2) --Reanimation spell_summon, todo improve this/call dreadstalkers somehow maybe?
 initializeMulti(5176) --Wrath
 initializeMulti(190984) --Wrath
 -- initializeMulti("Nether Portal") --?
