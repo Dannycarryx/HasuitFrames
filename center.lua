@@ -103,8 +103,9 @@ hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = {}
 -- hasuitDoThis_Group_Roster_UpdateGroupSize_5 --tinsert into .functions
 -- hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 --tinsert into .functions
 
-
 hasuitDoThis_Player_Target_Changed = {}
+
+
 
 
 -- hasuitDoThis_OnUpdate(func)
@@ -118,8 +119,8 @@ hasuitDoThis_Player_Target_Changed = {}
 
 
 -- hasuitDoThis_GroupUnitFramesUpdate_before = {} --normal
--- hasuitDoThis_GroupUnitFramesUpdate = {} --gives unitFrame as arg1
--- hasuitDoThis_GroupUnitFramesUpdate_after = {} --wipes at the end if it did anything
+hasuitDoThis_GroupUnitFramesUpdate = {} --gives unitFrame as arg1
+hasuitDoThis_GroupUnitFramesUpdate_after = {} --wipes at the end if it did anything
 --these are for efficiently running functions on every group unitFrame every time there's a group update (usually group_roster_update but the function can come from unit_aura guid not matching or arena update stealing a group frame(s), or player_login
 --the way it's set up allows for only running a function on every unitframe based on one condition changing and then not repeating the function on future group updates, until the condition you care about changes again
 --example for properly using in testingExternalAddon.lua, will make a guide some time
@@ -128,6 +129,36 @@ hasuitDoThis_Player_Target_Changed = {}
 -- hasuitDoThis_GroupUnitFramesUpdate_Positions_before = {} --normal, these wait for combat to drop
 hasuitDoThis_GroupUnitFramesUpdate_Positions = {} --gives unitFrame as arg1
 hasuitDoThis_GroupUnitFramesUpdate_Positions_after = {} --wipes at the end if it did anything
+
+
+
+
+do
+    local tinsert = tinsert
+    local danRemoveFunctionFromArray
+    local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
+    local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
+    function hasuitLocal9(asd1)
+        danRemoveFunctionFromArray = asd1
+    end
+
+    hasuitActiveCustomUnitFrameFunctions = {}
+    local hasuitActiveCustomUnitFrameFunctions = hasuitActiveCustomUnitFrameFunctions
+    function hasuitDoThis_EachUnitFrameForOneUpdate(customFunction)
+        if not hasuitActiveCustomUnitFrameFunctions[customFunction] then
+            local function removeAfter()
+                danRemoveFunctionFromArray(hasuitDoThis_GroupUnitFramesUpdate, customFunction)
+                hasuitActiveCustomUnitFrameFunctions[customFunction] = nil
+            end
+            tinsert(hasuitDoThis_GroupUnitFramesUpdate, customFunction)
+            tinsert(hasuitDoThis_GroupUnitFramesUpdate_after, removeAfter)
+            hasuitActiveCustomUnitFrameFunctions[customFunction] = removeAfter
+        end
+    end
+end
+
+
+
 
 
 
@@ -182,6 +213,7 @@ do
                     danDoThisEnteringWorld[i]()
                 end
             end)
+            danFrame:RegisterEvent("WALK_IN_DATA_UPDATE") --delves?, maybe make this only happen once per gettime?. --didn't work
             
         end
     end)
@@ -197,14 +229,14 @@ do --hasuitDoThis_OnUpdate, hasuitDoThis_OnUpdatePosition1
     local danDoThis
     local danFrame = CreateFrame("Frame")
     local function onUpdateFunction()
+        -- hasuitDoThis_OnUpdate_Active = true
+        danFrame:SetScript("OnUpdate", nil)
         local temp = danDoThis
         danDoThis = nil
         for i=1,#temp do
-            temp[i]() --kind of catastrophic if an error happens here, pcall if quick fix is needed in the future, or setscript nil above at least, could maybe be fine to do that anyway and get rid of if not danDoThis
+            temp[i]()
         end
-        if not danDoThis then
-            danFrame:SetScript("OnUpdate", nil) --is there a good way to not have to setscript onupdate an extra time if adding to the table mid-onupdate?
-        end
+        -- hasuitDoThis_OnUpdate_Active = false
     end
     function hasuitDoThis_OnUpdate(func)
         if danDoThis then
@@ -268,7 +300,6 @@ end
 local GetNumGroupMembers = GetNumGroupMembers
 do
     local danDoThisRelevantSizes = {}
-    hasuitDoThis_RelevantSizes = danDoThisRelevantSizes
     do
         local function getDoThisSizeTable(danSizeTable)
             local relevantGroupSizes = {functions={}}
@@ -290,14 +321,13 @@ do
         hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 =      getDoThisSizeTable({5,8,40})
     end
     
-    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
-    local danDoThis = hasuitDoThis_Group_Roster_UpdateAlways
-    local danDoThisGroupSizeChanged = hasuitDoThis_Group_Roster_UpdateGroupSizeChanged
+    local hasuitDoThis_Group_Roster_UpdateAlways = hasuitDoThis_Group_Roster_UpdateAlways
+    local hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = hasuitDoThis_Group_Roster_UpdateGroupSizeChanged
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
     tinsert(hasuitDoThis_Addon_Loaded, 1, function() --ends up being #2 (for now?)
-        for i=1,#danDoThisGroupSizeChanged do
-            danDoThisGroupSizeChanged[i]()
+        for i=1,#hasuitDoThis_Group_Roster_UpdateGroupSizeChanged do
+            hasuitDoThis_Group_Roster_UpdateGroupSizeChanged[i]()
         end
         for i=1,#danDoThisRelevantSizes do
             local sizeTable = danDoThisRelevantSizes[i]
@@ -307,14 +337,10 @@ do
                 sizeFunctions[j]()
             end
         end
-        for i=1,#danDoThis do
-            danDoThis[i]()
+        for i=1,#hasuitDoThis_Group_Roster_UpdateAlways do
+            hasuitDoThis_Group_Roster_UpdateAlways[i]()
         end
         
-        
-        -- danDoThisOnUpdate(function()
-            -- danFrame:RegisterEvent("GROUP_ROSTER_UPDATE") --don't think rosterupdate and player_login can happen at the same time
-        -- end)
         
         do
             local columnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
@@ -323,7 +349,18 @@ do
             end)
         end
     end)
-    local function groupRosterUpdateFunction() --why wasn't group test function just changing local GetNumGroupMembers to return fake number and then doing this? for the part that's copied that looks like this at least, hasuitMakeTestGroupFrames
+    
+    local GetNumGroupMembers = GetNumGroupMembers
+    local realGetNumGroupMembers = GetNumGroupMembers
+    function hasuitMakeFakeGetNumGroupMembers(fakeFunction)
+        GetNumGroupMembers = fakeFunction or realGetNumGroupMembers
+    end
+    local danUpdateGroupUnitFrames
+    function hasuitLocal8(asd1)
+        danUpdateGroupUnitFrames = asd1
+        return asd1
+    end
+    function hasuitGroupRosterUpdateFunction() --GROUP_ROSTER_UPDATE
         local groupSize = GetNumGroupMembers()
         if groupSize == 0 then
             groupSize = 1
@@ -331,8 +368,8 @@ do
         if groupSize~=hasuitGroupSize then
             hasuitGroupSize = groupSize
             
-            for i=1,#danDoThisGroupSizeChanged do
-                danDoThisGroupSizeChanged[i]()
+            for i=1,#hasuitDoThis_Group_Roster_UpdateGroupSizeChanged do
+                hasuitDoThis_Group_Roster_UpdateGroupSizeChanged[i]()
             end
             
             for i=1,#danDoThisRelevantSizes do
@@ -347,13 +384,17 @@ do
                 end
             end
         end
-        for i=1,#danDoThis do
-            danDoThis[i]()
-        end
+        -- for i=1,#hasuitDoThis_Group_Roster_UpdateAlways do --does nothing atm
+            -- hasuitDoThis_Group_Roster_UpdateAlways[i]()
+        -- end
+        danUpdateGroupUnitFrames() --instant now up to 2 times per gettime then it sets a C_Timer to go again after a delay. The way it works is a unittype update function can be triggered and then steal frames from a different unittype, then the update function for that unittype will go right afterward to try to fill things that got stolen, which can trigger the same unittype function from the beginning. Sometimes party and arena units can be the same thing so without some precaution it's probably possible to freeze the game. Sometimes frames got passed back and forth between shuffle rounds, switching places every gettime for a bit when new shuffle round. Would probably work the sameish way now, just got rid of the delay to hopefully make unit events more accurate when units change, at the cost of temporarily breaking a bunch of random things and having to figure out order of things again
+    
     end
-    danFrame:SetScript("OnEvent", groupRosterUpdateFunction) --GROUP_ROSTER_UPDATE
     
-    
+    local hasuitGroupRosterUpdateFunction = hasuitGroupRosterUpdateFunction
+    function hasuitSetScriptTestGroupRosterUpdateFunction(fakeFunction)
+        danFrame:SetScript("OnEvent", fakeFunction or hasuitGroupRosterUpdateFunction)
+    end
 end
 
 
@@ -522,6 +563,7 @@ local allTable = {}
 
 
 local function mainLoadOnFunction()
+    -- hasuitMainLoadOnFunctionSpammableActive = false
     for dan=1, #allTable do
         local loadedTable = allTable[dan][1]
         local unloadedTable = allTable[dan][2]
@@ -576,6 +618,7 @@ function mainLoadOnFunctionSpammable()
     local currentTime = GetTime()
     if lastTime~=currentTime then
         lastTime = currentTime
+        -- hasuitMainLoadOnFunctionSpammableActive = true
         danPriorityOnUpdate(mainLoadOnFunction)
     end
 end
@@ -613,7 +656,7 @@ end
 
 
 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
-hasuitInstanceType = instanceType
+hasuitInstanceType = instanceType --none, arena, pvp, scenario, party, raid
 hasuitInstanceId = instanceId
 
 local groupSize = GetNumGroupMembers()
@@ -889,7 +932,6 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitDoThis_Group_Roster_UpdateColumnsChanged = nil
         hasuitDoThis_Group_Roster_UpdateGroupSize_5 = nil
         hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 = nil
-        hasuitDoThis_RelevantSizes = nil
         
         -- hasuitDoThis_GroupUnitFramesUpdate_before = nil
         -- hasuitDoThis_GroupUnitFramesUpdate = nil
@@ -900,6 +942,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         
         hasuitDoThis_OnUpdate = nil
         hasuitDoThis_OnUpdatePosition1 = nil
+        -- hasuitDoThis_OnUpdateSpecificPosition = nil
         hasuitDoThis_PlayerTargetChanged = nil
         hasuitDoThis_AfterCombat = nil
         
@@ -1020,8 +1063,10 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         
         hasuitRestoreCooldowns = nil
         
-        hasuitMakeTestGroupFrames = nil
-        hasuitMakeTestArenaFrames = nil
+        hasuitGroupRosterUpdateFunction = nil
+        hasuitMakeFakeGetNumGroupMembers = nil
+        hasuitSetScriptTestGroupRosterUpdateFunction = nil
+        hasuitUpdateGroupUnitFrames = nil
         
         hasuitRemoveUnitHealthControlNotSafe = nil
         hasuitRemoveUnitHealthControlSafe = nil
@@ -1096,12 +1141,13 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         
         
         hasuitLocal1 = nil --inaccessible from outside, todo
-        
+        hasuitLocal2 = nil
         hasuitLocal3 = nil
-        
         hasuitLocal5 = nil
         hasuitLocal6 = nil
         hasuitLocal7 = nil
+        hasuitLocal8 = nil
+        hasuitLocal9 = nil
         
         
         hasuitResetCooldowns = nil
@@ -1134,6 +1180,9 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitGeneralCastStartFrame_PlayerHasRangedKick = nil
         hasuitPlayerCaresAboutRangedKickSometimes = nil
         
+        hasuitMakeTestGroupFrames = nil
+        hasuitDoThis_EachUnitFrameForOneUpdate = nil
+        hasuitActiveCustomUnitFrameFunctions = nil
     end)
 end)
 

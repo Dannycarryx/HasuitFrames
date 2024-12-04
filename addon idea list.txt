@@ -2,18 +2,22 @@
 
 
 biggest thing right now: 
-
-
+fix reload --done i think
 
 other important:
+option to ignore party# for <6 sort
+
 enabling people to track their own abilities/custom setups
 make a variable like d12 or d13 and set it for non-cleu so that people can initialize a spellname or spellid and have it not get ignored or however that works. should be able to use spellnames or spellids and not worry about it
+
+show more heals on middle castbars maybe? or maybe have a separate location for that that jumps out less but is still showing?
 
 clean up the rest of the globals that might have been missed. Make function that compares _G before and after loading the addon and then check after most stuff gets deleted for what's missing
 display for purgable buffs for people that have purge
 pet frames
 way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
 make party interrupt display for m+
+tank defensive cds
 interrupt duration modifiers from buffs that reduce them, are there passives like a talent that reduces by 10%? --concentration aura
 skip yellow text on target counts
 improve cleuINC to be the same way as how bossauras get decided, maybe that could make it good in pve and not need as much specific tracking in pvp?
@@ -25,6 +29,9 @@ mind control never got fixed like i thought it might have. When that breaks it's
 maybe put precog in text on a middle cast bar if they have it?
 could make a unit_aura function that puts a max timer on the aura and will get rid of it regardless of removed event for (new?) disintegrate bug. not ideal but easy fix
 saw ua show 2 cast bars from the same warlock for some reason. That might get fixed after reworking the way unit events work for the addon?
+update my private data collection addon to keep track of things in m+/raid, separately from the pvp info
+
+blizzard heal/damage text in middle of screen is awful by default, and should have an option to prevent it from spamming on top of raid frames
 
 
 less important:
@@ -45,6 +52,8 @@ improve/figure out scale. whole system needs to be made for size stuff and idk w
 initialize(198034) --Divine Hammer, todo 1 Holy Power per sec, use same system as blessingofautumn for this?
 better display for forbearance. right now you can only see if forbearance is preventing an affected ability like lay on hands from being used on the paladin, not if it can't be used on teammate. Technically people will be able to add forbearance as a dot or something if they want but that's not ideal. maybe that's a better temporary solution for the main addon though too. idk
 do something to make light of the martyr better for holy paladins? the red text display is probably not great for that
+update 4/5 pvp trinket hiding after inspecting talent/gear system is made
+should have an option to only show timer text on specific icons below a set amount like 4 sec, would be nice for keeping up buffs/debuffs like rejuv or other things
 
 even less important:
 summon/rez/phase indicators
@@ -116,6 +125,23 @@ change icon of freezing trap cd to immune version if the hunter is playing that?
 
 different levels of uninterruptible cast? just cast immunity vs all immunity? probably not good that way, but the grey could be based on player actually having something to stop the cast with like typhoon, and then the grey should be based on whether the target can be knocked back or not, not whether the cast is interruptible according to the game. But that's too much work probably
 
+communicating cooldowns with group members possibly, especially on new content where my cds will be more inaccurate. for now it'll be best to just focus on trying to get everything to show right in the first place
+
+When customization gets added, have a way for a raid/party leader in pve to automatically share/enforce something custom they make with everyone in the group/save that to savedvariables for people in group to be able to reload it, (and delete after leaving group? don't want custom things to be created from savedvariables outside of that context)
+
+
+do something to re-map new aura instance ids from a full aura update to existing aura icons instead of replacing them with new icons completely?
+could use new custom unitframe functions system to decide whether to do several things or not, like adding cooldowns or updating auras? many possible things here maybe
+new system that gets rid of the need for scriptProfile, have a good idea of what that's going to be now
+on new unit events system, change functions while main loadon is waiting to be run to all go right after that main loadon function and then change them back to being instant? could maybe do something like that during unit type updates too and just keep the delay without needing to worry about anything. If set up a certain way it would be really cheap to add the delay to all events at once and then change them back
+
+cooldowns that get hidden from changing specs while they're active can keep cooldown text shown while the icon itself gets set alpha 0. something like typhoon used while resto then switch to guardian
+
+nether ward goes back to grey each new round, maybe others/same thing for some hidden maybe? anything likely to get changed between rounds like nether ward/spell bop etc
+hunter feign death literally disappears if they sat longer than 31 sec before canceling feign. i have no idea where it goes. shows back up when used again
+
+
+
 
 
 
@@ -169,8 +195,6 @@ reflected spell incs?
 
 
 cooldown text color changing color over time as it gets closer to being back up? instead of the fixed colors at 19/5 seconds
-
-should have an option to only show timer text on specific icons below a set amount like 4 sec, would be nice for keeping up buffs/debuffs like rejuv or other things
 
 do something with border cooldown tech on certain icons to help show exactly when the effect will end without needing to have timer text?
 

@@ -260,7 +260,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     
     local hasuitMainLoadOnFunctionSpammable = hasuitMainLoadOnFunctionSpammable
     
-    do --loadon for pve, todo fully delete all saved pve stuff on unload? 
+    do --loadon for pve, todo fully delete all saved pve stuff on unload? todo auto attack timers maybe?
         local loadOn = {}
         local function loadOnCondition()
             local instanceId = hasuitInstanceId
@@ -294,7 +294,12 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     pveAuraSpellOptionsIsBossAura =     {["priority"]=470,  ["group"]=danCommonPveAuraIsBossAura, ["loadOn"]=hasuitLoadOn_EnablePve} --todo should pve debuffs be guaranteed to show up? could make something to make them smaller to fit on frames if they go over a limit, in instance not in open world
     pveAuraSpellOptionsUnknownType =    {}
     
-    local danCommonPveCleuINC =         {["size"]=14,   ["hideCooldownText"]=true,  ["alpha"]=1}
+    local danCommonPveVoidbound =       {["size"]=10,   ["hideCooldownText"]=true,  ["alpha"]=1} --could just do alpha = 0 for now? instead of making it really small
+    local pveAuraSpellOptionsVoidboundCDr={["priority"]=500,["group"]=danCommonPveVoidbound, ["loadOn"]=hasuitLoadOn_EnablePve} --m+ voidbound: Blessing from Beyond, textkey/actualtext to hide stacks. that's probably good to do right? only reason it wouldn't be is if people actually use that to decide whether to eat one of the buffs when it could've gone to someone with 10 stacks?
+    local pveAuraSpellOptionsVoidbound ={["priority"]=500,  ["group"]=danCommonPveVoidbound, ["loadOn"]=hasuitLoadOn_EnablePve} --todo way to hide stack text
+    
+    
+    local danCommonPveCleuINC =         {["size"]=12,   ["hideCooldownText"]=true,  ["alpha"]=1}
     pveCleuINCSpellOptions =            {["priority"]=490,  ["group"]=danCommonPveCleuINC,["duration"]=2.5,["isPve"]=true, ["loadOn"]=hasuitLoadOn_EnablePve} --todo fix
     
     local danCommonPveUnitCast =        {["size"]=12,   ["hideCooldownText"]=true,  ["alpha"]=1}
@@ -307,6 +312,12 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
         pveAuraSpellOptionsIsBossAura[1] = hasuitSpellFunction_AuraMainFunction
         pveAuraSpellOptionsUnknownType[1] = hasuitSpellFunction_AuraMainFunctionPveUnknown
         
+        danCommonPveVoidbound["controllerOptions"] = hasuitController_TopLeft_TopLeft --20% vers, 30% cdr. doesn't belong with debuffs but also more noise than anything in buffs controller too? so maybe todo after working on hidden aura system more
+        pveAuraSpellOptionsVoidboundCDr[1] = hasuitSpellFunction_AuraMainFunction
+        pveAuraSpellOptionsVoidboundCDr["specialAuraFunction"]=hasuitSpecialAuraFunction_BlessingOfAutumn --30% cdr for both so no need to change it at all. probably ignores the same cooldowns too?
+        pveAuraSpellOptionsVoidbound[1] = hasuitSpellFunction_AuraMainFunction
+        
+        
         danCommonPveCleuINC["controllerOptions"] = hasuitController_TopRight_TopRight
         pveCleuINCSpellOptions[1] = hasuitSpellFunction_CleuINC
         
@@ -314,11 +325,37 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
         pveUnitCastSpellOptions[1] = hasuitSpellFunction_UnitCasting
     end)
     
-    
+    local trackedPveSpells_Auras = trackedPveSubevents["SPELL_AURA_APPLIED"]
     hasuitFramesCenterSetEventType("aura") -- ___ manual pve track/ignore list here
-    hasuitSetupSpellOptions = pveAuraSpellOptions
+    hasuitSetupSpellOptions = pveAuraSpellOptionsUnknownType
     initialize(422806) --Smothering Shadows (99% damage/healing reduced in the cave)
-    trackedPveSubevents["SPELL_AURA_APPLIED"][422806] = true --prevents pve cleu from auto tracking this spellid when seen. it already doesn't but if they change the way it's coded i won't notice, or if m+ changes it or whatever. this debuff's sourceguid/band== thing is messed up which is why it doesn't auto track, not totally sure what's happening with it. most actual pve debuffs that get ignored like this seem bad to track anyway so not sure what's best to do here, also stuff like heroism debuff and pve potions get filtered out from this which is good. can get a better opinion over time
+    trackedPveSpells_Auras[422806] = true --prevents pve cleu from auto tracking this spellid when seen. it already doesn't but if they change the way it's coded i won't notice, or if m+ changes it or whatever. this debuff's sourceguid/band== thing is messed up which is why it doesn't auto track, not totally sure what's happening with it. most actual pve debuffs that get ignored like this seem bad to track anyway so not sure what's best to do here, also stuff like heroism debuff and pve potions get filtered out from this which is good. can get a better opinion over time
+    
+    
+    --m+ affixes that shouldn't be shown next to debuffs
+    initialize(440313) --Void Rift, dispellable? and can be removed after doing certain amount of healing?
+    trackedPveSpells_Auras[440313] = true
+    hasuitSetupSpellOptions = pveAuraSpellOptionsVoidboundCDr --CDr
+    initialize(462661) --Blessing from Beyond, voidbound debuff that acts like blessing of autumn, this + blessing of autumn should probably just be hidden? Might want to make this function more efficient if it's going to be reused a bunch like this. It's one of the worst things in the addon
+    trackedPveSpells_Auras[462661] = true
+    
+    hasuitSetupSpellOptions = pveAuraSpellOptionsVoidbound
+    initialize(463767) --Void Essence, --could just ignore all of these only instead of showing the small icons?
+    initialize(461904) --Cosmic Ascension
+    initialize(461910) --Cosmic Ascension2
+    initialize(465136) --Lingering Void
+    initialize(462704) --Shattered Essence
+    initialize(462508) --Dark Prayer, don't think this affects players but don't have data from m+ so putting this here in case
+    initialize(462510) --Dark Prayer, ^
+    initialize(440328) --Mending Void, ^
+    trackedPveSpells_Auras[463767] = true
+    trackedPveSpells_Auras[461904] = true
+    trackedPveSpells_Auras[461910] = true
+    trackedPveSpells_Auras[465136] = true
+    trackedPveSpells_Auras[462704] = true
+    trackedPveSpells_Auras[462508] = true
+    trackedPveSpells_Auras[462510] = true
+    trackedPveSpells_Auras[440328] = true
     
 end
 
@@ -1774,7 +1811,7 @@ local function hypo2ndTimerThing(icon, cooldownExpirationTime)
                     icon.specialTimer:Cancel()
                 end
                 icon.specialTimer = C_Timer_NewTimer(cooldownExpirationTime-currentTime, function()
-                    hasuitHypoCooldownTimerDone(icon)
+                    hypoCooldownTimerDone(icon)
                 end)
             elseif cooldownExpirationTime==currentTime then
                 icon:SetAlpha(icon.alpha)
@@ -2091,10 +2128,11 @@ function hasuitSpecialAuraFunction_FeignDeath() --todo check for real dead when 
 end
 
 do
-    local blessingOfAutumnIgnoreList
-    tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function()
-        blessingOfAutumnIgnoreList = hasuitBlessingOfAutumnIgnoreList
-    end)
+    local hasuitBlessingOfAutumnIgnoreList
+    function hasuitLocal2(asd1)
+        hasuitBlessingOfAutumnIgnoreList = asd1
+        return asd1
+    end
     local danSpellOptions = {["CDr"]=0.3}
     local function asd(timer) --might just work well as is without anything extra needing to be done, one potential problem is enemy stealthing, could fix that easily if a new system is made related to that or todo?: if the fullupdate just gets ignored if enemy is known to have used stealth ability, the setscript hide thing should get disabled for those icons?, other problem is just remembering to add relevant stuff to the ignore list, not sure of a good way to automate that
         local icon = timer.icon
@@ -2106,7 +2144,7 @@ do
         for _, coolIcon in pairs(danCurrentFrame.cooldownPriorities) do --this could obviously be improved a lot, but this way there's no need to worry about someone changing talents or something like that with autumn already up, or someone new joining or loadon loading or whatever else, or needing to keep this small thing in mind when making new things in the future (probably)
             if coolIcon.priority==256 or coolIcon.charges then
                 local spellId = coolIcon.spellId
-                if not blessingOfAutumnIgnoreList[spellId] then
+                if not hasuitBlessingOfAutumnIgnoreList[spellId] then
                     tinsert(affectedSpells, spellId)
                 end
             end
@@ -2875,7 +2913,7 @@ do
                                     icon.specialTimer:Cancel()
                                 end
                                 icon.specialTimer = C_Timer_NewTimer(expirationTime-currentTime, function()
-                                    hasuitHypoCooldownTimerDone(icon)
+                                    hypoCooldownTimerDone(icon)
                                 end)
                                 if expirationTime<icon.hypoExpirationTime then
                                     expirationTime = icon.hypoExpirationTime
@@ -2906,7 +2944,7 @@ do
                                     icon.specialTimer:Cancel()
                                 end
                                 icon.specialTimer = C_Timer_NewTimer(icon.expirationTime-GetTime(), function()
-                                    hasuitHypoCooldownTimerDone(icon)
+                                    hypoCooldownTimerDone(icon)
                                 end)
                                 if expirationTime<icon.hypoExpirationTime then
                                     expirationTime = icon.hypoExpirationTime

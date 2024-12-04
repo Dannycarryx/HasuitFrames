@@ -4,7 +4,7 @@
 
 
 
-hasuitBlessingOfAutumnIgnoreList = { --how would this interact with time stop? or other cd reduction like aug thing? if multiply then should combine on unitframe, if not then probably nothing needs to be done?
+hasuitBlessingOfAutumnIgnoreList = hasuitLocal2({ --how would this interact with time stop? or other cd reduction like aug thing? if multiply then should combine on unitframe, if not then probably nothing needs to be done?
     [336126]=true, --Gladiator's Medallion
     [42292]=true, --PvP Trinket, heirloom
     [336135]=true, --Adaptation
@@ -23,10 +23,11 @@ hasuitBlessingOfAutumnIgnoreList = { --how would this interact with time stop? o
     [45182]=true, --Cheating Death?
     
     [31616]=true, --Nature's Guardian?, what about warlock spell lock vs actual pet cd?
-}
+}) --extra steps to make it more similar to other stuff if trying to add to hasuitBlessingOfAutumnIgnoreList from an external addon
 
 
 local tinsert = tinsert
+local hasuitDoThis_OnUpdate = hasuitDoThis_OnUpdate
 
 do --cooldowns loadon
     
@@ -37,7 +38,6 @@ do --cooldowns loadon
         recycleCooldownIcon = func
     end
     
-    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
     local arenaCrowdControlSpellUpdateFrame = hasuitArenaCrowdControlSpellUpdateFrame
     hasuitArenaCrowdControlSpellUpdateFrame = nil
     
@@ -66,7 +66,7 @@ do --cooldowns loadon
                 arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
                 arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
                 if hasuitCooldownDisplayActiveGroup==false then
-                    danDoThisOnUpdate(danRestoreCooldowns2)
+                    hasuitDoThis_OnUpdate(danRestoreCooldowns2)
                 end
                 hasuitCooldownDisplayActiveGroup = true
             end
@@ -208,8 +208,8 @@ do
             ["sort"]=danSortCooldowns,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
-            ["group"] = {["specCooldowns"]=hasuitDefensiveCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",  ["xOffset"]=-73,    ["yOffset"]=yOffsets,   ["limit"]=7},
-            ["arena"] = {["specCooldowns"]=hasuitDefensiveCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT", ["xOffset"]=73,     ["yOffset"]=yOffsets,   ["limit"]=7},
+            ["group"] = {["specCooldowns"]=hasuitDefensiveCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",  ["xOffset"]=-73,    ["yOffset"]=yOffsets,   ["limit"]=7}, --these parts are controller.unitTypeStuff
+            ["arena"] = {["specCooldowns"]=hasuitDefensiveCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT", ["xOffset"]=73,     ["yOffset"]=yOffsets,   ["limit"]=7}, --^
         },
         
         { --interrupt
@@ -217,7 +217,7 @@ do
             ["sort"]=danSortCooldowns,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
-            ["group"] = {["specCooldowns"]=hasuitInterruptCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",  ["xOffset"]=-305,   ["yOffset"]=yOffsets,   ["limit"]=1},
+            ["group"] = {["specCooldowns"]=hasuitInterruptCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",  ["xOffset"]=-305,   ["yOffset"]=yOffsets,   ["limit"]=1}, --^
             ["arena"] = {["specCooldowns"]=hasuitInterruptCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT", ["xOffset"]=305,    ["yOffset"]=yOffsets,   ["limit"]=1},
         },
         
@@ -232,9 +232,30 @@ do
     }
     
     do --groupsize 4/5 changes
-        local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
-        local lastSize
         local hasuitController_CooldownsControllers = hasuitController_CooldownsControllers
+        local groupUnitFrames = hasuitUnitFramesForUnitType["group"] --danSortAllGroupCooldowns
+        local GetTime = GetTime
+        local lastTimeSorted = GetTime()
+        local function danSortAllGroupCooldowns()
+            local currentTime = GetTime()
+            if currentTime==lastTimeSorted then --just to prevent if both roster condition and instance type condition from below both happen at the same time, like from joining or leaving an instance group. Assuming it works like that. Should only run once because it sorts the controllers onupdate anyway and would just be a waste
+                return
+            end
+            lastTimeSorted = currentTime
+            for i=1,#groupUnitFrames do
+                local controllersPairs = groupUnitFrames[i].controllersPairs
+                if controllersPairs then
+                    for j=1,#hasuitController_CooldownsControllers do
+                        local controller = controllersPairs[hasuitController_CooldownsControllers[j]]
+                        if controller then
+                            hasuitSortController(controller) --controller:sortController() ?
+                        end
+                    end
+                end
+            end
+        end
+        
+        local lastSize
         
         local trinketControllerOptions = hasuitController_CooldownsControllers[1]
         local defensiveControllerOptions = hasuitController_CooldownsControllers[2]
@@ -246,26 +267,26 @@ do
         local interruptControllerOptions_GroupUnitTypeStuff = interruptControllerOptions["group"]
         local crowdControlControllerOptions_GroupUnitTypeStuff = crowdControlControllerOptions["group"]
         
-        tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, function() --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size, if doing that don't forget about yOffsets
+        local isPve
+        
+        local function rosterUpdate4or5Function()
             local groupSize = hasuitGroupSize --doesn't matter: could be delayed or something. this will be active and changing things sometimes where cooldowns aren't even loaded like battlegrounds when group is forming or disbanding, or no1 is online and bg can't fill. Ideally just check the loadon variable for whether cooldowns are shown. could do that better if hasuitDoThis_Group_Roster_UpdateGroupSize_5 came before hasuitDoThis_Group_Roster_UpdateGroupSizeChanged. even better use new hasuitDoThis_GroupUnitFramesUpdate system too
             if groupSize==4 or groupSize==5 then --bored todo cooldowns hidden by 4/5 system should really be disabled completely so they aren't using any resources, and reenabled to the correct time based on savedvariables system when that gets made. As is this is especially inefficient for m+/anything where groupsize is 4 or 5 and won't change
                 if lastSize~="fourOrFive" then
                     lastSize = "fourOrFive"
                     trinketControllerOptions_GroupUnitTypeStuff["xOffset"] = -5
-                    defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -34
+                    if not isPve then
+                        defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -34 --don't need to set affected stuff here in the controllers above. probably does nothing but add potential confusion. Not sure if this setup will change in the future
+                    else
+                        defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -5
+                    end
                     defensiveControllerOptions_GroupUnitTypeStuff["limit"] = 5
                     interruptControllerOptions_GroupUnitTypeStuff["limit"] = 0
                     crowdControlControllerOptions_GroupUnitTypeStuff["limit"] = 0
-                    for i=1,#groupUnitFrames do
-                        local controllersPairs = groupUnitFrames[i].controllersPairs
-                        if controllersPairs then --shouldn't be needed?
-                            for j=1,#hasuitController_CooldownsControllers do
-                                local controller = controllersPairs[hasuitController_CooldownsControllers[j]]
-                                if controller then --shouldn't need this
-                                    hasuitSortController(controller)
-                                end
-                            end
-                        end
+                    if groupUnitFrames.sort then
+                        hasuitDoThis_OnUpdate(danSortAllGroupCooldowns)
+                    else
+                        danSortAllGroupCooldowns()
                     end
                 end
                 
@@ -273,20 +294,18 @@ do
                 if lastSize~="threeOrLess" then
                     lastSize = "threeOrLess"
                     trinketControllerOptions_GroupUnitTypeStuff["xOffset"] = -44 --will need to be changed some when cooldowns get updated to allow more customization, but that might be a while from now
-                    defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -73
+                    if not isPve then
+                        defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -73
+                    else
+                        defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -34
+                    end
                     defensiveControllerOptions_GroupUnitTypeStuff["limit"] = 7
                     interruptControllerOptions_GroupUnitTypeStuff["limit"] = 1
                     crowdControlControllerOptions_GroupUnitTypeStuff["limit"] = nil
-                    for i=1,#groupUnitFrames do
-                        local controllersPairs = groupUnitFrames[i].controllersPairs
-                        if controllersPairs then
-                            for j=1,#hasuitController_CooldownsControllers do
-                                local controller = controllersPairs[hasuitController_CooldownsControllers[j]]
-                                if controller then
-                                    hasuitSortController(controller) --controller:sortController() ?
-                                end
-                            end
-                        end
+                    if groupUnitFrames.sort then
+                        hasuitDoThis_OnUpdate(danSortAllGroupCooldowns)
+                    else
+                        danSortAllGroupCooldowns()
                     end
                 end
                 
@@ -294,7 +313,48 @@ do
                 lastSize = nil
                 
             end
-        end)
+        end
+        local function enteringWorld4or5Function()
+            local instanceType = hasuitInstanceType --should really just pass this as an arg
+            if instanceType=="party" or instanceType=="scenario" then
+                if not isPve then
+                    isPve = true
+                    trinketControllerOptions_GroupUnitTypeStuff["limit"] = 0
+                    if lastSize=="threeOrLess" then
+                        defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -34
+                    else
+                        defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -5
+                    end
+                    if groupUnitFrames.sort then
+                        hasuitDoThis_OnUpdate(danSortAllGroupCooldowns)
+                    else
+                        danSortAllGroupCooldowns()
+                    end
+                end
+            else
+                if isPve then
+                    isPve = false
+                    trinketControllerOptions_GroupUnitTypeStuff["limit"] = 1
+                    if lastSize=="threeOrLess" then
+                        defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -73
+                    else
+                        defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -34
+                    end
+                    if groupUnitFrames.sort then
+                        hasuitDoThis_OnUpdate(danSortAllGroupCooldowns)
+                    else
+                        danSortAllGroupCooldowns()
+                    end
+                end
+            end
+        end
+        
+        tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, rosterUpdate4or5Function) --temporary? solution to show fewer cds in 4/5 mans since that goes over the chat so much, could also reduce size, if doing that don't forget about yOffsets
+        -- rosterUpdate4or5Function() --probably not needed, now or ever? If it is needed should run enteringWorld4or5Function first to set isPve
+        
+        tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, enteringWorld4or5Function)
+        enteringWorld4or5Function()
+        
     end
     
 end
@@ -441,14 +501,14 @@ do
         
         do
             local barkskin60 = 
-                {cdCle1,["spellId"]=22812,  ["priority"]=20,    ["duration"]=60} --Barkskin
+                {cdCle1,["spellId"]=22812,  ["priority"]=20,    ["duration"]=60} --Barkskin --priorities should stay the same for spells that are interchangeable/can be swapped between like bash and incapacitating roar. They should be different if the spells are unique to a spec, so like tranquility and survival instincts should be 21 and 22, instead of both 21 like i intended to be possible before. Thought it worked that way this whole time but was wrong. Best to just keep them separate instead of trying to mess with the system. The system is kind of clunky sometimes but the way it works allows for basically everything i want if things are done properly when setting up the cooldownOptions stuff (like the barkskin60 table to the left of this comment) in this file
             local barkskin31 = 
                 {cdCle1,["spellId"]=22812,  ["priority"]=20,    ["duration"]=34}--Barkskin, base 45 for guardian, 60 for other specs, reduced to 34 by guardian-only talents that might not get taken, new duration from 31.5
             
             
             defensiveCooldowns["DRUID"]={
-                {cdCle1,["spellId"]=108238, ["priority"]=26,    ["duration"]=90},--Renewal
-                {cleAura,["spellId"]=382912,["priority"]=27,    ["duration"]=120,--Well-Honed Instincts
+                {cdCle1,["spellId"]=108238, ["priority"]=27,    ["duration"]=90},--Renewal
+                {cleAura,["spellId"]=382912,["priority"]=28,    ["duration"]=120,--Well-Honed Instincts
                     ["specialText"]="proc"},
             }
             defensiveCooldowns[102]={--Balance
@@ -456,23 +516,23 @@ do
             }
             defensiveCooldowns[103]={--Feral
                 barkskin60,
-                {cdCle2,["spellId"]=61336,  ["priority"]=21,    ["duration"]=180,--Survival Instincts --todo 205673 savage momentum pvp talent check for -10 sec interrupt
+                {cdCle2,["spellId"]=61336,  ["priority"]=22,    ["duration"]=180,--Survival Instincts --todo 205673 savage momentum pvp talent check for -10 sec interrupt
                     ["charges"]=1},
             }
             defensiveCooldowns[104]={--Guardian
                 barkskin31,
-                {cdCle2,["spellId"]=61336,  ["priority"]=21,    ["duration"]=136.8, --Survival Instincts 2 charges new duration from 126
+                {cdCle2,["spellId"]=61336,  ["priority"]=22,    ["duration"]=136.8, --Survival Instincts 2 charges new duration from 126
                     ["charges"]=2},
             }
             defensiveCooldowns[105]={--Restoration
                 barkskin60,
                 {cdCle2,["spellId"]=740,    ["priority"]=21,    ["duration"]=180},--Tranquility, todo -20 sec cd talent, seems like there's no way to tell someone's playing it other than watching for cultivation/verdancy/treant wildgrowth/points from -30 sec cd talent, could do something like the blackCheck system for it, once everything is seen release the cd reduction that they would have had etc
-                {cdCle2,["spellId"]=203651, ["priority"]=22,    ["duration"]=60},--Overgrowth
-                -- {cleAurR,["spellId"]=132158,["priority"]=23, ["duration"]=60},--Nature's Swiftness, todo -12 sec? can tell if 35% talent is taken from points
-                -- {cdCle2,["spellId"]=18562,   ["priority"]=24,    ["duration"]=15},--Swiftmend
-                -- {cdCle2,["spellId"]=102693, ["priority"]=25,    ["duration"]=20, --Grove Guardians, todo? there's a -3 sec talent
+                {cdCle2,["spellId"]=203651, ["priority"]=23,    ["duration"]=60},--Overgrowth
+                -- {cleAurR,["spellId"]=132158,["priority"]=24, ["duration"]=60},--Nature's Swiftness, todo -12 sec? can tell if 35% talent is taken from points
+                -- {cdCle2,["spellId"]=18562,   ["priority"]=25,    ["duration"]=15},--Swiftmend
+                -- {cdCle2,["spellId"]=102693, ["priority"]=26,    ["duration"]=20, --Grove Guardians, todo? there's a -3 sec talent
                     -- ["charges"]=3},
-                {cdCle1,["spellId"]=102342, ["priority"]=28,    ["duration"]=90},--Ironbark
+                {cdCle1,["spellId"]=102342, ["priority"]=29,    ["duration"]=90},--Ironbark
             }
             
             
@@ -575,7 +635,7 @@ do
                 ["startAlpha"]=lowStartAlpha,["size"]=22}, --not sure about tracking this
         }
         defensiveCooldowns[71]={--Arms
-            {cdCle2,["spellId"]=118038, ["priority"]=21,    ["duration"]=85.5},--Die by the Sword, base 120, 5% and -30
+            {cdCle2,["spellId"]=118038, ["priority"]=20,    ["duration"]=85.5},--Die by the Sword, base 120, 5% and -30
         }
         defensiveCooldowns[72]={--Fury
             {cdCle2,["spellId"]=184364, ["priority"]=21,    ["duration"]=114},--Enraged Regeneration, base 120
@@ -619,22 +679,22 @@ do
             {cdCle2,["spellId"]=45438,  ["priority"]=21,    ["duration"]=180, --Ice Block --base 240, do people take the -60 sec cd talent 2/2?
                 ["isPrimary"]=true},
             {cdCle2,["spellId"]=414658, ["priority"]=21,    ["duration"]=180},--Ice Cold ^
-            {cdCle2,["spellId"]=110960, ["priority"]=23,    ["duration"]=120},--Greater Invisibility do people take the -45 sec pvp talent?
-            {cdCle2,["spellId"]=414660, ["priority"]=24,    ["duration"]=180, --Mass Barrier --todo hides when mass invis is seen?, new duration was 120
+            {cdCle2,["spellId"]=110960, ["priority"]=25,    ["duration"]=120},--Greater Invisibility do people take the -45 sec pvp talent?
+            {cdCle2,["spellId"]=414660, ["priority"]=26,    ["duration"]=180, --Mass Barrier --todo hides when mass invis is seen?, new duration was 120
                 ["startAlpha"]=0},
-            {cleAura,["spellId"]=342246,["priority"]=26,    ["duration"]=50},--Alter Time, base 60
+            {cleAura,["spellId"]=342246,["priority"]=30,    ["duration"]=50},--Alter Time, base 60
         }
         defensiveCooldowns[62]={--Arcane
             {cdCle2,["spellId"]=198111, ["priority"]=22,    ["duration"]=45},--Temporal Shield
-            {cdCle2,["spellId"]=235450, ["priority"]=25,    ["duration"]=25},--Prismatic Barrier
+            {cdCle2,["spellId"]=235450, ["priority"]=27,    ["duration"]=25},--Prismatic Barrier --are these shared between this/blazing/ice barrier when switching spec?
         }
         defensiveCooldowns[63]={--Fire
-            {cleAura,["spellId"]=87023, ["priority"]=22,    ["duration"]=300},--Cauterize, new talent that resets frost cds except for ice block or others 240 or greater base cd
-            {cdCle2,["spellId"]=235313, ["priority"]=25,    ["duration"]=25},--Blazing Barrier
+            {cleAura,["spellId"]=87023, ["priority"]=23,    ["duration"]=300},--Cauterize, new talent that resets frost cds except for ice block or others 240 or greater base cd
+            {cdCle2,["spellId"]=235313, ["priority"]=28,    ["duration"]=25},--Blazing Barrier
         }
         defensiveCooldowns[64]={--Frost
-            {cdCle2,["spellId"]=235219, ["priority"]=22,    ["duration"]=300},--Cold Snap, new talent that resets fire spells <240, todo no way to tell someone's playing it other than talents but that talent seems bad
-            {cdCle2,["spellId"]=11426,  ["priority"]=25,    ["duration"]=25},--Ice Barrier --todo 30% faster recharg while shield persists on all barriers, not sure about mass barrier
+            {cdCle2,["spellId"]=235219, ["priority"]=24,    ["duration"]=300},--Cold Snap, new talent that resets fire spells <240, todo no way to tell someone's playing it other than talents but that talent seems bad
+            {cdCle2,["spellId"]=11426,  ["priority"]=29,    ["duration"]=25},--Ice Barrier --todo 30% faster recharg while shield persists on all barriers, not sure about mass barrier
         }
         
         tinsert(shiftingPowerAffectedSpells, 45438)
@@ -712,31 +772,31 @@ do
         
 
         defensiveCooldowns["PRIEST"]={
-            {cdCle2,["spellId"]=108968, ["priority"]=22,    ["duration"]=300},--Void Shift
-            {cleAura,["spellId"]=408558,["priority"]=27,    ["duration"]=20, --Phase Shift from fade, base 30
+            {cdCle2,["spellId"]=108968, ["priority"]=28,    ["duration"]=300},--Void Shift
+            {cleAura,["spellId"]=408558,["priority"]=35,    ["duration"]=20, --Phase Shift from fade, base 30
                 ["startAlpha"]=lowStartAlpha},
         }
         defensiveCooldowns[256]={--Discipline
-            {cdCle1,["spellId"]=33206,  ["priority"]=21,    ["duration"]=180, --Pain Suppression
+            {cdCle1,["spellId"]=33206,  ["priority"]=25,    ["duration"]=180, --Pain Suppression
                 ["charges"]=2},
-            {cdCle2,["spellId"]=47536,  ["priority"]=24,    ["duration"]=90},--Rapture
-            -- {cdCle2,["spellId"]=421453,  ["priority"]=23,    ["duration"]=240},--Ultimate Penitence, todo each penance bolt -2 sec cd if they take it, and change below if so
-            {cdCle2,["spellId"]=62618,  ["priority"]=25,    ["duration"]=180},--Power Word: Barrier, only 20% now?
-            {cdCle2,["spellId"]=271466, ["priority"]=25,    ["duration"]=180},--Luminous Barrier
+            {cdCle2,["spellId"]=47536,  ["priority"]=30,    ["duration"]=90},--Rapture
+            -- {cdCle2,["spellId"]=421453,  ["priority"]=29,    ["duration"]=240},--Ultimate Penitence, todo each penance bolt -2 sec cd if they take it, and change below if so
+            {cdCle2,["spellId"]=62618,  ["priority"]=32,    ["duration"]=180},--Power Word: Barrier, only 20% now?
+            {cdCle2,["spellId"]=271466, ["priority"]=32,    ["duration"]=180},--Luminous Barrier
         }
         defensiveCooldowns[257]={--Holy
-            {cdCle2,["spellId"]=47788,  ["priority"]=21,    ["duration"]=71.1},--Guardian Spirit, todo -2 sec if not playing new talent
-            {cdCle2,["spellId"]=215769, ["priority"]=24,    ["duration"]=120, --Spirit of Redemption
+            {cdCle2,["spellId"]=47788,  ["priority"]=26,    ["duration"]=71.1},--Guardian Spirit, todo -2 sec if not playing new talent
+            {cdCle2,["spellId"]=215769, ["priority"]=31,    ["duration"]=120, --Spirit of Redemption
                 ["startAlpha"]=lowStartAlpha},
-            {cdCle2,["spellId"]=197268, ["priority"]=25,    ["duration"]=90, --Ray of Hope, todo bar
+            {cdCle2,["spellId"]=197268, ["priority"]=33,    ["duration"]=90, --Ray of Hope, todo bar
                 ["startAlpha"]=lowStartAlpha},
-            {cdCle2,["spellId"]=328530, ["priority"]=28,    ["duration"]=60, --Divine Ascension
+            {cdCle2,["spellId"]=328530, ["priority"]=36,    ["duration"]=60, --Divine Ascension
                 ["startAlpha"]=0},
         }
         defensiveCooldowns[258]={--Shadow
-            {cdCle2,["spellId"]=47585,  ["priority"]=21,    ["duration"]=90},--Dispersion, base 120
-            {cdCle2,["spellId"]=19236,  ["priority"]=26,    ["duration"]=90},--Desperate Prayer do people take -20 sec Angel's Mercy?, 
-            {cdCle2,["spellId"]=15286,  ["priority"]=28,    ["duration"]=90},--Vampiric Embrace
+            {cdCle2,["spellId"]=47585,  ["priority"]=27,    ["duration"]=90},--Dispersion, base 120
+            {cdCle2,["spellId"]=19236,  ["priority"]=34,    ["duration"]=90},--Desperate Prayer do people take -20 sec Angel's Mercy?, 
+            {cdCle2,["spellId"]=15286,  ["priority"]=37,    ["duration"]=90},--Vampiric Embrace
         }
         
         hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=3,["affectedSpells"]={33206},["loadOn"]=hasuitLoadOn_CooldownDisplay} --Pain Suppression, todo ignore unless disc and tracking pain supp
@@ -752,7 +812,7 @@ do
                 {cdCle2,["spellId"]=1022,   ["priority"]=24,    ["duration"]=240,--Blessing of Protection 1 charge, base 300
                     ["charges"]=1}
             local blessingOfSpellwarding1 = 
-                {cdCle2,["spellId"]=204018, ["priority"]=24,    ["duration"]=240,--Blessing of Spellwarding 1 charge, base 300
+                {cdCle2,["spellId"]=204018, ["priority"]=24,    ["duration"]=240,--Blessing of Spellwarding 1 charge, base 300 --todo this should be switched to bop texture if switching to a spec that can't use spellwarding? after spellwarding already seen from the unit. i don't remember if every spec can use it
                     ["charges"]=1}
             local blessingOfProtection2 = 
                 {cdCle2,["spellId"]=1022,   ["priority"]=24,    ["duration"]=240,--Blessing of Protection 2 charges, base 300, todo show forbearance properly for 2 charges, todo spec swapping update correctly
@@ -766,7 +826,7 @@ do
                 {cdCle2,["spellId"]=471195, ["priority"]=23,    ["duration"]=420},--Lay on Hands, less common, not sure what the difference is. really should switch to spellnames if the setup will work right in other languages
             }
             defensiveCooldowns[65]={--Holy
-                {cdCle2,["spellId"]=498,    ["priority"]=20,    ["duration"]=42},--Divine Protection, base 60, holy
+                {cdCle2,["spellId"]=498,    ["priority"]=20,    ["duration"]=42},--Divine Protection, base 60, holy --todo how does this interact with ret's divine protection if switching specs between the 2
                 blessingOfProtection2,
             }
             defensiveCooldowns[66]={--Protection
@@ -891,7 +951,6 @@ do
             {cdCle2,["spellId"]=183752, ["priority"]=1, ["duration"]=15},--Disrupt
         }
         -- interruptCooldowns[577]={--Havoc
-            -- {cdCle2,["spellId"]=211881,  ["priority"]=3, ["duration"]=30},--Fel Eruption
         -- }
         -- interruptCooldowns[581]={--Vengeance
         -- }
@@ -941,7 +1000,7 @@ do
         -- interruptCooldowns[72]={--Fury
         -- }
         -- interruptCooldowns[73]={--Protection
-            -- {cdCle2,["spellId"]="Disrupting Shout",  ["priority"]=1, ["duration"]=75},--Disrupting Shout todo?
+            -- {cdCle2,["spellId"]="Disrupting Shout",  ["priority"]=2, ["duration"]=75},--Disrupting Shout todo?
         -- }
 
 
@@ -956,15 +1015,15 @@ do
             {cdCle2,["spellId"]=147362, ["priority"]=1, ["duration"]=22},--Counter Shot base 24
         }
         interruptCooldowns[255]={--Survival
-            {cdCle2,["spellId"]=187707, ["priority"]=1, ["duration"]=13},--Muzzle base 15
+            {cdCle2,["spellId"]=187707, ["priority"]=2, ["duration"]=13},--Muzzle base 15
         }
         
         
         
         
 
-        interruptCooldowns["WARLOCK"]={
-            {cdCle2,["spellId"]=132409, ["priority"]=1, ["duration"]=24},--Spell Lock?
+        interruptCooldowns["WARLOCK"]={ --TODO fix pet cooldown stuff, mostly making sure the right spell gets set initially since the other problem should get fixed automatically after making new unit events system
+            {cdCle2,["spellId"]=132409, ["priority"]=1, ["duration"]=24},--Spell Lock? --should probably have each different pet on a unique priority and auto hide the inactive pets. that way cooldown would get preserved for each if switching to one and then back to the same one that's already on cd
             
             {cdCast,["spellId"]=119910, ["priority"]=1, ["duration"]=24},--Spell Lock (command demon) --seems 100% impossible to track these properly if they press command demon while out of range
             {cdCast,["spellId"]=119905, ["priority"]=1, ["duration"]=15},--Singe Magic (command demon)
@@ -1162,17 +1221,17 @@ do
             {cdCle2,["spellId"]=221527, ["priority"]=4, ["duration"]=45},--Imprison immune
             {cdCle2,["spellId"]=207684, ["priority"]=5, ["duration"]=90},--Sigil of Misery base 120, not sure if they take -25% honor talent
         }
-        -- crowdControlCooldowns[577]={--Havoc
-            -- {cdCle2,["spellId"]=211881,  ["priority"]=3, ["duration"]=30},--Fel Eruption
-        -- }
+        crowdControlCooldowns[577]={--Havoc
+            {cdCle2,["spellId"]=211881,  ["priority"]=3, ["duration"]=30},--Fel Eruption
+        }
         -- crowdControlCooldowns[581]={--Vengeance
         -- }
 
 
         do
             crowdControlCooldowns["EVOKER"]={ --todo wing buffet, tail swipe?
-                {cdCleE,["spellId"]=382266, ["priority"]=5, ["duration"]=30}, --Fire Breath
-                {cdCleE,["spellId"]=357208, ["priority"]=5, ["duration"]=30}, --Fire Breath
+                {cdCleE,["spellId"]=382266, ["priority"]=6, ["duration"]=30}, --Fire Breath
+                {cdCleE,["spellId"]=357208, ["priority"]=6, ["duration"]=30}, --Fire Breath
             }
             crowdControlCooldowns[1467]={--Devastation
                 {cdCle2,["spellId"]=357210, ["priority"]=3, ["duration"]=60},--Deep Breath 60, base 120
@@ -1181,12 +1240,12 @@ do
             crowdControlCooldowns[1468]={--Preservation
                 {cdCle2,["spellId"]=357210, ["priority"]=3, ["duration"]=120},--Deep Breath, todo [Wingleader] and [Onyx Legacy]
                 {cdCle2,["spellId"]=433874, ["priority"]=3, ["duration"]=120},--Deep Breath 120, this one is 3.75 sec duration and more common, other one is 6 sec, can't tell where the difference comes from but maybe one is devastation and the other is pres, or maybe one is the one that can fly around and be controlled but idk where the extra duration is coming from if that's the case. the 3.75 second one is an entirely different spellid but also adds like 5 random points and moves some around from the old spellid. none of the points ever change so like what? what's the point of points in an aura that look like this ["0, 0, -200, 0, 0, -100"]/["0, 0, 0, -200, -200, 200, 0, 100, 70, 70, -100, 0"] and not a single one ever changes? maybe just supposed to be used internally by blizzard and a way to tune stuff easily like how fast you can turn while it's active? speed and stuff. not actually inefficient probably i guess maybe, just weird because there are definitely ways to do that without it showing up in an aura's points. also why does the first -200 change from [3] to [4]? what's the extra 0 lol, or maybe it moved to [5]
-                {cdCle2,["spellId"]=359816, ["priority"]=4, ["duration"]=120, --Dream Flight
+                {cdCle2,["spellId"]=359816, ["priority"]=5, ["duration"]=120, --Dream Flight
                     ["startAlpha"]=0},
             }
             crowdControlCooldowns[1473]={--Augmentation
-                {cdCle2,["spellId"]=403631, ["priority"]=3, ["duration"]=120},--Breath of Eons, same thing as deep breath? spellid must be based on whether talent is taken that makes you able to steer but too low lvl to test
-                {cdCle2,["spellId"]=442204, ["priority"]=3, ["duration"]=120},--Breath of Eons
+                {cdCle2,["spellId"]=403631, ["priority"]=4, ["duration"]=120},--Breath of Eons, same thing as deep breath? spellid must be based on whether talent is taken that makes you able to steer but too low lvl to test
+                {cdCle2,["spellId"]=442204, ["priority"]=4, ["duration"]=120},--Breath of Eons --does this share a cd with deep breath if switching spec?
                 {cdCle2,["spellId"]=404977, ["priority"]=2, ["duration"]=180},--Time Skip
             }
             
@@ -1220,10 +1279,10 @@ do
 
 
         crowdControlCooldowns["WARRIOR"]={
-            {cdCle2,["spellId"]=107570, ["priority"]=2, ["duration"]=28.5},--Storm Bolt
-            {cdCle2,["spellId"]=46968,  ["priority"]=3, ["duration"]=25, --Shockwave --todo 15 sec reduction if it hit 3 targets,40 baseline, todo -5 sec from [Earthquaker] probably has an event
+            {cdCle2,["spellId"]=107570, ["priority"]=3, ["duration"]=28.5},--Storm Bolt
+            {cdCle2,["spellId"]=46968,  ["priority"]=4, ["duration"]=25, --Shockwave --todo 15 sec reduction if it hit 3 targets,40 baseline, todo -5 sec from [Earthquaker] probably has an event
                 ["startAlpha"]=lowStartAlpha},
-            {cdCle2,["spellId"]=5246,   ["priority"]=4, ["duration"]=90},--Intimidating Shout
+            {cdCle2,["spellId"]=5246,   ["priority"]=5, ["duration"]=90},--Intimidating Shout
         }
         crowdControlCooldowns[71]={--Arms
             {cdCle2,["spellId"]=236320, ["priority"]=6, ["duration"]=90, --War Banner
@@ -1233,16 +1292,15 @@ do
         -- crowdControlCooldowns[72]={--Fury
         -- }
         -- crowdControlCooldowns[73]={--Protection
-            -- {cdCle2,["spellId"]="Disrupting Shout",  ["priority"]=1, ["duration"]=75},--Disrupting Shout todo?
         -- }
 
 
         crowdControlCooldowns["HUNTER"]={
-            {cdCle2,["spellId"]=19577,  ["priority"]=2, ["duration"]=55},--Intimidation base 60, do people take -5?
-            {cdCle2,["spellId"]=187650, ["priority"]=3, ["duration"]=25},--Freezing Trap, 30 base, do people take -5?
-            {cdCle2,["spellId"]=213691, ["priority"]=4, ["duration"]=30},--Scatter Shot, doesn't share with binding anymore, shares with bursting now todo
-            {cdCle2,["spellId"]=109248, ["priority"]=5, ["duration"]=45},--Binding Shot
-            {cdCle2,["spellId"]=236776, ["priority"]=6, ["duration"]=35},--High Explosive Trap, 40 base, do people take -5? doesn't replace intim anymore, worth to track?
+            {cdCle2,["spellId"]=19577,  ["priority"]=3, ["duration"]=55},--Intimidation base 60, do people take -5?
+            {cdCle2,["spellId"]=187650, ["priority"]=4, ["duration"]=25},--Freezing Trap, 30 base, do people take -5?
+            {cdCle2,["spellId"]=213691, ["priority"]=5, ["duration"]=30},--Scatter Shot, doesn't share with binding anymore, shares with bursting now todo
+            {cdCle2,["spellId"]=109248, ["priority"]=6, ["duration"]=45},--Binding Shot
+            {cdCle2,["spellId"]=236776, ["priority"]=7, ["duration"]=35},--High Explosive Trap, 40 base, do people take -5? doesn't replace intim anymore, worth to track?
         }
         -- crowdControlCooldowns[253]={--Beast Mastery
         -- }

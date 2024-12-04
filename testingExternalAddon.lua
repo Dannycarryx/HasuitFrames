@@ -9,6 +9,8 @@
  --fixes middle icon if unitFrame height or width changes. had to make the grow function for it setpoint on something other than center or pixels bug and this seemed like a good excuse to make this system, could maybe have fixed differently, based on absolute position or something
  --first attempt to let people make custom functions that affect unitframes in their external addon. need to have a better idea of what i want this to be for otherwise should leave it for later, seems like a useful thing though
 
+--the stuff in this file has been turned into an easier to use function hasuitDoThis_EachUnitFrameForOneUpdate
+
 local danRemoveFunctionFromArray = hasuitRemoveUnitHealthControlNotSafe --should rename maybe?
 local hasuitDoThis_GroupUnitFramesUpdate_Positions = hasuitDoThis_GroupUnitFramesUpdate_Positions
 local hasuitDoThis_GroupUnitFramesUpdate_Positions_after = hasuitDoThis_GroupUnitFramesUpdate_Positions_after

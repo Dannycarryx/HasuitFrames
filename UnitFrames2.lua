@@ -24,7 +24,7 @@ local arenaY
 local groupColoredBackgroundMinimum
 local arenaColoredBackgroundMinimum
 
-
+local hasuitUnitFramesForUnitType = hasuitUnitFramesForUnitType
 local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
 local arenaUnitFrames = hasuitUnitFramesForUnitType["arena"]
 local changeUnitTypeColorBackgrounds
@@ -37,10 +37,15 @@ local updateArenaPositions
 local updatingGroupPositions
 local danUpdateGroupPositionsButtons
 
+local danMakeTestGroupFrames
+local danTestGroupFramesActive
+local danMakeTestArenaFrames
+
+local hasuitDoThis_AfterCombat = hasuitDoThis_AfterCombat
+
 tinsert(hasuitDoThis_UserOptionsLoaded, function()
     local savedUserOptions = hasuitSavedUserOptions
     local userOptionsOnChanged = hasuitUserOptionsOnChanged
-    local danRunAfterCombat = hasuitDoThis_AfterCombat
     
     
     
@@ -49,7 +54,7 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function()
             danUpdateGroupPositionsButtons()
         elseif not updatingGroupPositions then
             updatingGroupPositions = true
-            danRunAfterCombat(danUpdateGroupPositionsButtons)
+            hasuitDoThis_AfterCombat(danUpdateGroupPositionsButtons)
         end
     end
     
@@ -92,7 +97,7 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function()
             updateArenaPositions()
         elseif not updatingArenaPositions then
             updatingArenaPositions = true
-            danRunAfterCombat(arenaPositions2)
+            hasuitDoThis_AfterCombat(arenaPositions2)
         end
     end
     arenaX = savedUserOptions["arenaX"]
@@ -119,17 +124,14 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function()
     end
     
     
-    
-    local makeTestGroupFrames = hasuitMakeTestGroupFrames
     userOptionsOnChanged["partyTest"] = function()
-        makeTestGroupFrames(savedUserOptions["partyTest"])
+        danMakeTestGroupFrames(savedUserOptions["partyTest"])
     end
-    local makeTestArenaFrames = hasuitMakeTestArenaFrames
     userOptionsOnChanged["arenaTest"] = function()
-        makeTestArenaFrames(savedUserOptions["arenaTest"])
+        danMakeTestArenaFrames(savedUserOptions["arenaTest"])
     end
     userOptionsOnChanged["raidTest"] = function()
-        makeTestGroupFrames(savedUserOptions["raidTest"])
+        danMakeTestGroupFrames(savedUserOptions["raidTest"])
     end
     
     
@@ -195,7 +197,6 @@ local arenaSpecIconAlpha = 0.45
 
 local rolePriorities
 local classPriorities
-local danUpdatePriority
 local danUpdateFrameRole
 
 local danUpdateHealthAndAbsorbValues
@@ -410,7 +411,7 @@ do
         colorBackgroundTableGreen = {}
         colorBackgroundTableBlue = {}
         
-        for i=0,25 do --not sure what i like better here
+        for i=0,25 do
             colorBackgroundTableRed[i] = 1
             colorBackgroundTableGreen[i] = 0
             colorBackgroundTableBlue[i] = 0.4*((25-i)/25)
@@ -432,7 +433,7 @@ do
         end
         
         
-        -- for i=0,50 do
+        -- for i=0,50 do --not sure what i like better here between this commented out part and above. this is maybe better for smaller groups and above is better for bigger groups? this might just be better overall because it doesn't need an explanation like above does? but idk. should probably increase number of shades of color since that would only really cost a little extra memory (i think)? and save this table to savedvariables once done
             -- colorBackgroundTableRed[i] = 1
             -- colorBackgroundTableGreen[i] = i/50
             -- colorBackgroundTableBlue[i] = 0
@@ -490,6 +491,28 @@ do
 
 
     do
+        local function customUnitFrameFunction_ColoredBackground_Enable(unitFrame)
+            if not unitFrame.colorBackground then
+                danCurrentFrame = unitFrame
+                danCurrentUnit = unitFrame.unit
+                enableColorBackgroundForFrame()
+                if not unitFrame.updatingColor then
+                    danUpdateClassColor3(unitFrame)
+                end
+            end
+        end
+        local function customUnitFrameFunction_ColoredBackground_Disable(unitFrame)
+            if unitFrame.colorBackground then
+                danCurrentFrame = unitFrame
+                disableColorBackgroundForFrame()
+                if not unitFrame.updatingColor then
+                    danUpdateClassColor3(unitFrame)
+                end
+            end
+        end
+        
+        local hasuitActiveCustomUnitFrameFunctions = hasuitActiveCustomUnitFrameFunctions
+        local hasuitDoThis_EachUnitFrameForOneUpdate = hasuitDoThis_EachUnitFrameForOneUpdate
         local colorTypeCount = 0
         function changeUnitTypeColorBackgrounds(enable)
             if enable and not danCurrentUnitTable.colorBackgroundEnabled then
@@ -498,12 +521,22 @@ do
                     colorBackgroundsFirstRun = nil
                 end
                 danCurrentUnitTable.colorBackgroundEnabled = true
-                for i=1, #danCurrentUnitTable do
-                    danCurrentFrame = danCurrentUnitTable[i]
-                    danCurrentUnit = danCurrentFrame.unit
-                    enableColorBackgroundForFrame()
-                    danUpdateClassColor3(danCurrentFrame)
+                if danCurrentUnitTable==groupUnitFrames then --i don't remember if there's a reason why it's like this instead of just the same way i made it for arena frames below
+                    local removeDisableIfActive = hasuitActiveCustomUnitFrameFunctions[customUnitFrameFunction_ColoredBackground_Disable]
+                    if removeDisableIfActive then
+                        removeDisableIfActive()
+                    end
+                    hasuitDoThis_EachUnitFrameForOneUpdate(customUnitFrameFunction_ColoredBackground_Enable)
+                    customUnitFrameFunction_ColoredBackground_Enable(danPlayerFrame)
+                    danUpdateClassColor3(danPlayerFrame)
+                    
+                elseif danCurrentUnitTable==arenaUnitFrames then
+                    for i=1,#arenaUnitFrames do
+                        customUnitFrameFunction_ColoredBackground_Enable(arenaUnitFrames[i])
+                    end
+                    
                 end
+                
                 colorTypeCount = colorTypeCount+1
                 
                 if colorTypeCount==1 then
@@ -516,11 +549,23 @@ do
                 
             elseif not enable and danCurrentUnitTable.colorBackgroundEnabled then
                 danCurrentUnitTable.colorBackgroundEnabled = nil
-                for i=1, #danCurrentUnitTable do
-                    danCurrentFrame = danCurrentUnitTable[i]
-                    disableColorBackgroundForFrame()
-                    danUpdateClassColor3(danCurrentFrame)
+                
+                if danCurrentUnitTable==groupUnitFrames then
+                    local removeEnableIfActive = hasuitActiveCustomUnitFrameFunctions[customUnitFrameFunction_ColoredBackground_Enable]
+                    if removeEnableIfActive then
+                        removeEnableIfActive()
+                    end
+                    hasuitDoThis_EachUnitFrameForOneUpdate(customUnitFrameFunction_ColoredBackground_Disable)
+                    customUnitFrameFunction_ColoredBackground_Disable(danPlayerFrame)
+                    danUpdateClassColor3(danPlayerFrame)
+                    
+                elseif danCurrentUnitTable==arenaUnitFrames then
+                    for i=1,#arenaUnitFrames do
+                        customUnitFrameFunction_ColoredBackground_Disable(arenaUnitFrames[i])
+                    end
+                    
                 end
+                
                 colorTypeCount = colorTypeCount-1
                 
                 if colorTypeCount==0 then
@@ -861,6 +906,7 @@ function danRemoveUnitHealthControlNotSafe(oldOtherUnitHealthFunctions, healthFu
     end
 end
 hasuitRemoveUnitHealthControlNotSafe = danRemoveUnitHealthControlNotSafe
+hasuitLocal9(danRemoveUnitHealthControlNotSafe)
 local danRemoveUnitHealthControlSafe
 do
     local function danEmpty()
@@ -1097,7 +1143,7 @@ function danHideUnitFrame2(frame)
     end
     
     frame.unitType = nil
-    frame.number = nil
+    frame.partyNumber = nil
     frame.text:SetText("")
     frame.text2:SetText("")
     frame.broken = nil
@@ -1337,7 +1383,7 @@ classPriorities = { --todo spec priorities
     ["d/c"]         = 5000,
 }
 
-function danUpdateFrameRole2(skipLastHalf)
+local function danUpdateFrameRole2(skipLastHalf)
     local role = UnitGroupRolesAssigned(danCurrentUnit)
     if danCurrentFrame.role ~= role then 
         if role == "TANK" then 
@@ -1478,7 +1524,7 @@ function danGetUnit_HealthFunctionLines(frame)
 end
 do
     local function getColorsForBackground(unit, maxHealth)
-        local percentHealth = floor(((danCurrentUnitHealth+UnitGetTotalAbsorbs(unit))/maxHealth)*100)
+        local percentHealth = floor(((danCurrentUnitHealth+UnitGetTotalAbsorbs(unit))/maxHealth)*100) --bored todo maybe use % instead of floor, also UnitGetTotalAbsorbs should go on the frame when it changes instead of here maybe? or maybe not, can't remember if there's a good reason for it being like this
         if percentHealth > 100 then 
             percentHealth = 100
         end
@@ -1614,18 +1660,7 @@ end
 
 
 
-
-
-do
-    local GetNumSubgroupMembers = GetNumSubgroupMembers
-    tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, 1, function()
-        danCurrentGroupSize = hasuitGroupSize
-        danCurrentPartySize = GetNumSubgroupMembers()
-        
-        danCurrentUnitTable = groupUnitFrames
-        changeUnitTypeColorBackgrounds(groupColoredBackgroundMinimum>0 and danCurrentGroupSize>=groupColoredBackgroundMinimum) --bugged during a shuffle transition where group size was 4 and someone was d/ced for 1 frame, dark color stuck on the one that was d/ced, so i moved this out of group roster update unsafe function and changed a few things with updating existing units so should be good now? the problem was probably with updating existing units and probably not this
-    end)
-end
+local danUpdateGroupUnitFrames --GROUP_ROSTER_UPDATE
 
 local UIParent = UIParent
 
@@ -1635,9 +1670,6 @@ local hasuitGetIcon = hasuitGetIcon
 
 local numberOfTrackedDrs
 local arenaDiminishTextures = {}
-
-local updatingGroupRoster
-local hasuitUpdateGroupRosterUnsafe
 
 tinsert(hasuitDoThis_Player_Login, 1, function()
     do
@@ -1779,7 +1811,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
     danCurrentUnitTable = groupUnitFrames
     
     if groupColoredBackgroundMinimum>0 and danCurrentGroupSize>=groupColoredBackgroundMinimum then
-        changeUnitTypeColorBackgrounds(true)
+        -- changeUnitTypeColorBackgrounds(true)
     else
         danSetScriptRangeMaybe()
     end
@@ -1790,7 +1822,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
     danPlayerFrame.updatingColor = true
     danPlayerFrame.colorFunction = nil --works itself out for color background updating color3, other things like unit_flags will go through afterward on playerframe but setscript onupdate to nil from this and updatingColor back to true at the same time
     danPlayerFrame.priority = 0
-    danPlayerFrame.number = 0
+    danPlayerFrame.partyNumber = 0
     danPlayerFrame.updated = hasuitFrameTypeUpdateCount["group"]
     
     danPlayerFrame.border:SetScript("OnEvent", function()
@@ -1832,29 +1864,86 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
         danCurrentUnit = "player"
         danEnablePowerBar2()
     end)
-    hasuitUpdateGroupRosterUnsafe()
     
+    
+    
+    local GetNumSubgroupMembers = GetNumSubgroupMembers
+    local function rosterSizeChangedFunction1()
+        danCurrentGroupSize = hasuitGroupSize
+        danCurrentPartySize = GetNumSubgroupMembers()
+        
+        danCurrentUnitTable = groupUnitFrames
+        changeUnitTypeColorBackgrounds(groupColoredBackgroundMinimum>0 and danCurrentGroupSize>=groupColoredBackgroundMinimum) --bugged during a shuffle transition where group size was 4 and someone was d/ced for 1 frame, dark color stuck on the one that was d/ced, so i moved this out of group roster update unsafe function and changed a few things with updating existing units so should be good now? the problem was probably with updating existing units and probably not this
+    end
+    tinsert(hasuitDoThis_Group_Roster_UpdateGroupSizeChanged, 1, rosterSizeChangedFunction1)
+    rosterSizeChangedFunction1()
+    
+    
+    
+    hasuitSetScriptTestGroupRosterUpdateFunction()
+    
+    danUpdateGroupUnitFrames()
+    
+    -- local danExists = UnitExists("player")
+    -- if danExists then
+        -- print("dan exists")
+        -- danUpdateGroupUnitFrames()
+    -- else
+        -- print("dan doesn't exist")
+        -- if hasuitGroupSize<2 then
+            -- hasuitMakeTestGroupFrames(40)
+            -- hasuitDoThis_OnUpdate(function()
+                -- hasuitMakeTestGroupFrames(0)
+            -- end)
+        -- else
+            -- danUpdateGroupUnitFrames()
+        -- end
+    -- end
 end)
 
 
+local onEventSetScriptTestFor0
 local playerRaidUnit
 do
-    
-    local danDoThis = hasuitDoThis_Group_Roster_UpdateAlways
-    local danDoThisGroupSizeChanged = hasuitDoThis_Group_Roster_UpdateGroupSizeChanged
-    local danDoThisRelevantSizes = hasuitDoThis_RelevantSizes
-    
+    local hasuitMakeFakeGetNumGroupMembers = hasuitMakeFakeGetNumGroupMembers
+    local hasuitSetScriptTestGroupRosterUpdateFunction = hasuitSetScriptTestGroupRosterUpdateFunction
+    local fakeNumber
+    function onEventSetScriptTestFor0() --little bit sketchy that this will only happen on real roster event and get ignored by other sources, but maybe fine. main reason i did it like this is to not dig the real function out of roster update array
+        hasuitGroupSize = 0 --say it was 0, but it never will be so the real update will always be full. problem was i went from having test size 4 up to being in a real group of 4 and all it did was remove the 3 test frames and never updated the real units until i reloaded. i assume it would've updated if a 5th joined. surprised it broke like that
+        hasuitSetScriptTestGroupRosterUpdateFunction()
+        hasuitMakeFakeGetNumGroupMembers()
+        danMakeTestGroupFrames()
+    end
+    local function fakeGetNumGroupMembers()
+        return fakeNumber
+    end
+    local hasuitGroupRosterUpdateFunction = hasuitGroupRosterUpdateFunction --the main group roster update function from center.lua
     
     local targetGUID
     local lastFrames = {}
-    function hasuitMakeTestGroupFrames(number)
+    function danMakeTestGroupFrames(number)
+        if number then
+            fakeNumber = number
+            if not danTestGroupFramesActive then
+                danTestGroupFramesActive = true
+                hasuitMakeFakeGetNumGroupMembers(fakeGetNumGroupMembers)
+                hasuitSetScriptTestGroupRosterUpdateFunction(onEventSetScriptTestFor0)
+            end
+        else
+            fakeNumber = 0
+            danTestGroupFramesActive = false
+            -- hasuitSetScriptTestGroupRosterUpdateFunction()
+            -- hasuitMakeFakeGetNumGroupMembers()
+        end
         
         local actualGroupSize = GetNumGroupMembers()
         if actualGroupSize == 0 then
             actualGroupSize = 1
         end
         
-        
+        if not number then
+            number = 0 --run test function as 0 when actual event gets triggered and test function was the previous thing that was setscript for that
+        end
         if number<=actualGroupSize then
             number = actualGroupSize
             
@@ -1866,6 +1955,7 @@ do
             
         end
         
+        fakeNumber = number
         
         danCurrentUnitType = "group"
         danCurrentUnitTable = groupUnitFrames
@@ -1877,36 +1967,6 @@ do
         else
             playerRaidUnit = "raid1"
         end
-        
-        
-        if number~=hasuitGroupSize then
-            hasuitGroupSize = number
-            
-            for i=1,#danDoThisGroupSizeChanged do
-                danDoThisGroupSizeChanged[i]()
-            end
-            
-            for i=1,#danDoThisRelevantSizes do
-                local sizeTable = danDoThisRelevantSizes[i]
-                local relevantSize = sizeTable[number]
-                if sizeTable.activeRelevantSize~=relevantSize then
-                    sizeTable.activeRelevantSize = relevantSize
-                    local sizeFunctions = sizeTable.functions
-                    for j=1,#sizeFunctions do
-                        sizeFunctions[j]()
-                    end
-                end
-            end
-        end
-        for i=1,#danDoThis do
-            danDoThis[i]()
-        end
-        
-        
-        
-        
-        local updatedPlus1 = hasuitFrameTypeUpdateCount["group"]+1
-        hasuitFrameTypeUpdateCount["group"] = updatedPlus1
         
         
         if targetGUID and targetGUID~=true then --made first fake frame "target" to be able to test things on a dummy easily like root/root ccbreakbar/loadon switching text around/unloading ccbreakbar on roots only etc. can test a bunch of stuff super easily this way, might be misleading for other people though because some stuff won't get tracked if spell is from player or things like that. not sure if ideal because of that?
@@ -1925,6 +1985,10 @@ do
             end
         end
         targetGUID = nil
+        
+        
+        local updatedPlus1 = hasuitFrameTypeUpdateCount["group"]+1
+        hasuitFrameTypeUpdateCount["group"] = updatedPlus1
         
         for i=1,#groupUnitFrames do
             local frame = groupUnitFrames[i]
@@ -1965,18 +2029,25 @@ do
             hasuitUnitFrameMakeHealthBarMain()
             local frame = danCurrentFrame
             hasuitUnitFrameForUnit[unit] = frame
-            frame.updatingColor = true
-            frame.colorFunction = nil
+            -- frame.updatingColor = true --don't remember if there's a reason why these were here
+            -- frame.colorFunction = nil
             frame.priority = i+10000
-            frame.number = i+10000
+            frame.partyNumber = i+10000
             frame.updated = updatedPlus1+1
             C_Timer_After(0, function()
                 frame:SetAlpha(1)
             end)
             tinsert(lastFrames, frame)
         end
+        
+        hasuitGroupRosterUpdateFunction()
+        
     end
+    hasuitMakeTestGroupFrames = danMakeTestGroupFrames
 end
+
+
+local danUpdateArenaUnitFrames
 
 local hasuitArenaTestNumber = hasuitArenaTestNumber
 local hasuitSpecIsHealerTable = hasuitSpecIsHealerTable
@@ -1992,13 +2063,12 @@ do
         fakeSpec = next(hasuitSpecIsHealerTable, fakeSpec) or next(hasuitSpecIsHealerTable)
         return realSpec and realSpec~=0 and realSpec or fakeSpec
     end
-    GetArenaOpponentSpec = fakeGetArenaOpponentSpec
     local realGetNumArenaOpponentSpecs = GetNumArenaOpponentSpecs
     local function fakeGetNumArenaOpponentSpecs()
         local realNumber = realGetNumArenaOpponentSpecs()
         return hasuitArenaTestNumber>realNumber and hasuitArenaTestNumber or realNumber
     end
-    function hasuitMakeTestArenaFrames(number)
+    function danMakeTestArenaFrames(number)
         if hasuitInstanceType=="arena" then
             return
         end
@@ -2024,16 +2094,12 @@ do
             -- frame.specialAuraInstanceIDsRemove = {}
         end
         
-        danUpdateArenaFramesUnsafe()
+        danUpdateArenaUnitFrames()
         
         GetArenaOpponentSpec = realGetArenaOpponentSpec
         GetNumArenaOpponentSpecs = realGetNumArenaOpponentSpecs
     end
 end
-
-
-
-
 
 
 
@@ -2273,15 +2339,14 @@ local function partyFixedFunction()
     partyBrokenTable = {}
 end
 
-
-function danSortGroup()
+local function groupUnitFramesSort()
     if danCurrentGroupSize<6 then
         if danCurrentGroupSize-danCurrentPartySize>1 then
             partyBroken = true --partybroken thing could be improved
             partyFixedFunction()
             for i=2,#groupUnitFrames do
                 local frame = groupUnitFrames[i]
-                frame.number = i+5
+                frame.partyNumber = i+5
                 partyBrokenTable[i] = frame
                 frame.broken = true
             end
@@ -2291,20 +2356,39 @@ function danSortGroup()
         end
         if partyBroken then
             for i=1,danCurrentPartySize do
-                partyBrokenTable[i] = nil
-                hasuitUnitFrameForUnit["party"..i].number = i
+                local frame = hasuitUnitFrameForUnit["party"..i]
+                if frame then
+                    partyBrokenTable[i] = nil
+                    frame.partyNumber = i
+                end
             end
             partyBrokenFunction()
         else
             for i=1,danCurrentPartySize do
-                hasuitUnitFrameForUnit["party"..i].number = i
+                local frame = hasuitUnitFrameForUnit["party"..i]
+                if frame then
+                    frame.partyNumber = i
+                end
             end
         end
         
-        danPlayerFrame.number = 0
+        danPlayerFrame.partyNumber = 0
         
-        sort(groupUnitFrames, function(a,b)
-            return a.number<b.number
+        sort(groupUnitFrames, function(a,b) --broke after trying to make instant unit updates instead of onupdates. this whole part is terrible anyway
+            local aPartyNumber = a.partyNumber
+            local bPartyNumber = b.partyNumber
+            if aPartyNumber and bPartyNumber then
+                return aPartyNumber<bPartyNumber
+            elseif aPartyNumber then
+                return aPartyNumber
+            elseif bPartyNumber then
+                return bPartyNumber
+            elseif a.priority and b.priority then
+                return aPartyNumber<b.priority
+            else
+                return a.id<b.id
+            end
+            
         end)
     else
         if partyBroken then
@@ -2317,6 +2401,14 @@ function danSortGroup()
         sort(groupUnitFrames, function(a,b)
             return a.priority<b.priority
         end)
+    end
+    
+    
+    if not InCombatLockdown() then
+        danUpdateGroupPositionsButtons()
+    elseif not updatingGroupPositions then
+        updatingGroupPositions = true
+        hasuitDoThis_AfterCombat(danUpdateGroupPositionsButtons)
     end
 end
 
@@ -2352,7 +2444,7 @@ function danUpdateExistingUnit()
                 danCurrentFrame.targetOf = nil
             end
         end
-        hasuitUpdateAllUnitsForUnitType[oldUnitType]()
+        hasuitUnitFramesForUnitType[oldUnitType].needsUpdate = true
         danCurrentFrame.unitType = danCurrentUnitType
     end
     
@@ -2407,52 +2499,6 @@ function danUpdateExistingUnit()
     
 end
 
-
-
-local danUpdatingRole = true
-local danUpdateArenaFramesPriority
-local danUpdatingArenaFrames
-do
-    local danPlayerRolesAssignedFrame = CreateFrame("Frame")
-    danPlayerRolesAssignedFrame:SetScript("OnEvent", function()
-        danUpdatingRole = true
-    end)
-    danPlayerRolesAssignedFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
-    
-    local hasuitDoThis_Group_Roster_UpdateAlways = hasuitDoThis_Group_Roster_UpdateAlways
-    
-    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
-    danDoThisOnUpdate(function()
-        local rosterUpdateFunction = hasuitUpdateAllUnitsForUnitType["group"]
-        tinsert(hasuitDoThis_Group_Roster_UpdateAlways, rosterUpdateFunction)
-    end)
-    
-    
-    function danUpdateArenaFramesPriority()
-        if not danUpdatingArenaFrames then
-            danUpdatingArenaFrames = true
-            danDoThisOnUpdate(danUpdateArenaFramesUnsafe)
-        end
-    end
-    
-    do
-        local function hasuitUpdateGroupRosterSafe()
-            if not updatingGroupRoster then
-                updatingGroupRoster = true
-                danDoThisOnUpdate(hasuitUpdateGroupRosterUnsafe)
-            end
-        end
-        local function danUpdateArenaFramesSafe()
-            if not danUpdatingArenaFrames then
-                danUpdatingArenaFrames = true
-                danDoThisOnUpdate(danUpdateArenaFramesUnsafe)
-            end
-        end
-        
-        hasuitUpdateAllUnitsForUnitType["group"] = hasuitUpdateGroupRosterSafe
-        hasuitUpdateAllUnitsForUnitType["arena"] = danUpdateArenaFramesSafe
-    end
-end
 
 
 local targetOfCountActive
@@ -2662,6 +2708,8 @@ danUpdateUnitSpecial["arena"] = function()
     danUnitAuraIsFullUpdate(danCurrentFrame)
 end
 
+local GetTime = GetTime
+
 do
     local unusedTextFrames = hasuitUnusedTextFrames
     local hasuitSetIconText = hasuitSetIconText
@@ -2771,7 +2819,7 @@ do
             cooldownOnCooldownDone(icon.cooldown)
         end
     end
-    hasuitLocal5(hasuitHypoCooldownTimerDone)
+    hasuitLocal5(hypoCooldownTimerDone) --was broken for some amount of time but never saw an error for it
     local hasuitSortController = hasuitSortController
     hasuitLocal6(cooldownOnCooldownDone)
     local hasuitController_CooldownsControllers = hasuitController_CooldownsControllers
@@ -2946,10 +2994,10 @@ do
                 end
             end
         end
-        for i=1,#controllers do --to skip having to wait until next gettime since this usually gets called during onupdate, although that delay might be better anyway to minimize load time for new unitframes. idk
+        for i=1,#controllers do --point is to do things instantly instead of controller onupdate, although should it be?
             local controller = controllers[i]
             if controller.doingSomething then
-                controller.doingSomething(controller)
+                controller.doingSomething(controller) --should just do a cleanController for them all and not do that above/not check .doingSomething?
             else
                 controller.grow(controller)
             end
@@ -3128,12 +3176,25 @@ initialize(384255) --Changing Talents
 
 
 
+
+
+local danUpdatingRole = true
+do
+    local danPlayerRolesAssignedFrame = CreateFrame("Frame")
+    danPlayerRolesAssignedFrame:SetScript("OnEvent", function()
+        danUpdatingRole = true
+    end)
+    danPlayerRolesAssignedFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
+end
+
+
+
 -- local hasuitDoThis_GroupUnitFramesUpdate_before = hasuitDoThis_GroupUnitFramesUpdate_before
--- local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
--- local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
+local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
+local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
 local lastRaidSize = 0
 local lastPartySize = 0
-function danUpdateGroupUnits(groupType, number, lastNumber)
+local function danUpdateGroupUnits(groupType, number, lastNumber)
     if number<lastNumber then
         number = lastNumber
     end
@@ -3171,27 +3232,99 @@ function danUpdateGroupUnits(groupType, number, lastNumber)
             end
             danCurrentFrame.updated = updateCount
             
-            -- for j=1,#hasuitDoThis_GroupUnitFramesUpdate do --won't work from test function if solo because number (party size) is 0 and the test function cheats to make frames, it just makes them directly and gives them fake .updated so they don't hide
-                -- print("asd")
-                -- hasuitDoThis_GroupUnitFramesUpdate[j](danCurrentFrame)
-            -- end
+            for j=1,#hasuitDoThis_GroupUnitFramesUpdate do --won't work from test function if solo because number (party size) is 0 and the test function cheats to make frames, it just makes them directly and gives them fake .updated so they don't hide
+                hasuitDoThis_GroupUnitFramesUpdate[j](danCurrentFrame)
+            end
             
         else
             hasuitUnitFrameForUnit[danCurrentUnit] = nil
         end
     end
-    -- if #hasuitDoThis_GroupUnitFramesUpdate_after>0 then
-        -- for i=1,#hasuitDoThis_GroupUnitFramesUpdate_after do
-            -- hasuitDoThis_GroupUnitFramesUpdate_after[i]()
-        -- end
-        -- wipe(hasuitDoThis_GroupUnitFramesUpdate_after)
-    -- end
+    if #hasuitDoThis_GroupUnitFramesUpdate_after>0 then
+        for i=1,#hasuitDoThis_GroupUnitFramesUpdate_after do
+            hasuitDoThis_GroupUnitFramesUpdate_after[i]()
+        end
+        wipe(hasuitDoThis_GroupUnitFramesUpdate_after)
+    end
     
     danUpdatingRole = false
 end
 
-function danUpdateArenaFramesUnsafe()
-    danUpdatingArenaFrames = false
+
+
+
+
+
+
+
+
+local updateAllOtherUnits
+local updatingAllOtherUnits
+local hasuitUnitFramesForUnitType_Array = hasuitUnitFramesForUnitType_Array
+local hasuitDoThis_OnUpdatePosition1 = hasuitDoThis_OnUpdatePosition1
+local function endOfUnitFrameUpdateSharedFunction(ownUnitTable, updatingAllOtherUnits_local)
+    for i=1,#hasuitUnitFramesForUnitType_Array do
+        local unitTable = hasuitUnitFramesForUnitType_Array[i]
+        if unitTable.needsUpdate and unitTable~=ownUnitTable then
+            if not unitTable.timerActive then
+                hasuitUpdateAllUnitsForUnitType[unitTable.unitType]()
+                break
+            end
+        end
+    end
+    if not updatingAllOtherUnits_local then
+        updateAllOtherUnits()
+    end
+end
+
+
+
+
+
+local function delayedUnitFrameUpdateFunction(unitTable)
+    unitTable.timerActive = false
+    if unitTable.needsUpdate then
+        unitTable.mainUnitTypeUpdateFunction()
+    end
+end
+local function beginningOfUnitFrameUpdateSharedFunction(unitTable)
+    local currentTime = GetTime()
+    if unitTable.lastUpdateTime == currentTime then
+        if unitTable.attemptToUpdateCount<2 then
+            unitTable.attemptToUpdateCount = unitTable.attemptToUpdateCount+1
+        else
+            if not unitTable.timerActive then
+                unitTable.timerActive = true
+                unitTable.needsUpdate = true
+                C_Timer_After(0, function()
+                    delayedUnitFrameUpdateFunction(unitTable)
+                end)
+            end
+            return true
+        end
+    else
+        unitTable.attemptToUpdateCount = 0
+        unitTable.lastUpdateTime = currentTime
+    end
+    unitTable.needsUpdate = false
+    -- print(hasuitPurple2, unitTable.unitType, unitTable.attemptToUpdateCount, currentTime)
+end
+
+
+
+
+
+function danUpdateArenaUnitFrames()
+    
+    
+    if beginningOfUnitFrameUpdateSharedFunction(arenaUnitFrames) then
+        -- print("arena >2")
+        return
+    end
+    local updatingAllOtherUnits_local = updatingAllOtherUnits --to only do it once and not from stealing other unit types
+    updatingAllOtherUnits = true
+    
+    
     danCurrentUnitType = "arena"
     danCurrentUnitTable = arenaUnitFrames
     
@@ -3248,10 +3381,16 @@ function danUpdateArenaFramesUnsafe()
         end
     end
     
-    danHideInactiveFrames()
-    updateTargetBorder()
+    
+    endOfUnitFrameUpdateSharedFunction(arenaUnitFrames, updatingAllOtherUnits_local)
+    if not updatingAllOtherUnits_local then
+        updatingAllOtherUnits = false
+    end
+    
+    
 end
-
+hasuitUpdateAllUnitsForUnitType["arena"] = danUpdateArenaUnitFrames
+arenaUnitFrames.mainUnitTypeUpdateFunction = danUpdateArenaUnitFrames
 
 
 
@@ -3280,7 +3419,6 @@ function hideTimerFinished(timer)
         -- print("hideTimerFinished(timer) 2")
     end
 end
-local hasuitUnitFramesForUnitType_Array = hasuitUnitFramesForUnitType_Array
 function danHideInactiveFrames()
     -- for unitType, unitTable in pairs(hasuitUnitFramesForUnitType) do --not 100% sure this is worse. it probably is. will test some time
     for i=1,#hasuitUnitFramesForUnitType_Array do
@@ -3311,9 +3449,78 @@ function danHideInactiveFrames()
     end
 end
 
-local danRunAfterCombat = hasuitDoThis_AfterCombat
-function hasuitUpdateGroupRosterUnsafe()
-    updatingGroupRoster = false
+
+function updateAllOtherUnits()
+    updatingAllOtherUnits = false
+    -- print(hasuitGreen, "update all other")
+    danHideInactiveFrames()
+    
+    
+    for i=1,#hasuitUnitFramesForUnitType_Array do
+        local unitTable = hasuitUnitFramesForUnitType_Array[i]
+        if unitTable.sort then
+            unitTable.sort()
+            unitTable.sort = false
+        end
+    end
+    
+    
+    for unitGUID, unit in pairs(hasuitFramesCenterNamePlateGUIDs) do
+        hasuitUnitFrameForUnit[unit] = hasuitUnitFrameForUnit[unitGUID]
+    end
+    
+    local unitGUID = UnitGUID("target")
+    if unitGUID then
+        hasuitUnitFrameForUnit["target"] = hasuitUnitFrameForUnit[unitGUID]
+    else
+        hasuitUnitFrameForUnit["target"] = nil
+    end
+    
+    local unitGUID = UnitGUID("focus")
+    if unitGUID then
+        hasuitUnitFrameForUnit["focus"] = hasuitUnitFrameForUnit[unitGUID]
+    else
+        hasuitUnitFrameForUnit["focus"] = nil
+    end
+    
+    local unitGUID = UnitGUID("mouseover")
+    if unitGUID then
+        hasuitUnitFrameForUnit["mouseover"] = hasuitUnitFrameForUnit[unitGUID]
+    else
+        hasuitUnitFrameForUnit["mouseover"] = nil
+    end
+    
+    local unitGUID = UnitGUID("softfriend")
+    if unitGUID then
+        hasuitUnitFrameForUnit["softfriend"] = hasuitUnitFrameForUnit[unitGUID]
+    else
+        hasuitUnitFrameForUnit["softfriend"] = nil
+    end
+    
+    local unitGUID = UnitGUID("softenemy")
+    if unitGUID then
+        hasuitUnitFrameForUnit["softenemy"] = hasuitUnitFrameForUnit[unitGUID]
+    else
+        hasuitUnitFrameForUnit["softenemy"] = nil
+    end
+    
+    
+    updateTargetBorder() --todo different color on blue map?
+    
+end
+
+
+
+function danUpdateGroupUnitFrames() --instant the first time on a gettime now + safe to spam, will delay with C_Timer if called 3x on the same gettime and ignore anything else for the rest of the gettime
+    
+    if beginningOfUnitFrameUpdateSharedFunction(groupUnitFrames) then
+        -- print("group >2")
+        return
+    end
+
+    local updatingAllOtherUnits_local = updatingAllOtherUnits --to only do it once and not from stealing other unit types
+    updatingAllOtherUnits = true
+    
     
     danCurrentUnitType = "group"
     danCurrentUnitTable = groupUnitFrames
@@ -3360,61 +3567,21 @@ function hasuitUpdateGroupRosterUnsafe()
         end
     end
     
-    danHideInactiveFrames()
     
     
-    for unitGUID, unit in pairs(hasuitFramesCenterNamePlateGUIDs) do --probably just coincidental that there are never problems here, forgot about making sure these always get set after all unit updates are finished (arena frames). should probably separate this from group and do it after any unit type update?/all updates are complete and not spam it for no reason? todo
-        hasuitUnitFrameForUnit[unit] = hasuitUnitFrameForUnit[unitGUID]
-    end
+    groupUnitFrames.sort = groupUnitFramesSort
     
-    local unitGUID = UnitGUID("target")
-    if unitGUID then
-        hasuitUnitFrameForUnit["target"] = hasuitUnitFrameForUnit[unitGUID]
-    else
-        hasuitUnitFrameForUnit["target"] = nil
-    end
     
-    local unitGUID = UnitGUID("focus")
-    if unitGUID then
-        hasuitUnitFrameForUnit["focus"] = hasuitUnitFrameForUnit[unitGUID]
-    else
-        hasuitUnitFrameForUnit["focus"] = nil
-    end
-    
-    local unitGUID = UnitGUID("mouseover")
-    if unitGUID then
-        hasuitUnitFrameForUnit["mouseover"] = hasuitUnitFrameForUnit[unitGUID]
-    else
-        hasuitUnitFrameForUnit["mouseover"] = nil
-    end
-    
-    local unitGUID = UnitGUID("softfriend")
-    if unitGUID then
-        hasuitUnitFrameForUnit["softfriend"] = hasuitUnitFrameForUnit[unitGUID]
-    else
-        hasuitUnitFrameForUnit["softfriend"] = nil
-    end
-    
-    local unitGUID = UnitGUID("softenemy")
-    if unitGUID then
-        hasuitUnitFrameForUnit["softenemy"] = hasuitUnitFrameForUnit[unitGUID]
-    else
-        hasuitUnitFrameForUnit["softenemy"] = nil
+    endOfUnitFrameUpdateSharedFunction(groupUnitFrames, updatingAllOtherUnits_local)
+    if not updatingAllOtherUnits_local then
+        updatingAllOtherUnits = false
     end
     
     
-    danSortGroup()
-    
-    
-    if not InCombatLockdown() then
-        danUpdateGroupPositionsButtons()
-    elseif not updatingGroupPositions then
-        updatingGroupPositions = true
-        danRunAfterCombat(danUpdateGroupPositionsButtons)
-    end
-    
-    updateTargetBorder() --todo different color on blue map?
 end
+hasuitUpdateGroupUnitFrames = hasuitLocal8(danUpdateGroupUnitFrames)
+hasuitUpdateAllUnitsForUnitType["group"] = danUpdateGroupUnitFrames
+groupUnitFrames.mainUnitTypeUpdateFunction = danUpdateGroupUnitFrames
 
 
 do
@@ -3861,7 +4028,7 @@ local function arenaUnitSeen()
     end
 end
 
-local hasuitMakeTestGroupFrames = hasuitMakeTestGroupFrames
+-- local danMakeTestGroupFrames = danMakeTestGroupFrames
 local GetInstanceInfo = GetInstanceInfo
 
 danArenaUpdateFrame:RegisterEvent("PVP_MATCH_STATE_CHANGED")
@@ -3877,9 +4044,9 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
             danHideInactiveFrames() --should make a more specific version of this?
         end
         local _, instanceType = GetInstanceInfo()
-        if instanceType=="arena" then
-            hasuitMakeTestGroupFrames(0)
-        end
+        -- if instanceType=="arena" then
+            -- danMakeTestGroupFrames(0) --don't remember putting this here, but maybe gets fixed more properly with new setup?
+        -- end
         -- print(hasuitGreen, "enteringbg", instanceType==hasuitInstanceType)
         
     end
@@ -3888,7 +4055,7 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
             if arg2=="seen" then --unstealth or hunter coming back from feign(/resurrect?)
                 danCurrentFrame = hasuitUnitFrameForUnit[arg1]
                 if not danCurrentFrame then 
-                    danUpdateArenaFramesPriority()
+                    danUpdateArenaUnitFrames()
                 else
                     danCurrentUnit = arg1
                     danCurrentUnitGUID = UnitGUID(arg1)
@@ -3900,12 +4067,13 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
             elseif arg2=="unseen" then --stealth or hunter feign (or death?) --is this reliable? didn't think it used to be
                 danCurrentFrame = hasuitUnitFrameForUnit[arg1]
                 if not danCurrentFrame then 
-                    danUpdateArenaFramesPriority()
+                    danUpdateArenaUnitFrames()
                 else
                     if not danCurrentFrame.dead then
                         danCurrentFrame.text:SetText("unseen")
                     end
                     danCurrentFrame:SetAlpha(outOfRangeAlpha)
+                    healthBarLineOnEvent(hasuitHealthBarTargetLinesForUnits[arg1], "UNIT_TARGET", arg1)
                 end
             elseif arg2=="destroyed" then --left the arena
                 danCurrentFrame = hasuitUnitFrameForUnit[arg1]
@@ -3922,7 +4090,7 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
         end
         for i=1, numArenaOpponents do
             if not hasuitUnitFrameForUnit["arena"..i] then
-                danUpdateArenaFramesPriority()
+                danUpdateArenaUnitFrames()
                 break
             end
         end
@@ -3944,7 +4112,7 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
             end
             if hasuitArenaGatesActive==nil then
                 danArenaUpdateFrame:RegisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
-                danUpdateArenaFramesPriority()
+                danUpdateArenaUnitFrames()
             end
             if state==3 then --Engaged
                 danArenaUpdateFrame:RegisterEvent("ARENA_OPPONENT_UPDATE")

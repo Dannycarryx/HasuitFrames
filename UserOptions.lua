@@ -190,11 +190,11 @@ end)
 local CreateFrame = CreateFrame
 
 local danBackdrop = hasuitCommonBackdrop
-local danFont25 = CreateFont("danUserOptionsFont25")
+local danFont25 = CreateFont("hasuitUserOptionsFont25")
 danFont25:SetFont("Fonts/FRIZQT__.TTF", 25, "OUTLINE")
-local danFont16 = CreateFont("danUserOptionsFont16")
+local danFont16 = CreateFont("hasuitUserOptionsFont16")
 danFont16:SetFont("Fonts/FRIZQT__.TTF", 16, "OUTLINE")
-local danFont14 = CreateFont("danUserOptionsFont14")
+local danFont14 = CreateFont("hasuitUserOptionsFont14")
 danFont14:SetFont("Fonts/FRIZQT__.TTF", 14, "OUTLINE")
 
 local editBoxEscape

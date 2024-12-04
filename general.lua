@@ -170,7 +170,7 @@ do
     local bigGroupDebuffsRaid = { --bigGroupDebuffsRaidForSize,
                -- 1,  2,  3,  4,  5,  6,  7  --no cooldown text 4+
         [8] =   {26, 24, 22, 20, 18, 16, 14 },
-        [40] =  {22, 21, 20, 17, 15, 13, 10 }, --todo system for changing sizes of things based on frame size, and system for changing scale of everything while keeping every number an integer
+        [40] =  {22, 21, 20, 17, 15, 14, 10 }, --todo system for changing sizes of things based on frame size, and system for changing scale of everything while keeping every number an integer
     }
     local lastGroupSize = 0
     local sizeTable = hasuitDoThis_Group_Roster_UpdateGroupSize_5_8
@@ -511,13 +511,16 @@ initialize(386071) --Disrupting Shout
 
 hasuitFramesCenterSetEventType("aura")
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-45,                           ["group"]=danCommonBigGroupDebuffs[5], ["arena"]=danCommonBigBottomLeftArena[5],} --misc
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-44,                           ["group"]=danCommonBigGroupDebuffs[5], ["arena"]=danCommonBigBottomLeftArena[5],} --misc
 initialize(372048) --Oppressing Roar
 initialize(406971) --Oppressing Roar
 initialize(383005) --Chrono Loop
 initialize(80240) --Havoc
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-42,                           ["group"]=danCommonBigGroupDebuffs[6], ["arena"]=danCommonBigBottomLeftArena[6],} --misc
+
+-- -43/-44/-45 is taken by chaos bolt/storm bolt inc, -44 shared with oppressing roar etc so it'll usually show the casts from below in bgs because they'll be cast more recently, but in arena they're in different controllers
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-42,                           ["group"]=danCommonBigGroupDebuffs[5], ["arena"]=danCommonBigBottomLeftArena[5],} --misc
 initialize(353293) --Shadow Rift
 initialize(376080) --Champion's Spear, new Spear of Bastion?
 
@@ -595,14 +598,19 @@ initializePlusDiminish(407031)--Sticky Tar Bomb it says disarmed in the tooltip
 initializePlusDiminish(407032)--Sticky Tar Bomb
 
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-24,                       ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7],}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=-25,                       ["group"]=danCommonBigGroupDebuffs[6],  ["arena"]=danCommonBigBottomLeftArena[6],} --damage taken increase
+initialize(199261) --Death Wish
+initialize(415246) --Divine Plea, -30% healing/damage for 20 sec to regain 750k mana. can't click it off, todo? no1 plays this though
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-24,                       ["group"]=danCommonBigGroupDebuffs[5], ["arena"]=danCommonBigBottomLeftArena[5],["specialAuraFunction"]=hasuitSpecialAuraFunction_DarkSimShowingWhatGotStolen,["specialIconType"]="greenBorder"}
+initialize(77616) --Dark Simulacrum has something stolen, untested, not sure exactly where to show this, should probably just make a controller for stuff to show in the mi ddle of the screen? and probably not care about friendly stolen, but this for now, todo
+
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=256,                       ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7],}
 -- initialize("Duel") --?
 initialize(394119) --Blackjack (30%)
 initialize(410598) --Soul Rip (25%)
 initialize(77606) --Dark Simulacrum stealing next
-initialize(415246) --Divine Plea, -30% healing/damage for 20 sec to regain 750k mana. can't click it off, todo? no1 plays this though
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-24,                       ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7],["specialAuraFunction"]=hasuitSpecialAuraFunction_DarkSimShowingWhatGotStolen,["specialIconType"]="greenBorder"}
-initialize(77616) --Dark Simulacrum has something stolen, untested, not sure exactly where to show this, should probably just make a controller for stuff to show in the mi ddle of the screen? and probably not care about friendly stolen, but this for now, todo
 
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=257,                       ["group"]=danCommonBigGroupDebuffs[7], ["arena"]=danCommonBigBottomLeftArena[7],} --todo
@@ -1149,9 +1157,9 @@ local dotDebuffsArena = {
     12,
 }
 local dotDebuffsRbg = {
-    12,
+    15,
+    13,
     11,
-    10,
     10,
     10,
 }
@@ -1197,10 +1205,10 @@ end
 
 hasuitFramesCenterSetEventType("cleu")
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_CleuINC,                 ["priority"]=-22,               ["group"]=danCommonBigGroupDebuffs[7],      ["arena"]=danCommonBigBottomLeftArena[7],  ["ignoreSource"]=true,  ["duration"]=2.5,["spellINCType"]="aura",   } --SPELL INC ___
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuINC,                 ["priority"]=-45,               ["group"]=danCommonBigGroupDebuffs[5],      ["arena"]=danCommonBigBottomLeftArena[7],  ["ignoreSource"]=true,  ["duration"]=2.5,["spellINCType"]="aura",   } --SPELL INC ___
 initialize(89766) --axe toss stun
 initialize(119914) --axe toss cast success
-hasuitSetupSpellOptions = {hasuitSpellFunction_CleuINC,                 ["priority"]=-22,               ["group"]=danCommonBigGroupDebuffs[7],      ["arena"]=danCommonBigBottomLeftArena[7],  ["duration"]=2.5,["spellINCType"]="aura",   }
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuINC,                 ["priority"]=-45,               ["group"]=danCommonBigGroupDebuffs[5],      ["arena"]=danCommonBigBottomLeftArena[7],  ["duration"]=2.5,["spellINCType"]="aura",   }
 initialize(6789) --Mortal Coil
 initialize(107570) --Storm Bolt cast and damage, damage unused here
 initialize(132169) --Storm Bolt aura
@@ -1211,8 +1219,8 @@ initialize(213691) --Scatter Shot
 
 
 hasuitSetupSpellOptionsMulti = { --priority_1
-                          {hasuitSpellFunction_CleuINC,                 ["priority"]=186,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  ["duration"]=2.5,},
-                          {hasuitSpellFunction_UnitCasting,             ["priority"]=186,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  },
+                          {hasuitSpellFunction_CleuINC,                 ["priority"]=-44,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  ["duration"]=2.5,},
+                          {hasuitSpellFunction_UnitCasting,             ["priority"]=-43,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  },
                           hasuitYellowMiddleCastBarsSpellOptions,
 }
 initializeMulti(203286) --Greater Pyroblast cast/success/damage, what's 450421 from? damage only but from npc once/guardian 7x and never from a player, 203286 has 8 spell damage total too all from a player
@@ -1238,7 +1246,7 @@ initialize(228600) --Glacial Spike damage/aura
 initialize(370970) --the hunt root
 
 hasuitSetupSpellOptionsMulti = { --priority_1
-                          {hasuitSpellFunction_CleuCasting,             ["priority"]=186,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  ["castType"]="channel", ["backupDuration"]=1.6,},
+                          {hasuitSpellFunction_CleuCasting,             ["priority"]=-43,               ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],  ["castType"]="channel", ["backupDuration"]=1.6,},
                           hasuitYellowMiddleCastBarsSpellOptions,
 }
 initializeMulti(359073) --Eternity Surge --todo inc based on dest guid for cleu
@@ -1334,7 +1342,7 @@ initialize(113656) --Fists of Fury, channel --todo track Heavy-Handed Strikes 10
 initialize(324536) --Malefic Rapture, todo proper targets inc icon
 initialize(368847) --?, Firestorm
 initialize(278350) --Vile Taint --30 sec cd aoe dot affliction?
-hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCasting,             ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[2], ["arena"]=danCommonTopLeftArenaDebuffs[2],  ["ignoreSameUnitType"]=true,}
+hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCasting,             ["priority"]=300,               ["group"]=danCommonTopRightGroupDebuffs[3], ["arena"]=danCommonTopLeftArenaDebuffs[3],  ["ignoreSameUnitType"]=true,}
 initialize(361469) --Living Flame, there's a guardian (did i mean pres? ah no the unit type is guardian, not the spec) version of this 401382
 initialize(431443) --Chrono Flames
 initialize(47757) --Penance --todo get correct dest unit from cast success
