@@ -2,9 +2,14 @@
 
 
 biggest thing right now: 
-fix reload --done i think
+
 
 other important:
+unit_target on pve casts after new system, or maybe onupdate for that
+fake debuffs on party/arena test
+ability to change scale of different things independently like party frames 1.2 and cooldowns still 1?
+reorganize useroptions?
+
 option to ignore party# for <6 sort
 
 enabling people to track their own abilities/custom setups
@@ -32,6 +37,10 @@ saw ua show 2 cast bars from the same warlock for some reason. That might get fi
 update my private data collection addon to keep track of things in m+/raid, separately from the pvp info
 
 blizzard heal/damage text in middle of screen is awful by default, and should have an option to prevent it from spamming on top of raid frames
+
+hasuitDoThis_GroupUnitFramesUpdate on fake frames that get created from test function/remove the comment about it not working on test frames
+
+see if going above scale 1 can cause problems and change warning message for that depending on whether they go above or below 1
 
 
 less important:
@@ -140,8 +149,9 @@ cooldowns that get hidden from changing specs while they're active can keep cool
 nether ward goes back to grey each new round, maybe others/same thing for some hidden maybe? anything likely to get changed between rounds like nether ward/spell bop etc
 hunter feign death literally disappears if they sat longer than 31 sec before canceling feign. i have no idea where it goes. shows back up when used again
 
+reorganize unitframes2.lua
 
-
+low opacity empty cast bars for units that aren't casting while any casts are active? or option for that? to make it easier to see which unit is casting, although not sure. would need to actually play something with a kick for a bit to know whether the middle cast bars i made are good enough to do 1-3 kicks well
 
 
 

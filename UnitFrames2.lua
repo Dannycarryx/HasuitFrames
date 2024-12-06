@@ -2380,13 +2380,13 @@ local function groupUnitFramesSort()
             if aPartyNumber and bPartyNumber then
                 return aPartyNumber<bPartyNumber
             elseif aPartyNumber then
-                return aPartyNumber
+                return true
             elseif bPartyNumber then
-                return bPartyNumber
+                return false
             elseif a.priority and b.priority then
-                return aPartyNumber<b.priority
+                return a.priority<b.priority
             else
-                return a.id<b.id
+                return a.priority or b.priority and false or a.id<b.id
             end
             
         end)
