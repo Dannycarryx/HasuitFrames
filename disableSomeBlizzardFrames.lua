@@ -46,9 +46,8 @@ tinsert(hasuitDoThis_Player_Login, function()
         end
         local function danDisableBlizzardUnitFrame(frame)
             if type(frame)=="table" then
-                if not frame.danSeen then
-                    frame.danSeen = true
-                    tinsert(ignoredFramesList, frame)
+                if not ignoredFramesList[frame] then
+                    ignoredFramesList[frame] = true
                     frame:HookScript("OnEvent", hookScriptFunction)
                     frame:SetParent(hiddenFrame)
                 end
@@ -145,9 +144,6 @@ tinsert(hasuitDoThis_Player_Login, function()
                     -- end)
                 -- end)
             end
-        end
-        for i=1,#ignoredFramesList do
-            ignoredFramesList[i].danSeen = nil --making frames the way they were before in case there are any pairs( things that go on them that could break from this still being there. .danSeen probably does nothing to begin with but definitely nothing after this
         end
     end
 end) --ps no frame for arenapet15?

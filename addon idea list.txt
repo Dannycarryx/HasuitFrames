@@ -2,9 +2,15 @@
 
 
 biggest thing right now: 
+fix the way icons hide when too many are showing? or whatever the new bug is that's making icon's cooldown swipe show up when they're supposed to be hidden, or whatever's causing that --overridesSame?
+new system that gets rid of the need for scriptProfile, have a good idea of what that's going to be now
+on new unit events system, change functions while main loadon is waiting to be run to all go right after that main loadon function and then change them back to being instant? could maybe do something like that during unit type updates too and just keep the delay without needing to worry about anything. If set up a certain way it would be really cheap to add the delay to all events at once and then change them back
+option for minimum icon size?
+fix party members not updating occasionally after leaving an instance group while in a real group
 
 
 other important:
+put welcome message in /hf instead of print
 unit_target on pve casts after new system, or maybe onupdate for that
 fake debuffs on party/arena test
 ability to change scale of different things independently like party frames 1.2 and cooldowns still 1?
@@ -23,7 +29,6 @@ pet frames
 way to use mouse buttons like button4/button5 on unitframes like normal keybinds is necessary for using mouseover binds
 make party interrupt display for m+
 tank defensive cds
-interrupt duration modifiers from buffs that reduce them, are there passives like a talent that reduces by 10%? --concentration aura
 skip yellow text on target counts
 improve cleuINC to be the same way as how bossauras get decided, maybe that could make it good in pve and not need as much specific tracking in pvp?
 option to show fewer abilities. Playing with the addon for the first bit might be overwhelming, and some people might prefer to just keep the option for showing less enabled permanently
@@ -44,6 +49,7 @@ see if going above scale 1 can cause problems and change warning message for tha
 
 
 less important:
+channeling castbars aren't quite right
 audio warnings for things or some way of knowing when offensive cds get pressed at least without needing to rely on another addon
 efficient target indicator for bgs
 nameplates, especially important for melee
@@ -141,8 +147,6 @@ When customization gets added, have a way for a raid/party leader in pve to auto
 
 do something to re-map new aura instance ids from a full aura update to existing aura icons instead of replacing them with new icons completely?
 could use new custom unitframe functions system to decide whether to do several things or not, like adding cooldowns or updating auras? many possible things here maybe
-new system that gets rid of the need for scriptProfile, have a good idea of what that's going to be now
-on new unit events system, change functions while main loadon is waiting to be run to all go right after that main loadon function and then change them back to being instant? could maybe do something like that during unit type updates too and just keep the delay without needing to worry about anything. If set up a certain way it would be really cheap to add the delay to all events at once and then change them back
 
 cooldowns that get hidden from changing specs while they're active can keep cooldown text shown while the icon itself gets set alpha 0. something like typhoon used while resto then switch to guardian
 
@@ -152,6 +156,51 @@ hunter feign death literally disappears if they sat longer than 31 sec before ca
 reorganize unitframes2.lua
 
 low opacity empty cast bars for units that aren't casting while any casts are active? or option for that? to make it easier to see which unit is casting, although not sure. would need to actually play something with a kick for a bit to know whether the middle cast bars i made are good enough to do 1-3 kicks well
+
+show an icon for someone in dps spec that has role of healer
+
+icon for friendly rogue spec? --idk though should stay consistent
+
+use new one-time update function for unitframes to do role updates instead of the current thing?
+
+cast bars for incoming casts in m+ instead of icons? and top-right outside of the frames instead of inside
+
+multiply each frame level by 2 to leave gaps everywhere for someone to put something custom? idk
+
+check to make sure hasuitUnitFrameForUnit[unit] isn't still pointing to that unit before getting rid of it when swapping units between types, for cases where the unit is like raid3 and arena1 at the same time?
+
+reorganize cooldowns.lua to put everything from each class/spec together?, like defensive+offensive next to each other --although the way it is now makes it easy to just comment an entire category out or something like that. maybe just leave it
+
+maybe auraExpiredEarlyCount could be more efficient? with :Pause()?
+
+option to normalize scrolling health text/in-game health text if possible relative to 10k max health or something to avoid retarded numbers like 200k rejuv tick
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

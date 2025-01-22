@@ -5,7 +5,8 @@
 local hasuitSpellFunction_UnitCastingMiddleCastBars = hasuitSpellFunction_UnitCastingMiddleCastBars
 local tremove = tremove
 local CreateFrame = CreateFrame
--- local danBorderBackdrop = hasuit1PixelBorderBackdrop
+local hasuitUninterruptibleBorderSize = hasuitUninterruptibleBorderSize
+local uninterruptibleBorderBackdrop = {edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeSize = hasuitUninterruptibleBorderSize}
 local hasuitFramesParent = hasuitFramesParent
 
 local unusedCastBars = {}
@@ -35,13 +36,16 @@ function hasuitGetCastBar() --bored todo migrate danGetIcon to be with this in a
         castBar.arenaNumberText = arenaNumberText
         arenaNumberText:SetPoint("CENTER", arenaNumberBox, "CENTER")
         
-        castBar.arenaNumberBoxShowing = true
         
-        -- local border = CreateFrame("Frame", nil, castBar, "BackdropTemplate")
-        -- castBar.border = border
-        -- border:SetBackdrop(danBorderBackdrop)
-        -- border:SetAllPoints()
-        -- border:SetBackdropBorderColor(0,0,0)
+        local uninterruptibleBorder = CreateFrame("Frame", nil, castBar, "BackdropTemplate")
+        castBar.uninterruptibleBorder = uninterruptibleBorder
+        uninterruptibleBorder:SetBackdrop(uninterruptibleBorderBackdrop)
+        uninterruptibleBorder:SetPoint("TOPLEFT",-hasuitUninterruptibleBorderSize,0)
+        uninterruptibleBorder:SetBackdropBorderColor(0.5,0.5,0.5)
+        
+        castBar.arenaNumberBoxShowing = true
+        uninterruptibleBorder:SetPoint("BOTTOMRIGHT", arenaNumberBox, "BOTTOMRIGHT", hasuitUninterruptibleBorderSize, 0)
+        
         
         return castBar
         
@@ -194,15 +198,19 @@ hasuitSmallDamageMiddleCastBarsSpellOptions =       {hasuitSpellFunction_UnitCas
 --[[
 tinsert(hasuitDoThis_Addon_Loaded, function()
     hasuitSetupSpellOptionsMulti = {
-                              {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitBigRedMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitBigRedMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitGreenishDefensiveMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitOrangeMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitYellowMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallMiscMiddleCastBarsSpellOptions["arena"]},
                               -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitUntrackedMiddleCastBarsSpellOptions["arena"]},
-                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallDamageMiddleCastBarsSpellOptions["arena"]},
+                              {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallDamageMiddleCastBarsSpellOptions["arena"]},
     }
-    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()  , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
+    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
+    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
+    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
+    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
+    hasuitFramesInitializeMulti(740) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
 end)
 --]]
 
@@ -263,20 +271,22 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function() --useroptions stuff for posit
                     
                     local arenaNumberText = fakeCastBar.arenaNumberText
                     arenaNumberText:SetFontObject(hasuitCastBarFont20)
-                
+                    
                 elseif not fakeCastBar.arenaNumberBoxShowing then
                     local arenaNumberBox = fakeCastBar.arenaNumberBox
                     local arenaNumberText = fakeCastBar.arenaNumberText
                     
                     arenaNumberBox:SetAlpha(1)
                     arenaNumberText:SetAlpha(1)
-                    fakeCastBar.arenaNumberBoxShowing = true
                     
                     if not arenaNumberText:GetFontObject() then
                         arenaNumberBox:SetSize(36, 36)
                         arenaNumberBox:SetColorTexture(1,0.49,0.04)
                         arenaNumberText:SetFontObject(hasuitCastBarFont20)
                     end
+                    
+                    fakeCastBar.arenaNumberBoxShowing = true
+                    fakeCastBar.uninterruptibleBorder:SetPoint("BOTTOMRIGHT", arenaNumberBox, "BOTTOMRIGHT", hasuitUninterruptibleBorderSize, 0)
                     
                 end
                 
@@ -293,6 +303,9 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function() --useroptions stuff for posit
                 fakeCastBar:SetMinMaxValues(0, 5)
                 fakeCastBar.currentValue = 0
                 fakeCastBar:SetScript("OnUpdate", hasuitCastBarOnUpdateFunction)
+                
+                fakeCastBar.uninterruptibleBorder:SetAlpha(0)
+                
             end
         else
             testCastBarsTimer:Cancel()

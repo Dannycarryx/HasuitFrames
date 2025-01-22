@@ -27,6 +27,7 @@ hasuitBlessingOfAutumnIgnoreList = hasuitLocal2({ --how would this interact with
 
 
 local tinsert = tinsert
+local pairs = pairs
 local hasuitDoThis_OnUpdate = hasuitDoThis_OnUpdate
 
 do --cooldowns loadon
@@ -257,7 +258,7 @@ do
         
         local lastSize
         
-        local trinketControllerOptions = hasuitController_CooldownsControllers[1]
+        local trinketControllerOptions = hasuitController_CooldownsControllers[1] --todo should do the same thing as hasuitUnitFramesForUnitType? before the big customization update anyway
         local defensiveControllerOptions = hasuitController_CooldownsControllers[2]
         local interruptControllerOptions = hasuitController_CooldownsControllers[3]
         local crowdControlControllerOptions = hasuitController_CooldownsControllers[4]

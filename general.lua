@@ -6,6 +6,10 @@ local initializeMultiPlusDiminish = hasuitFramesInitializeMultiPlusDiminish
 local initialize = hasuitFramesInitialize
 local hasuitFramesCenterSetEventType = hasuitFramesCenterSetEventType
 
+local trackedPveSubevents = hasuitTrackedPveSubevents --to manually track/ignore spells that might show up in pve too, like 50% ms spellid that can be in both bgs and open world
+local trackedPveSpells_Auras = trackedPveSubevents["SPELL_AURA_APPLIED"]
+
+
 
 -- danLoadOnPvpTalentsInstance = hasuitFramesCenterAddLoadingProfile({
     -- ["instanceType"]={["none"]=true,["arena"]=true,["pvp"]=true},
@@ -510,6 +514,26 @@ initialize(386071) --Disrupting Shout
 
 
 hasuitFramesCenterSetEventType("aura")
+
+
+-- hasuitSetupSpellOptions = {} --todo make this more efficient/no for loop in interrupt function
+-- initialize(317920) --Concentration Aura
+-- initialize(234084) --Moon and Stars
+
+-- initialize(35126) --Silence Resistance 20% very unlikely but add this when more efficient setup is made
+-- tranquil air?
+-- Holy Concentration? check when logged on hpriest for pvp talent 70%
+-- Burning Determination? ^ fire mage 70%
+
+-- 42184, Silence Resistance 10%, from old items Voice Amplification Modulator
+-- 331582? --Familiar Predicaments slands soulbind
+-- 196879 Solemn Prayers? 25%
+-- 387134 Infurious Binding of Gesticulation? 15%
+
+--Oppressing Roar doesn't matter right?
+
+
+
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=-44,                           ["group"]=danCommonBigGroupDebuffs[5], ["arena"]=danCommonBigBottomLeftArena[5],} --misc
 initialize(372048) --Oppressing Roar
@@ -1478,11 +1502,19 @@ initialize(417537) --Oblivion, warlock 3 sec channel/debuff pvp talent
 initialize(263165) --Void Torrent
 
 
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=212,                       ["group"]=danCommonTopRightGroupDebuffs[1],["arena"]=danCommonTopLeftArenaDebuffs[1],}
+initialize(288849) --Crypt Fever (healing extends dot) --todo lower priority if not healer?
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraMainFunction,        ["priority"]=213,["overridesSame"]=true,["group"]=danCommonTopRightGroupDebuffs[1],["arena"]=danCommonTopLeftArenaDebuffs[1],} --big mortal strike effects, todo text
 initialize(199845) --Psyflay
 initialize(198819) --sharpen (Mortal Strike) --these were 221 priority
-initialize(288849) --Crypt Fever (healing extends dot) --todo lower priority if not healer?
+
+initialize(177147) --Mortal Cleave, 60%
+trackedPveSpells_Auras[177147] = true
+initialize(19643) --Mortal Strike, 50%
+trackedPveSpells_Auras[19643] = true
+initialize(178050) --Wound Poison, 50%
+trackedPveSpells_Auras[178050] = true
 
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsNotPlayer,   ["priority"]=215,                   ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],}
@@ -1673,7 +1705,7 @@ hasuitFramesCenterSetEventType("aura")
 
 
 local danCommon = {["controllerOptions"]=hasuitController_Hots1_BottomRight_BottomRight,["size"]=18,["alpha"]=1}
-hasuitHots_1 = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=danCommon}
+hasuitHots_1 = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=danCommon} --todo should do something to show player's hots top right of arena frames maybe? for spellsteal. wouldn't be as simple as just putting ["arena"] and topright controller on each of these though
 
 
 local danCommon = {["controllerOptions"]=hasuitController_Hots2_BottomRight_BottomRight,["size"]=15,["alpha"]=1,    ["hideCooldownText"]=true}

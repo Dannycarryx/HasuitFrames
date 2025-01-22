@@ -13,7 +13,11 @@ hasuitFramesParent:SetFrameLevel(11)
 
 -- hasuitLoginTime = GetTime()
 hasuitPlayerGUID = UnitGUID("player")
-hasuitPlayerClass = UnitClassBase("player")
+do
+    local _, dan = UnitClass("player")
+    hasuitPlayerClass = dan
+end
+
 
 hasuitOutOfRangeAlpha = 0.55
 hasuitCcBreakHealthThreshold = 460000 --todo base it on level or patch or something? to not have to change this in the future
@@ -50,6 +54,7 @@ hasuitCommonBackdrop = {
     edgeFile = "Interface\\ChatFrame\\ChatFrameBackground", 
     edgeSize = 1,
 }
+hasuitUninterruptibleBorderSize = 5
 
 
 
@@ -133,7 +138,7 @@ hasuitDoThis_GroupUnitFramesUpdate_Positions_after = {} --wipes at the end if it
 
 
 
-do
+do --hasuitDoThis_EachUnitFrameForOneUpdate(func) --todo hasuitDoThis_GroupUnitFramesUpdate/hasuitDoThis_GroupUnitFramesUpdate_after should probably go after the sorting function? some way of limiting it better now that group update function can happen multiple times on the same gettime
     local tinsert = tinsert
     local danRemoveFunctionFromArray
     local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
@@ -144,7 +149,7 @@ do
 
     hasuitActiveCustomUnitFrameFunctions = {}
     local hasuitActiveCustomUnitFrameFunctions = hasuitActiveCustomUnitFrameFunctions
-    function hasuitDoThis_EachUnitFrameForOneUpdate(customFunction)
+    function hasuitDoThis_EachUnitFrameForOneUpdate(customFunction) --to use properly it should probably be a named function, like don't do this:   hasuitDoThis_EachUnitFrameForOneUpdate(function(unitFrame) end)   Do this instead:   local function asd(unitFrame) end hasuitDoThis_EachUnitFrameForOneUpdate(asd)   This way you can call it multiple times for the same function before a group update actually happens and it will prevent duplicates. Also this way you can clear it easily from the array without it actually happening from the group update by doing   hasuitActiveCustomUnitFrameFunctions[asd]()
         if not hasuitActiveCustomUnitFrameFunctions[customFunction] then
             local function removeAfter()
                 danRemoveFunctionFromArray(hasuitDoThis_GroupUnitFramesUpdate, customFunction)
@@ -985,6 +990,8 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitLoadOn_CooldownDisplay = nil
         hasuitLoadOn_PvpEnemyMiddleCastBars = nil
         
+        hasuitTrackedPveSubevents = nil
+        
         
         hasuitSpellFunction_CleuCcBreakThreshold = nil
         hasuitSpellFunction_CleuInterrupted = nil
@@ -1140,7 +1147,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitDanCommonTopLeftArenaDebuffs = nil
         
         
-        hasuitLocal1 = nil --inaccessible from outside, todo
+        hasuitLocal1 = nil --inaccessible from outside, todo --no they aren't? most of them are useless from outside though
         hasuitLocal2 = nil
         hasuitLocal3 = nil
         hasuitLocal5 = nil
@@ -1183,6 +1190,8 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitMakeTestGroupFrames = nil
         hasuitDoThis_EachUnitFrameForOneUpdate = nil
         hasuitActiveCustomUnitFrameFunctions = nil
+        
+        hasuitUninterruptibleBorderSize = nil
     end)
 end)
 

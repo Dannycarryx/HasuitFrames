@@ -133,9 +133,16 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
         }
         hasuitSavedUserOptions = savedUserOptions
     end
-    savedUserOptions["partyTest"] = 3 --need to fix cds for party of 5, todo would also be nice to show them in test mode, very bored todo don't save this to savedvariables?
-    savedUserOptions["arenaTest"] = 3
-    savedUserOptions["raidTest"] = 8
+    
+    
+    if savedUserOptions["version"]~=1 then --way to add default values for new options or give info on new updates or whatever
+        savedUserOptions["version"] = 1 --welcome message that can't be missed as easily
+    end
+    
+    
+    
+    
+    
     
     
     
@@ -344,7 +351,7 @@ local function hideUserOptionsFrame()
     currentOptionsPage:Hide()
 end
 local function onKeyDown(optionsFrame, key)
-    if key=="ESCAPE" then
+    if key=="ESCAPE" then --could verify that escape is bound to menu like normal? actually not a big deal though because this only closes the menu. would be a problem for a small number of players if this toggled the menu instead but ya. should probably verify anyway though
         if InCombatLockdown() then
             hideUserOptionsFrame()
         else
@@ -413,6 +420,10 @@ local function openMainOptions()
     end
 end
 local function openMainOptionsFirst()
+    savedUserOptions["partyTest"] = 3 --need to fix cds for party of 5, todo would also be nice to show them in test mode, very bored todo don't save this to savedvariables?
+    savedUserOptions["arenaTest"] = 3
+    savedUserOptions["raidTest"] = 8
+    
     userOptionsShown = true
     userOptionsFrame:SetClampedToScreen(true)
     userOptionsFrame:SetClampRectInsets(500, -500, 0, 0)

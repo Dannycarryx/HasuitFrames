@@ -516,15 +516,15 @@ do
         local colorTypeCount = 0
         function changeUnitTypeColorBackgrounds(enable)
             if enable and not danCurrentUnitTable.colorBackgroundEnabled then
-                if colorBackgroundsFirstRun then
+                if colorBackgroundsFirstRun then --bored todo
                     colorBackgroundsFirstRun()
                     colorBackgroundsFirstRun = nil
                 end
                 danCurrentUnitTable.colorBackgroundEnabled = true
-                if danCurrentUnitTable==groupUnitFrames then --i don't remember if there's a reason why it's like this instead of just the same way i made it for arena frames below
+                if danCurrentUnitTable==groupUnitFrames then --i don't remember if there's a good reason why it's like this instead of just the same way i made it for arena frames below
                     local removeDisableIfActive = hasuitActiveCustomUnitFrameFunctions[customUnitFrameFunction_ColoredBackground_Disable]
                     if removeDisableIfActive then
-                        removeDisableIfActive()
+                        removeDisableIfActive() --probably doesn't actually do anything here? wouldn't changeUnitTypeColorBackgrounds always be followed by a group update? not sure
                     end
                     hasuitDoThis_EachUnitFrameForOneUpdate(customUnitFrameFunction_ColoredBackground_Enable)
                     customUnitFrameFunction_ColoredBackground_Enable(danPlayerFrame)
@@ -553,7 +553,7 @@ do
                 if danCurrentUnitTable==groupUnitFrames then
                     local removeEnableIfActive = hasuitActiveCustomUnitFrameFunctions[customUnitFrameFunction_ColoredBackground_Enable]
                     if removeEnableIfActive then
-                        removeEnableIfActive()
+                        removeEnableIfActive() --^
                     end
                     hasuitDoThis_EachUnitFrameForOneUpdate(customUnitFrameFunction_ColoredBackground_Disable)
                     customUnitFrameFunction_ColoredBackground_Disable(danPlayerFrame)
@@ -739,7 +739,7 @@ end
 
 
 
-
+local UnitGUID = UnitGUID
 
 
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost
@@ -931,6 +931,7 @@ end
 
 
 
+local UnitClass = UnitClass
 local danHideUnitFrame2
 local hideTimerFinished
 local danHideInactiveFrames
@@ -968,7 +969,7 @@ do
                     line:RegisterUnitEvent("UNIT_MAXHEALTH", unitTarget)
                     
                     if not line.colorSet then --todo make healer target line shorter? or something but probably not hide completely
-                        local unitClass = UnitClassBase(unit)
+                        local _, unitClass = UnitClass(unit)
                         if unitClass then
                             line.colorSet = true --very bored todo, set color properly once per line per shuffle round
                         else
@@ -1292,7 +1293,10 @@ local danAddSpecializationCooldowns
 function danUpdateClass(frame)
     local failed
     if not frame.unitClassSet then
-        local unitClass = UnitClassBase(frame.unit) or "d/c"
+        local _, unitClass = UnitClass(frame.unit)
+        if not unitClass then
+            unitClass = "d/c"
+        end
         if unitClass~="d/c" then
             danCurrentFrame = frame
             danCurrentUnitType = frame.unitType
@@ -3189,9 +3193,9 @@ end
 
 
 
--- local hasuitDoThis_GroupUnitFramesUpdate_before = hasuitDoThis_GroupUnitFramesUpdate_before
-local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
-local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
+-- local hasuitDoThis_GroupUnitFramesUpdate_before = hasuitDoThis_GroupUnitFramesUpdate_before --these 3 moved?
+-- local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
+-- local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
 local lastRaidSize = 0
 local lastPartySize = 0
 local function danUpdateGroupUnits(groupType, number, lastNumber)
@@ -3232,20 +3236,20 @@ local function danUpdateGroupUnits(groupType, number, lastNumber)
             end
             danCurrentFrame.updated = updateCount
             
-            for j=1,#hasuitDoThis_GroupUnitFramesUpdate do --won't work from test function if solo because number (party size) is 0 and the test function cheats to make frames, it just makes them directly and gives them fake .updated so they don't hide
-                hasuitDoThis_GroupUnitFramesUpdate[j](danCurrentFrame)
-            end
+            -- for j=1,#hasuitDoThis_GroupUnitFramesUpdate do --won't work from test function if solo because number (party size) is 0 and the test function cheats to make frames, it just makes them directly and gives them fake .updated so they don't hide
+                -- hasuitDoThis_GroupUnitFramesUpdate[j](danCurrentFrame)
+            -- end
             
         else
             hasuitUnitFrameForUnit[danCurrentUnit] = nil
         end
     end
-    if #hasuitDoThis_GroupUnitFramesUpdate_after>0 then
-        for i=1,#hasuitDoThis_GroupUnitFramesUpdate_after do
-            hasuitDoThis_GroupUnitFramesUpdate_after[i]()
-        end
-        wipe(hasuitDoThis_GroupUnitFramesUpdate_after)
-    end
+    -- if #hasuitDoThis_GroupUnitFramesUpdate_after>0 then
+        -- for i=1,#hasuitDoThis_GroupUnitFramesUpdate_after do
+            -- hasuitDoThis_GroupUnitFramesUpdate_after[i]()
+        -- end
+        -- wipe(hasuitDoThis_GroupUnitFramesUpdate_after)
+    -- end
     
     danUpdatingRole = false
 end
@@ -3450,6 +3454,12 @@ function danHideInactiveFrames()
 end
 
 
+
+
+-- local hasuitDoThis_GroupUnitFramesUpdate_before = hasuitDoThis_GroupUnitFramesUpdate_before
+local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
+local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
+
 function updateAllOtherUnits()
     updatingAllOtherUnits = false
     -- print(hasuitGreen, "update all other")
@@ -3503,6 +3513,25 @@ function updateAllOtherUnits()
     else
         hasuitUnitFrameForUnit["softenemy"] = nil
     end
+    
+    
+    
+    
+    if #hasuitDoThis_GroupUnitFramesUpdate~=0 then
+        for i=1,#groupUnitFrames do --should majorly reorganize some things probably. Wait until making new unitTypes to get an idea of what things should look like. Ideally merge things a lot more than they are right now and have less separated group/arena stuff
+            for j=1,#hasuitDoThis_GroupUnitFramesUpdate do
+                hasuitDoThis_GroupUnitFramesUpdate[j](groupUnitFrames[i])
+            end
+        end
+    end
+    if #hasuitDoThis_GroupUnitFramesUpdate_after~=0 then
+        for j=1,#hasuitDoThis_GroupUnitFramesUpdate_after do
+            hasuitDoThis_GroupUnitFramesUpdate_after[j]()
+        end
+        wipe(hasuitDoThis_GroupUnitFramesUpdate_after)
+    end
+    
+    
     
     
     updateTargetBorder() --todo different color on blue map?

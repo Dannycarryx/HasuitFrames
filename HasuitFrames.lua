@@ -8,7 +8,7 @@ local hasuitPlayerGUID = hasuitPlayerGUID
 
 local danCurrentIcon
 local danCurrentFrame --after a bit of testing i realized that setting a file wide local variable and then having multiple functions use it one after another without passing it as an argument is just worse than passing a variable around multiple times from one function to another. The entire addon was made with that assumption that passing a variable around multiple times to different functions was creating a new thing every time for no reason but ya idk how it actually works. it's still a good way to do cleu though according to the test i did. also probably good for unit_aura added/updated/removed. not sure if good for anything else, needs something where a variable gets set but may or may not be needed, but if variable will always get used in the function it should just be an arg
-local danCurrentAura --oh well it gives the addon character
+local danCurrentAura
 
 local danGetIcon
 local danCooldownDoneRecycle
@@ -146,6 +146,8 @@ do --hasuitTempSwiftmend
 end
 --]]
 
+local UnitGUID = UnitGUID
+
 
 local pveAuraSpellOptions
 local pveAuraSpellOptionsIsBossAura
@@ -160,7 +162,13 @@ hasuitFramesCenterAddToAllTable(hasuitUnitAuraFunctions, "aura")
 
 do --pve stuff, todo put debuffs that player can dispel at a higher priority
     
-    local trackedPveSubevents = {["SPELL_AURA_APPLIED"]={},["SPELL_CAST_SUCCESS"]={},["SPELL_CAST_START"]={},["SPELL_EMPOWER_START"]={}}
+    local trackedPveSubevents = {
+        ["SPELL_AURA_APPLIED"]={},
+        ["SPELL_CAST_SUCCESS"]={},
+        ["SPELL_CAST_START"]={},
+        ["SPELL_EMPOWER_START"]={},
+    }
+    hasuitTrackedPveSubevents = trackedPveSubevents
     local hasuitCleuSpellIdFunctionsPve = danGetHasuitCleuSpellIdFunctions()
     danGetHasuitCleuSpellIdFunctions = nil
     
@@ -331,10 +339,12 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     initialize(422806) --Smothering Shadows (99% damage/healing reduced in the cave)
     trackedPveSpells_Auras[422806] = true --prevents pve cleu from auto tracking this spellid when seen. it already doesn't but if they change the way it's coded i won't notice, or if m+ changes it or whatever. this debuff's sourceguid/band== thing is messed up which is why it doesn't auto track, not totally sure what's happening with it. most actual pve debuffs that get ignored like this seem bad to track anyway so not sure what's best to do here, also stuff like heroism debuff and pve potions get filtered out from this which is good. can get a better opinion over time
     
-    
-    --m+ affixes that shouldn't be shown next to debuffs
     initialize(440313) --Void Rift, dispellable? and can be removed after doing certain amount of healing?
     trackedPveSpells_Auras[440313] = true
+    
+    
+    
+    --m+ affixes that shouldn't be shown next to debuffs
     hasuitSetupSpellOptions = pveAuraSpellOptionsVoidboundCDr --CDr
     initialize(462661) --Blessing from Beyond, voidbound debuff that acts like blessing of autumn, this + blessing of autumn should probably just be hidden? Might want to make this function more efficient if it's going to be reused a bunch like this. It's one of the worst things in the addon
     trackedPveSpells_Auras[462661] = true
@@ -2270,7 +2280,27 @@ hasuitSpellFunction_CleuInterrupted = addMultiFunction(function() --todo could d
                 danSharedIconFunction()
                 danCurrentIcon.iconTexture:SetTexture(GetSpellTexture(d15anCleuOther))
                 local currentTime = GetTime()
+                
+                
                 local duration = danCurrentSpellOptions["duration"]
+                local unit = danCurrentFrame.unit
+                for i=1,255 do --todo make this better after a better hidden aura tracking system gets made
+                    local aura = GetAuraDataByIndex(unit, i) --nil means "HELPFUL" filter
+                    if not aura then
+                        break
+                    end
+                    local spellId = aura["spellId"]
+                    if spellId==317920 then --Concentration Aura
+                        local pointsModifier = aura["points"][1]/100 --points[1] gives -20 most of the time, sometimes -26 even though tooltip says 27% but oh well. probably 30%+ in pve
+                        duration = duration*(1+pointsModifier)
+                        
+                    elseif spellId==234084 then --Moon and Stars
+                        duration = duration*0.5 --todo test stacking this+concentration aura etc
+                        
+                    end
+                end
+                
+                
                 danCurrentIcon.startTime = currentTime
                 danCurrentIcon.expirationTime = currentTime+duration
                 danCurrentIcon.cooldown:SetCooldown(currentTime, duration)
@@ -2464,6 +2494,7 @@ do
             end
         end
     end
+    local UnitClass = UnitClass
     local lastEventId
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("UNIT_PET")
@@ -2485,7 +2516,8 @@ do
                     danUnitPetUpdateCooldown(asd[1], asd[2])
                 else
                     unitKBelongsToV[unitPetGUID] = {UnitGUID(unit)}
-                    if UnitClassBase(unit)=="WARLOCK" then
+                    local _, unitClass = UnitClass(unit)
+                    if unitClass=="WARLOCK" then
                         local npcId = select(6, strsplit("-", unitPetGUID)) --UnitCreatureFamily is localized, todo could make savedvariables to remember? and reset it if language changes
                         local spellId = hasuitNpcIds[npcId]
                         if spellId then
@@ -3407,7 +3439,7 @@ local function danSpecialAuraFunction_RedLifebloom(icon) --specialFunction
         danSpecialAuraFunction_RedLifebloom(icon)
     end)
 end
-hasuitSpecialAuraFunction_RedLifebloom = danSpecialAuraFunction_RedLifebloom
+hasuitSpecialAuraFunction_RedLifebloom = danSpecialAuraFunction_RedLifebloom --could have done local function hasuitSpecialAuraFunction_RedLifebloom above and _G["hasuitSpecialAuraFunction_RedLifebloom"] = hasuitSpecialAuraFunction_RedLifebloom maybe? keeping consistent names for the same thing is probably best everywhere and do something with _G if needed in rare cases like here, assuming it works the way i think it would. never tested
 
 
 
@@ -3692,9 +3724,13 @@ do
             if castBar then
                 if event=="UNIT_SPELLCAST_INTERRUPTIBLE" then
                     local spellOptionsCommon = castBar.spellOptionsCommon
-                    castBar:SetStatusBarColor(spellOptionsCommon.r, spellOptionsCommon.g, spellOptionsCommon.b)
-                else
-                    castBar:SetStatusBarColor(0.5,0.5,0.5)
+                    -- castBar:SetStatusBarColor(spellOptionsCommon.r, spellOptionsCommon.g, spellOptionsCommon.b)
+                    castBar.uninterruptibleBorder:SetAlpha(0)
+                    
+                else --UNIT_SPELLCAST_NOT_INTERRUPTIBLE
+                    -- castBar:SetStatusBarColor(0.5,0.5,0.5)
+                    castBar.uninterruptibleBorder:SetAlpha(1)
+                    
                 end
             end
         end
@@ -3814,6 +3850,7 @@ do
     end
     hasuitCastBarOnUpdateFunction = castBarOnUpdateFunction
     
+    local hasuitUninterruptibleBorderSize = hasuitUninterruptibleBorderSize
     
     hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function() --should split this function up into different smaller conditions that call the main one if passed?
         local sourceGUID = UnitGUID(danCurrentUnit)
@@ -3855,22 +3892,30 @@ do
                         castBar.currentValue = 0
                         castBar:SetScript("OnUpdate", castBarOnUpdateFunction)
                         
+                        
                         castBar.spellOptionsCommon = spellOptionsCommon
                         if spellCast then
                             castBar:SetReverseFill(false)
                             if arg8 then --not interruptible
-                                castBar:SetStatusBarColor(0.5,0.5,0.5)
+                                -- castBar:SetStatusBarColor(0.5,0.5,0.5)
+                                castBar.uninterruptibleBorder:SetAlpha(1)
                             else
-                                castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
+                                -- castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
+                                castBar.uninterruptibleBorder:SetAlpha(0)
                             end
                         else
                             castBar:SetReverseFill(true)
                             if arg7 then --not interruptible
-                                castBar:SetStatusBarColor(0.5,0.5,0.5)
+                                -- castBar:SetStatusBarColor(0.5,0.5,0.5)
+                                castBar.uninterruptibleBorder:SetAlpha(1)
                             else
-                                castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
+                                -- castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
+                                castBar.uninterruptibleBorder:SetAlpha(0)
                             end
                         end
+                        
+                        castBar:SetStatusBarColor(spellOptionsCommon.r,spellOptionsCommon.g,spellOptionsCommon.b)
+                        
                         
                         local height = spellOptionsCommon["height"]
                         castBar.height = height
@@ -3910,12 +3955,14 @@ do
                                 arenaNumberBox:SetAlpha(1)
                                 arenaNumberText:SetAlpha(1)
                                 castBar.arenaNumberBoxShowing = true
+                                castBar.uninterruptibleBorder:SetPoint("BOTTOMRIGHT", arenaNumberBox, "BOTTOMRIGHT", hasuitUninterruptibleBorderSize, 0)
                             end
                             
                         elseif castBar.arenaNumberBoxShowing then
                             castBar.arenaNumberBox:SetAlpha(0)
                             castBar.arenaNumberText:SetAlpha(0)
                             castBar.arenaNumberBoxShowing = false
+                            castBar.uninterruptibleBorder:SetPoint("BOTTOMRIGHT", hasuitUninterruptibleBorderSize, 0)
                             
                         end
                         
