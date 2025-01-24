@@ -2,7 +2,7 @@ Hey, thanks for using my addon!
 
 To get started if you play anything other than rdruid you should double check that every spell you care about seeing on raidframes is 
 showing. If anything is missing/broken/doesn't make sense just let me know and I'll change it. The discord for the addon is HasuitFrames, 
-https://discord.gg/suzM65wjK8, or you can dm me at _dannycarry, or email HasuitFrames@gmail.com. I've pretty thoroughly tested everything 
+https://discord.gg/suzM65wjK8, or you can dm me at dannycarryx, or email HasuitFrames@gmail.com. I've pretty thoroughly tested everything 
 that shows when playing rdruid, but other classes are mostly untested. This includes things like your own atonement showing on raidframes 
 if you're on a disc priest, or the drs that show on arena frames. Those are also unique per class. example drs: if on a warlock you'll 
 only be tracking stun fear and incap, and those will always show as Shadowfury, Fear, or Mortal Coil, regardless of what spell caused the 
@@ -76,7 +76,7 @@ only gamer, when that option gets made.
 
 
 Let me know what you think or if you have any questions, or especially if you have any problems, either HasuitFrames discord, 
-https://discord.gg/suzM65wjK8, or dm me _dannycarry. Or email HasuitFrames@gmail.com. I'm curious what people will think about different 
+https://discord.gg/suzM65wjK8, or dm me dannycarryx. Or email HasuitFrames@gmail.com. I'm curious what people will think about different 
 things, like the colored backgrounds in groupsize 4+ (by default). 
 
 Basically everything I've written here has been about raids but don't be mislead by that. The majority of time and effort put into the 

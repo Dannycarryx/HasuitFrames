@@ -5,6 +5,7 @@ biggest thing right now:
 new system that gets rid of the need for scriptProfile, have a good idea of what that's going to be now --nvm i forgot
 on new unit events system, change functions while main loadon is waiting to be run to all go right after that main loadon function and then change them back to being instant? could maybe do something like that during unit type updates too and just keep the delay without needing to worry about anything. If set up a certain way it would be really cheap to add the delay to all events at once and then change them back
 option for minimum icon size?
+fix random error that happened from unit_aura
 
 
 other important:
