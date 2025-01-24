@@ -10,6 +10,7 @@
 local screenHeight
 
 local currentX
+local wholePageXOffset
 local currentY
 local yChange
 
@@ -41,7 +42,7 @@ local createOptionsPages = {
         danCreateEditBox("raidTest", "Test Size")
     end,
     function() --2
-        createPageBackground(220)
+        createPageBackground(220, 25)
         
         danSetPointAndDirection("TOP", "TOPLEFT", 390, 19, -25)
         danCreateNewHeader("group")
@@ -50,7 +51,8 @@ local createOptionsPages = {
         danCreateCheckButton("hideBlizzardParty", "Hide Default")
         
         danSetPointAndDirection("TOP", "TOPLEFT", 170, -61, -25)
-        danCreateEditBox("scale", "scale")
+        danCreateEditBox("scale", "UnitFrames Scale")
+        danCreateEditBox("cdScale", "Cooldowns Scale")
         if screenHeight~=1080 then
             danCreateCheckButton("usePixelPerfectModifier", "pixel perfect?")
         end
@@ -74,6 +76,19 @@ local createOptionsPages = {
         danCreateCheckButton("hideBlizzardRaid")
     end,
 }
+    
+-- local CHANGE
+-- tinsert(hasuitDoThis_UserOptionsLoaded, function()
+    -- local savedUserOptions = hasuitSavedUserOptions
+    -- local userOptionsOnChanged = hasuitUserOptionsOnChanged
+
+
+    -- CHANGE = savedUserOptions["CHANGE"]
+    -- userOptionsOnChanged["CHANGE"] = function()
+        -- CHANGE = savedUserOptions["CHANGE"]
+        -- stuff
+    -- end
+-- end)
 
 
 local print = print
@@ -134,17 +149,18 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
         hasuitSavedUserOptions = savedUserOptions
     end
     
-    
-    if savedUserOptions["version"]~=1 then --way to add default values for new options or give info on new updates or whatever
-        savedUserOptions["version"] = 1 --welcome message that can't be missed as easily
+    local currentVersion = 2
+    local version = savedUserOptions["version"] or 0
+    if version~=currentVersion then --way to add default values for new options or give info on new updates or whatever
+        savedUserOptions["version"] = currentVersion
+        
+        
+        if version<2 then
+            savedUserOptions["cdScale"] = 1
+        end
+        
+        
     end
-    
-    
-    
-    
-    
-    
-    
     
     
     
@@ -154,6 +170,17 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
     for i=1,#danDoThisUserOptionsLoaded do
         danDoThisUserOptionsLoaded[i]()
     end
+    
+end)
+
+
+
+
+
+tinsert(hasuitDoThis_UserOptionsLoaded, 1, function()
+    local savedUserOptions = hasuitSavedUserOptions
+    local userOptionsOnChanged = hasuitUserOptionsOnChanged
+    
     
     
     local scaleChangeFunction
@@ -174,6 +201,7 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
             scaleChangeFunction()
         end
     end
+    hasuitActiveScaleMultiplier = activeScaleMultiplier
     
     local pixelWarningMessage = "changing the scale from 1 could make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually"
     local hasuitFramesParent = hasuitFramesParent
@@ -187,6 +215,7 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
         hasuitFramesParent:SetScale(scale*activeScaleMultiplier)
     end
     userOptionsOnChanged["scale"] = scaleChangeFunction
+    
 end)
 
 
@@ -320,7 +349,7 @@ do
     function danSetPointAndDirection(setOwnPoint, setTargetPoint, setX, setY, setYChange)
         ownPoint = setOwnPoint
         targetPoint = setTargetPoint
-        currentX = setX
+        currentX = setX+wholePageXOffset
         currentY = setY
         yChange = setYChange
     end
@@ -370,7 +399,8 @@ local function onKeyDown(optionsFrame, key)
         end
     end
 end
-function createPageBackground(height)
+function createPageBackground(height, xOffset)
+    wholePageXOffset = xOffset or 0
     currentOptionsPage = CreateFrame("Frame", nil, userOptionsFrame, "BackdropTemplate")
     currentOptionsPage:SetBackdrop(danBackdrop)
     currentOptionsPage:SetHeight(height)

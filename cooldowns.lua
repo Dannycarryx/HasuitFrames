@@ -185,23 +185,23 @@ do
             
         end
     end
-
-
-    local defaultCdSize = 28
-    local yOffsets = (defaultCdSize-hasuitRaidFrameHeightForGroupSize[3])/2-1 --doing it like this with TOPRIGHT/TOPLEFT instead of RIGHT/LEFT because it'll be better if i make some cooldowns different sizes? will need to change something if frame size stuff for under groupsize 6 is ever different --which should be possible in useroptions, todo
     
+    
+    local defaultCdSize = 28
+    -- local yOffsets = (defaultCdSize-hasuitRaidFrameHeightForGroupSize[3])/2-1 --doing it like this with TOPRIGHT/TOPLEFT instead of RIGHT/LEFT because it'll be better if i make some cooldowns different sizes? will need to change something if frame size stuff for under groupsize 6 is ever different --which should be possible in useroptions, todo
+    local yOffsets = defaultCdSize/2
     hasuitTrinketCooldowns={}
     hasuitDefensiveCooldowns={}
     hasuitInterruptCooldowns={}
     hasuitCrowdControlCooldowns={}
-    hasuitController_CooldownsControllers = { --some stuff here gets changed around with hardcoded numbers when groupsize goes to 4/5, just below the end of this table
+    hasuitController_CooldownsControllers = {--some stuff here gets changed around with hardcoded numbers when groupsize goes to 4/5, just below the end of this table
         { --trinket
             ["grow"]=cooldownGrow,
             ["sort"]=danSortCooldowns,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
-            ["group"] = {["specCooldowns"]=hasuitTrinketCooldowns,      ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",  ["xOffset"]=-44,    ["yOffset"]=yOffsets,   ["limit"]=1}, --could have like a half grow upward when trinket is about to come up and go back to limit 1 when it's off cd, some way of showing trinket is about to come up would be nice?
-            ["arena"] = {["specCooldowns"]=hasuitTrinketCooldowns,      ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT", ["xOffset"]=44,     ["yOffset"]=yOffsets,   ["limit"]=1}, --offsets/limits change below too from 4 or 5 people in group
+            ["group"] = {["specCooldowns"]=hasuitTrinketCooldowns,      ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="LEFT",  ["xOffset"]=-44,   ["yOffset"]=yOffsets,    ["limit"]=1}, --could have like a half grow upward when trinket is about to come up and go back to limit 1 when it's off cd, some way of showing trinket is about to come up would be nice?
+            ["arena"] = {["specCooldowns"]=hasuitTrinketCooldowns,      ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="RIGHT", ["xOffset"]=44,    ["yOffset"]=yOffsets,    ["limit"]=1}, --offsets/limits change below too from 4 or 5 people in group
         },
         
         { --defensive
@@ -209,8 +209,8 @@ do
             ["sort"]=danSortCooldowns,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
-            ["group"] = {["specCooldowns"]=hasuitDefensiveCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",  ["xOffset"]=-73,    ["yOffset"]=yOffsets,   ["limit"]=7}, --these parts are controller.unitTypeStuff
-            ["arena"] = {["specCooldowns"]=hasuitDefensiveCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT", ["xOffset"]=73,     ["yOffset"]=yOffsets,   ["limit"]=7}, --^
+            ["group"] = {["specCooldowns"]=hasuitDefensiveCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="LEFT",  ["xOffset"]=-73,    ["yOffset"]=yOffsets,    ["limit"]=7}, --these parts are controller.unitTypeStuff
+            ["arena"] = {["specCooldowns"]=hasuitDefensiveCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="RIGHT", ["xOffset"]=73,     ["yOffset"]=yOffsets,    ["limit"]=7}, --^
         },
         
         { --interrupt
@@ -218,8 +218,8 @@ do
             ["sort"]=danSortCooldowns,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
-            ["group"] = {["specCooldowns"]=hasuitInterruptCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",  ["xOffset"]=-305,   ["yOffset"]=yOffsets,   ["limit"]=1}, --^
-            ["arena"] = {["specCooldowns"]=hasuitInterruptCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT", ["xOffset"]=305,    ["yOffset"]=yOffsets,   ["limit"]=1},
+            ["group"] = {["specCooldowns"]=hasuitInterruptCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="LEFT",  ["xOffset"]=-305,   ["yOffset"]=yOffsets,    ["limit"]=1}, --^
+            ["arena"] = {["specCooldowns"]=hasuitInterruptCooldowns,    ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="RIGHT", ["xOffset"]=305,    ["yOffset"]=yOffsets,    ["limit"]=1},
         },
         
         { --crowdcontrol
@@ -227,8 +227,8 @@ do
             ["sort"]=danSortCooldownsStationaryish,
             ["setPointOnBorder"]=true,
             ["frameLevel"]=19,
-            ["group"] = {["specCooldowns"]=hasuitCrowdControlCooldowns, ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="TOPLEFT",  ["xOffset"]=-334,   ["yOffset"]=yOffsets,   },
-            ["arena"] = {["specCooldowns"]=hasuitCrowdControlCooldowns, ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="TOPRIGHT", ["xOffset"]=334,    ["yOffset"]=yOffsets,   },
+            ["group"] = {["specCooldowns"]=hasuitCrowdControlCooldowns, ["size"]=defaultCdSize, ["xDirection"]=-1,  ["ownPoint"]="TOPRIGHT",    ["targetPoint"]="LEFT",  ["xOffset"]=-334,   ["yOffset"]=yOffsets,    },
+            ["arena"] = {["specCooldowns"]=hasuitCrowdControlCooldowns, ["size"]=defaultCdSize, ["xDirection"]=1,   ["ownPoint"]="TOPLEFT",     ["targetPoint"]="RIGHT", ["xOffset"]=334,    ["yOffset"]=yOffsets,    },
         },
     }
     

@@ -43,6 +43,9 @@ local danMakeTestArenaFrames
 
 local hasuitDoThis_AfterCombat = hasuitDoThis_AfterCombat
 
+local cdScale
+local cooldownsParentArray = {}
+
 tinsert(hasuitDoThis_UserOptionsLoaded, function()
     local savedUserOptions = hasuitSavedUserOptions
     local userOptionsOnChanged = hasuitUserOptionsOnChanged
@@ -137,11 +140,32 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function()
     
     
     
+    
+    
+    
+    
+    local activeScaleMultiplier = hasuitActiveScaleMultiplier
+    cdScale = savedUserOptions["cdScale"]*activeScaleMultiplier
+    userOptionsOnChanged["cdScale"] = function()
+        cdScale = savedUserOptions["cdScale"]*activeScaleMultiplier
+        for i=1,#cooldownsParentArray do
+            cooldownsParentArray[i]:SetScale(cdScale)
+        end
+    end
+    
+    
+    
+    
+    
+    
     -- CHANGE = savedUserOptions["CHANGE"]
     -- userOptionsOnChanged["CHANGE"] = function()
         -- CHANGE = savedUserOptions["CHANGE"]
         -- updateGroupUnitFrames()
     -- end
+    
+    
+    
 end)
 
 
@@ -595,8 +619,6 @@ end
 
 
 
-
-
 local hasuitFramesParent = hasuitFramesParent
 
 
@@ -657,6 +679,14 @@ function danGetHealthBar()
         overAbsorbBar:SetStatusBarTexture("Interface\\ChatFrame\\ChatFrameBackground")
         overAbsorbBar:SetFrameLevel(13)
         overAbsorbBar:SetFillStyle("REVERSE")
+        
+        
+        local cooldownsParent = CreateFrame("Frame", nil, frame)
+        cooldownsParent:SetIgnoreParentScale(true)
+        frame.cooldownsParent = cooldownsParent
+        tinsert(cooldownsParentArray, cooldownsParent)
+        cooldownsParent:SetScale(cdScale)
+        
         
         return frame
     end
@@ -2862,7 +2892,7 @@ do
                             newSpellIds[spellId] = true
                             if not icon then
                                 icon = hasuitGetIcon("trueNoReverse")
-                                icon:SetParent(controller)
+                                icon:SetParent(danCurrentFrame.cooldownsParent)
                                 icon:ClearAllPoints()
                                 
                                 local size = cooldownOptions["size"] or defaultSize

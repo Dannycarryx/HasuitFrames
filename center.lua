@@ -1225,6 +1225,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitActiveCustomUnitFrameFunctions = nil
         
         hasuitUninterruptibleBorderSize = nil
+        hasuitActiveScaleMultiplier = nil
         
         _G["hasuitFramesParent"] = nil
     end)
