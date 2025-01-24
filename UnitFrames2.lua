@@ -29,7 +29,7 @@ local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
 local arenaUnitFrames = hasuitUnitFramesForUnitType["arena"]
 local changeUnitTypeColorBackgrounds
 local danCurrentUnitTable
-local danCurrentGroupSize = hasuitGroupSize
+local danCurrentGroupSize = hasuitGlobal_GroupSize
 local danCurrentPartySize = GetNumSubgroupMembers()
 
 local InCombatLockdown = InCombatLockdown
@@ -186,6 +186,7 @@ local GetCurrentEventID = GetCurrentEventID
 
 local powerBarOnEvent
 local danEnablePowerBar
+local danEnablePowerBar2
 local danDisablePowerBar
 local danUpdateClassColor3
 local danFullPowerUpdate
@@ -843,6 +844,10 @@ local danGetUnit_HealthFunctionMain
 local danGetUnit_HealthFunctionAbsorbs
 local danAbsorbFunction
 
+local danInitialHealthAndAbsorbsFunction
+local danSetSize
+
+local danUpdateUnitSpecial
 
 local function hasuitUnitFrameMakeHealthBarMain()
     danCurrentFrame = danGetHealthBar()
@@ -1058,7 +1063,7 @@ do
         danCurrentUnitFrameWidth = frameWidthForGroupSize[danCurrentGroupSize]
         danCurrentUnitFrameWidthPlus2 = danCurrentUnitFrameWidth+2
         danCurrentUnitFrameWidthPlus3 = danCurrentUnitFrameWidth+3
-        hasuitRaidFrameWidth = danCurrentUnitFrameWidth
+        hasuitGlobal_RaidFrameWidth = danCurrentUnitFrameWidth
     end)
 end
 
@@ -1071,7 +1076,7 @@ do
         danCurrentUnitFrameHeight = frameHeightForGroupSize[danCurrentGroupSize]
         danCurrentUnitFrameHeightPlus2 = danCurrentUnitFrameHeight+2
         danCurrentUnitFrameHeightPlus3 = danCurrentUnitFrameHeight+3
-        hasuitRaidFrameHeight = danCurrentUnitFrameHeight
+        hasuitGlobal_RaidFrameHeight = danCurrentUnitFrameHeight
     end)
 end
 
@@ -1290,7 +1295,7 @@ end
 
 local hasuitTrackedRaceCooldowns = hasuitTrackedRaceCooldowns
 local danAddSpecializationCooldowns
-function danUpdateClass(frame)
+local function danUpdateClass(frame)
     local failed
     if not frame.unitClassSet then
         local _, unitClass = UnitClass(frame.unit)
@@ -1300,7 +1305,7 @@ function danUpdateClass(frame)
         if unitClass~="d/c" then
             danCurrentFrame = frame
             danCurrentUnitType = frame.unitType
-            if hasuitCooldownDisplayActiveGroup then
+            if hasuitGlobal_CooldownDisplayActiveGroup then
                 local _, race = UnitRace(danCurrentFrame.unit)
                 if race and hasuitTrackedRaceCooldowns[race] then
                     danCurrentFrame.unitRace = race
@@ -1386,6 +1391,8 @@ classPriorities = { --todo spec priorities
     
     ["d/c"]         = 5000,
 }
+
+local danDisablePowerBar2
 
 local function danUpdateFrameRole2(skipLastHalf)
     local role = UnitGroupRolesAssigned(danCurrentUnit)
@@ -1776,6 +1783,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
             end)
             
             
+            local RegisterAttributeDriver = RegisterAttributeDriver
             if i<36 then --raid
                 button:SetAttribute("*type2", "target")
                 RegisterUnitWatch(button) --raid
@@ -1857,7 +1865,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
     end
     
     
-    if hasuitInstanceType=="arena" then
+    if hasuitGlobal_InstanceType=="arena" then
         danHideTargetLines() --just to hide playertarget
     end
     
@@ -1873,7 +1881,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
     
     local GetNumSubgroupMembers = GetNumSubgroupMembers
     local function rosterSizeChangedFunction1()
-        danCurrentGroupSize = hasuitGroupSize
+        danCurrentGroupSize = hasuitGlobal_GroupSize
         danCurrentPartySize = GetNumSubgroupMembers()
         
         danCurrentUnitTable = groupUnitFrames
@@ -1894,7 +1902,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
         -- danUpdateGroupUnitFrames()
     -- else
         -- print("dan doesn't exist")
-        -- if hasuitGroupSize<2 then
+        -- if hasuitGlobal_GroupSize<2 then
             -- hasuitMakeTestGroupFrames(40)
             -- hasuitDoThis_OnUpdate(function()
                 -- hasuitMakeTestGroupFrames(0)
@@ -1913,7 +1921,7 @@ do
     local hasuitSetScriptTestGroupRosterUpdateFunction = hasuitSetScriptTestGroupRosterUpdateFunction
     local fakeNumber
     function onEventSetScriptTestFor0() --little bit sketchy that this will only happen on real roster event and get ignored by other sources, but maybe fine. main reason i did it like this is to not dig the real function out of roster update array
-        hasuitGroupSize = 0 --say it was 0, but it never will be so the real update will always be full. problem was i went from having test size 4 up to being in a real group of 4 and all it did was remove the 3 test frames and never updated the real units until i reloaded. i assume it would've updated if a 5th joined. surprised it broke like that
+        hasuitGlobal_GroupSize = 0 --say it was 0, but it never will be so the real update will always be full. problem was i went from having test size 4 up to being in a real group of 4 and all it did was remove the 3 test frames and never updated the real units until i reloaded. i assume it would've updated if a 5th joined. surprised it broke like that
         hasuitSetScriptTestGroupRosterUpdateFunction()
         hasuitMakeFakeGetNumGroupMembers()
         danMakeTestGroupFrames()
@@ -1951,7 +1959,7 @@ do
         if number<=actualGroupSize then
             number = actualGroupSize
             
-        elseif hasuitInstanceType=="arena" then
+        elseif hasuitGlobal_InstanceType=="arena" then
             return
             
         elseif number>40 then
@@ -2073,7 +2081,7 @@ do
         return hasuitArenaTestNumber>realNumber and hasuitArenaTestNumber or realNumber
     end
     function danMakeTestArenaFrames(number)
-        if hasuitInstanceType=="arena" then
+        if hasuitGlobal_InstanceType=="arena" then
             return
         end
         GetNumArenaOpponentSpecs = fakeGetNumArenaOpponentSpecs
@@ -2160,7 +2168,7 @@ end
 
 
 
-
+local arenaInRange
 
 
 do
@@ -2419,7 +2427,7 @@ end
 local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
 
 local danCurrentArenaSpec
-function danUpdateExistingUnit()
+local function danUpdateExistingUnit()
     local insert
     if danCurrentFrame.hideTimer then
         insert = true
@@ -2538,7 +2546,7 @@ danUpdateUnitSpecial["group"] = function()
         end
     end
     
-    if hasuitInstanceType=="arena" then --bored todo, should only need to check hasuitInstanceType once?, not for multiple frames each roster update, here and arenaframes
+    if hasuitGlobal_InstanceType=="arena" then --bored todo, should only need to check hasuitGlobal_InstanceType once?, not for multiple frames each roster update, here and arenaframes
         if not hasuitHealthBarTargetLinesForUnits[danCurrentUnit] then
             danMakeHealthBarTargetLine()
         else
@@ -2569,7 +2577,7 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
     do --dr loadon
         local loadOn = {}
         local function loadOnCondition()
-            local instanceType = hasuitInstanceType
+            local instanceType = hasuitGlobal_InstanceType
             if instanceType=="none" or instanceType=="arena" or instanceType=="pvp" then --should load
                 if not loadOn.shouldLoad then
                     loadOn.shouldLoad = true
@@ -2622,7 +2630,7 @@ function danInitializeArenaSpecialIcons()
     end
 end
 
-function danInitializeArenaSpecIcon()
+local function danInitializeArenaSpecIcon()
     local specIcon = danCurrentFrame.arenaSpecIcon
     if not specIcon then
         specIcon = hasuitGetIcon(true)
@@ -2668,7 +2676,7 @@ danUpdateUnitSpecial["arena"] = function()
     end
     
     
-    if hasuitInstanceType=="arena" then
+    if hasuitGlobal_InstanceType=="arena" then
         if not hasuitHealthBarTargetLinesForUnits[danCurrentUnit] then
             danMakeHealthBarTargetLine()
         else
@@ -3127,7 +3135,7 @@ do
             danRequestsInspection[danCurrentFrame] = nil
             danIsInspecting = danIsInspecting-1
             if danCurrentFrame.specId~=specId then
-                if hasuitCooldownDisplayActiveGroup then
+                if hasuitGlobal_CooldownDisplayActiveGroup then
                     danCurrentUnitType = danCurrentFrame.unitType
                     danAddSpecializationCooldowns(specId)
                 else
@@ -3398,7 +3406,7 @@ arenaUnitFrames.mainUnitTypeUpdateFunction = danUpdateArenaUnitFrames
 
 
 
-function danUpdateOtherUnits(groupType, number, lastNumber)
+local function danUpdateOtherUnits(groupType, number, lastNumber)
     if number<lastNumber then
         number = lastNumber
     end
@@ -3561,7 +3569,7 @@ function danUpdateGroupUnitFrames() --instant the first time on a gettime now + 
         danUpdateFrameRole2()
     end
     
-    if not raid1Exists or hasuitInstanceType=="arena" then
+    if not raid1Exists or hasuitGlobal_InstanceType=="arena" then
         danUpdateGroupUnits("party", danCurrentPartySize, lastPartySize)
         lastPartySize = danCurrentPartySize
         
@@ -3848,7 +3856,7 @@ do
     end
     local function seeIfTargetCountBruteForceShouldLoad()
         if not targetCountBruteForceTicker then
-            if hasuitInstanceType~="arena" then
+            if hasuitGlobal_InstanceType~="arena" then
                 targetOfCountActive = true
                 targetCountBruteForceTicker = C_Timer_NewTicker(0.15, danUpdateAllFramesTargetCountBruteForce)
                 local groupUnitFrames = groupUnitFrames
@@ -3858,7 +3866,7 @@ do
             end
             
         else
-            if hasuitInstanceType=="arena" then
+            if hasuitGlobal_InstanceType=="arena" then
                 targetOfCountActive = false
                 targetCountBruteForceTicker:Cancel()
                 targetCountBruteForceTicker = nil
@@ -3943,7 +3951,7 @@ local function gatesOpeningFunction()
 end
 
 
-danArenaUpdateFrame = CreateFrame("Frame")
+local danArenaUpdateFrame = CreateFrame("Frame")
 local tempTrackedArenaUnits = { --todo
     ["arena1"] = true,
     ["arena2"] = true,
@@ -4076,7 +4084,7 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
         -- if instanceType=="arena" then
             -- danMakeTestGroupFrames(0) --don't remember putting this here, but maybe gets fixed more properly with new setup?
         -- end
-        -- print(hasuitGreen, "enteringbg", instanceType==hasuitInstanceType)
+        -- print(hasuitGreen, "enteringbg", instanceType==hasuitGlobal_InstanceType)
         
     end
     if event=="ARENA_OPPONENT_UPDATE" then
@@ -4125,7 +4133,7 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
         end
         
     elseif event=="PVP_MATCH_STATE_CHANGED" or event=="PLAYER_ENTERING_BATTLEGROUND" or event=="PVP_MATCH_INACTIVE" then
-        if hasuitInstanceType=="arena" then
+        if hasuitGlobal_InstanceType=="arena" then
             local state = C_PvP.GetActiveMatchState()
             if state==2 then --starting gates
                 if hasuitArenaGatesActive~=nil then

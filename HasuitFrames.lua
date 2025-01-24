@@ -271,8 +271,8 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     do --loadon for pve, todo fully delete all saved pve stuff on unload? todo auto attack timers maybe?
         local loadOn = {}
         local function loadOnCondition()
-            local instanceId = hasuitInstanceId
-            local instanceType = hasuitInstanceType
+            local instanceId = hasuitGlobal_InstanceId
+            local instanceType = hasuitGlobal_InstanceType
             if instanceType=="none" or instanceType=="party" or instanceType=="raid" or instanceType=="scenario" or instanceId==2177 then --should load, --2177 is comp stomp, untested, pve mobs spellids in comp stomp are all different than pvp so nothing will show up without considering it to be pve
                 if not loadOn.shouldLoad then
                     danGeneralCleuFrameSetScriptOnEvent(pveCleuFunc)
@@ -893,18 +893,18 @@ do
     unusedTextFrames = {}
     hasuitUnusedTextFrames = unusedTextFrames
 
-    local danFont5 = CreateFont("danFont5")
+    local danFont5 = CreateFont("hasuitFont5")
     danFont5:SetFont("Fonts/FRIZQT__.TTF", 5, "OUTLINE")
-    local danFont6 = CreateFont("danFont6")
+    local danFont6 = CreateFont("hasuitFont6")
     danFont6:SetFont("Fonts/FRIZQT__.TTF", 6, "OUTLINE")
-    local danFont7 = CreateFont("danFont7")
+    local danFont7 = CreateFont("hasuitFont7")
     danFont7:SetFont("Fonts/FRIZQT__.TTF", 7, "OUTLINE")
 
-    local danFont9 = CreateFont("danFont9")
+    local danFont9 = CreateFont("hasuitFont9")
     danFont9:SetFont("Fonts/FRIZQT__.TTF", 9, "OUTLINE")
-    local danFont10 = CreateFont("danFont10")
+    local danFont10 = CreateFont("hasuitFont10")
     danFont10:SetFont("Fonts/FRIZQT__.TTF", 10, "OUTLINE")
-    local danFont11 = CreateFont("danFont11")
+    local danFont11 = CreateFont("hasuitFont11")
     danFont11:SetFont("Fonts/FRIZQT__.TTF", 11, "OUTLINE")
 
 
@@ -1201,13 +1201,16 @@ local cooldownTextFonts = {
     [47]=16,
 }
 do
+    -- local _G = _G
     local temp = {}
     for iconSize, fontSize in pairs(cooldownTextFonts) do
         if not temp[fontSize] then
+            -- local s = "hasuitCooldownFont"..fontSize
             local asd = CreateFont("hasuitCooldownFont"..fontSize) --needs a unique name, --todo Subsequently changing the font object will affect the text displayed on every widget it was assigned to.?
             cooldownTextFonts[iconSize] = asd
             asd:SetFont("Fonts/FRIZQT__.TTF", fontSize, "OUTLINE")
             temp[fontSize] = asd
+            -- _G[s] = nil
         else
             cooldownTextFonts[iconSize] = temp[fontSize]
         end
@@ -1518,11 +1521,11 @@ danBorderBackdrop = hasuit1PixelBorderBackdrop
 do
     local danCurrentUnitFrameWidth
     tinsert(hasuitDoThis_Group_Roster_UpdateWidthChanged.functions, function()
-        danCurrentUnitFrameWidth = hasuitRaidFrameWidth
+        danCurrentUnitFrameWidth = hasuitGlobal_RaidFrameWidth
     end)
     local danCurrentUnitFrameHeight
     tinsert(hasuitDoThis_Group_Roster_UpdateHeightChanged.functions, function()
-        danCurrentUnitFrameHeight = hasuitRaidFrameHeight
+        danCurrentUnitFrameHeight = hasuitGlobal_RaidFrameHeight
     end)
 
     function hasuitNormalGrow(controller) --todo this is an easy place to get performance probably, along with better sort functions --the new non-arena target count is by far the most important thing now
@@ -2187,7 +2190,7 @@ end
 
 function hasuitSpecialAuraFunction_DarkSimShowingWhatGotStolen() --surprised points just tells exactly what spell they got. spent all day making something out of like 10 tellmewhen icons interacting with each other to show reliably what spell got stolen years ago
     danCurrentIcon.iconTexture:SetTexture(GetSpellTexture(danCurrentAura["points"][1])) --whole function is untested
-    danSetIconText(hasuitKICKTextKey, "stolen")
+    danSetIconText(hasuitGlobal_KICKTextKey, "stolen")
     danCurrentIcon.specialFunction = nil
 end
 
@@ -2314,7 +2317,7 @@ hasuitSpellFunction_CleuInterrupted = addMultiFunction(function() --todo could d
                 end
                 
                 danCurrentIcon.cooldown:SetScript("OnCooldownDone", danCooldownDoneRecycle)
-                danSetIconText(hasuitKICKTextKey, "KICK")
+                danSetIconText(hasuitGlobal_KICKTextKey, "KICK")
             end
         end
     end

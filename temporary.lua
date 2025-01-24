@@ -13,28 +13,29 @@ do --Thanks to Ghost from WoWUIDev discord for helping figure out why GetCurrent
         local scriptProfileMessage = hasuitSavedVariables["scriptProfileMessage"]
         if asd then
             SetCVar("scriptProfile", "1")
+            local hasuitPlayerFrame = hasuitPlayerFrame
             
             local asd1 = scriptProfileMessage and function()
-                print("cvar scriptProfile must be 1 for HasuitFrames to work. It seems like something else changed this to 0 right after events PLAYER_LOGOUT/ADDONS_UNLOADING. HasuitFrames will prevent an endless forced reload aka the black screen with click in the middle, but also won't work right without the cvar already being set to 1 as addons begin loading")
+                print("cvar scriptProfile must be 1 for HasuitFrames to work. It seems like something else changed this to 0 right after events PLAYER_LOGOUT/ADDONS_UNLOADING. Won't work right without the cvar already being set to 1 before addons begin loading")
             end
             
             or --here
             
             function()
-                local reloadButton = CreateFrame("Button", "hasuitFramesOptionsreloadButton", UIParent, "BackdropTemplate")
+                local reloadButton = CreateFrame("Button", "hasuitFramesOptionsreloadButton", hasuitPlayerFrame, "BackdropTemplate")
                 reloadButton:SetBackdrop({
                     bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
                 })
-                reloadButton:SetBackdropColor(0,0,0)
+                reloadButton:SetBackdropColor(0,0,0,0.2)
                 
-                local danFont80 = CreateFont("danUserOptionsFont80")
-                danFont80:SetFont("Fonts/FRIZQT__.TTF", 80, "OUTLINE")
+                local danFont = CreateFont("hasuitUserOptionsFont30")
+                danFont:SetFont("Fonts/FRIZQT__.TTF", 30, "OUTLINE")
                 local text = reloadButton:CreateFontString()
-                text:SetFontObject(danFont80)
+                text:SetFontObject(danFont)
                 
                 
                 
-                text:SetText("click") --a problem with this is potentially preventing normal setup from other addons if logging in with no savedvariables?
+                text:SetText("/reload")
                 
                 
                 
@@ -42,33 +43,25 @@ do --Thanks to Ghost from WoWUIDev discord for helping figure out why GetCurrent
                 text:SetJustifyH("CENTER")
                 
                 reloadButton:SetAllPoints()
-                reloadButton:SetFrameStrata("TOOLTIP")
-                reloadButton:SetFrameLevel(9999)
+                -- reloadButton:SetFrameStrata("TOOLTIP")
+                reloadButton:SetFrameLevel(50)
                 reloadButton:EnableMouse(true)
                 reloadButton:RegisterForClicks("AnyDown")
                 
                 local reload = C_UI.Reload
-                local function forcedReloadFunction()
+                local function reloadFunction()
                     -- hasuitSavedVariables["scriptProfileMessage"] = "HasuitFrames reloaded to change cvar scriptProfile to 1. Without this the addon would not work. This requirement will be removed in the future."
                     hasuitSavedVariables["scriptProfileMessage"] = "HasuitFrames reloaded to change cvar scriptProfile to 1."
                     SetCVar("scriptProfile", "1")
                     reloadButton:SetScript("OnClick", nil)
-                    reloadButton:SetScript("OnKeyDown", nil)
+                    -- reloadButton:SetScript("OnKeyDown", nil)
                     reload()
                 end
-                reloadButton:SetScript("OnClick", forcedReloadFunction)
-                reloadButton:SetScript("OnKeyDown", forcedReloadFunction)
+                reloadButton:SetScript("OnClick", reloadFunction)
+                -- reloadButton:SetScript("OnKeyDown", reloadFunction)
             end
             
-            
-            local function asd2()
-                if InCinematic and InCinematic() or IsInCinematicScene and IsInCinematicScene() or OpeningCinematic and OpeningCinematic() then
-                    C_Timer.After(0.1, asd2)
-                else
-                    asd1()
-                end
-            end
-            asd2()
+            asd1()
             
         elseif scriptProfileMessage then
             print(scriptProfileMessage)

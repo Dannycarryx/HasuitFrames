@@ -67,13 +67,13 @@ initialize(157982)  --Tranquility
 
 
 --------------------------------hots 5, above hots 1/grows left
-hasuitHots_5["loadOn"]=hasuitLoadOn_PartySize
 hasuitSetupSpellOptions = hasuitHots_5
 initialize(468152)  --Reactive Resin
-
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_5["group"]}
-initialize(429222)  --Minor Cenarion Ward
 initialize(391891)  --adaptive swarm
+
+local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=10,["alpha"]=1,    ["hideCooldownText"]=true}
+hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
+initialize(429222)  --Minor Cenarion Ward
 
 --end hots
 

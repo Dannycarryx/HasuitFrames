@@ -1,15 +1,14 @@
 
 
 
-biggest thing right now: 
-fix the way icons hide when too many are showing? or whatever the new bug is that's making icon's cooldown swipe show up when they're supposed to be hidden, or whatever's causing that --overridesSame?
-new system that gets rid of the need for scriptProfile, have a good idea of what that's going to be now
+biggest thing right now:
+new system that gets rid of the need for scriptProfile, have a good idea of what that's going to be now --nvm i forgot
 on new unit events system, change functions while main loadon is waiting to be run to all go right after that main loadon function and then change them back to being instant? could maybe do something like that during unit type updates too and just keep the delay without needing to worry about anything. If set up a certain way it would be really cheap to add the delay to all events at once and then change them back
 option for minimum icon size?
-fix party members not updating occasionally after leaving an instance group while in a real group
 
 
 other important:
+fix the way icons hide when too many are showing? or whatever the new bug is that's making icon's cooldown swipe show up when they're supposed to be hidden, or whatever's causing that --only ever saw this once
 put welcome message in /hf instead of print
 unit_target on pve casts after new system, or maybe onupdate for that
 fake debuffs on party/arena test
@@ -103,7 +102,7 @@ improve overridesSame to be able to override based on more than just its own pri
 
 clean up cooldowns.lua
 
-get rid of some redundant hasuitInstanceType=="arena" checks with new hasuitDoThis_GroupUnitFramesUpdate system?
+get rid of some redundant hasuitGlobal_InstanceType=="arena" checks with new hasuitDoThis_GroupUnitFramesUpdate system?
 
 split up the big grow function
 

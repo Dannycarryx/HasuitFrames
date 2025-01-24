@@ -1,6 +1,6 @@
 
 
-
+--GetBuildInfo
 
 
 local CreateFrame = CreateFrame
@@ -10,6 +10,8 @@ hasuitFramesParent:SetSize(1,1)
 hasuitFramesParent:SetPoint("CENTER")
 hasuitFramesParent:SetFrameStrata("LOW")
 hasuitFramesParent:SetFrameLevel(11)
+
+-- hasuitPlayerFrame is global after player_login
 
 -- hasuitLoginTime = GetTime()
 hasuitPlayerGUID = UnitGUID("player")
@@ -104,7 +106,7 @@ hasuitDoThis_Group_Roster_UpdateAlways = {}
 hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = {}
 -- hasuitDoThis_Group_Roster_UpdateWidthChanged --tinsert into .functions
 -- hasuitDoThis_Group_Roster_UpdateHeightChanged --tinsert into .functions
--- hasuitDoThis_Group_Roster_UpdateColumnsChanged --tinsert into .functions
+-- hasuitDoThis_Group_Roster_UpdateColumnsChanged --tinsert into .functions --not used atm
 -- hasuitDoThis_Group_Roster_UpdateGroupSize_5 --tinsert into .functions
 -- hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 --tinsert into .functions
 
@@ -149,7 +151,7 @@ do --hasuitDoThis_EachUnitFrameForOneUpdate(func) --todo hasuitDoThis_GroupUnitF
 
     hasuitActiveCustomUnitFrameFunctions = {}
     local hasuitActiveCustomUnitFrameFunctions = hasuitActiveCustomUnitFrameFunctions
-    function hasuitDoThis_EachUnitFrameForOneUpdate(customFunction) --to use properly it should probably be a named function, like don't do this:   hasuitDoThis_EachUnitFrameForOneUpdate(function(unitFrame) end)   Do this instead:   local function asd(unitFrame) end hasuitDoThis_EachUnitFrameForOneUpdate(asd)   This way you can call it multiple times for the same function before a group update actually happens and it will prevent duplicates. Also this way you can clear it easily from the array without it actually happening from the group update by doing   hasuitActiveCustomUnitFrameFunctions[asd]()
+    function hasuitDoThis_EachUnitFrameForOneUpdate(customFunction) --to use properly it should probably be a named function, like don't do this:   hasuitDoThis_EachUnitFrameForOneUpdate(function(unitFrame) end)   do this instead:   local function asd(unitFrame) end hasuitDoThis_EachUnitFrameForOneUpdate(asd)   This way you can call it multiple times for the same function before a group update actually happens and it will prevent duplicates. Also this way you can clear it easily from the array without it actually happening from the group update by doing   hasuitActiveCustomUnitFrameFunctions[asd]()
         if not hasuitActiveCustomUnitFrameFunctions[customFunction] then
             local function removeAfter()
                 danRemoveFunctionFromArray(hasuitDoThis_GroupUnitFramesUpdate, customFunction)
@@ -209,16 +211,16 @@ do
             local danDoThisEnteringWorld = hasuitDoThis_Player_Entering_WorldSkipsFirst
             danFrame:SetScript("OnEvent", function()
                 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
-                hasuitInstanceId = instanceId
-                if instanceType~=hasuitInstanceType then
-                    hasuitInstanceType = instanceType
+                hasuitGlobal_InstanceId = instanceId
+                if instanceType~=hasuitGlobal_InstanceType then
+                    hasuitGlobal_InstanceType = instanceType
                     mainLoadOnFunctionSpammable() --maybe just move this to loadons only to make it less confusing
                 end
                 for i=1,#danDoThisEnteringWorld do
                     danDoThisEnteringWorld[i]()
                 end
             end)
-            danFrame:RegisterEvent("WALK_IN_DATA_UPDATE") --delves?, maybe make this only happen once per gettime?. --didn't work
+            danFrame:RegisterEvent("WALK_IN_DATA_UPDATE") --delves?, maybe make this only happen once per gettime?
             
         end
     end)
@@ -321,7 +323,7 @@ do
         end
         hasuitDoThis_Group_Roster_UpdateWidthChanged =       getDoThisSizeTable({5,8,15,20,24,28,32,36,40}) --todo make this kind of thing work the same way on a table like hasuitRaidFrameWidthForGroupSize? might be nice when useroptions can change frame size and stuff
         hasuitDoThis_Group_Roster_UpdateHeightChanged =      getDoThisSizeTable({8,10,15,40})
-        hasuitDoThis_Group_Roster_UpdateColumnsChanged =     getDoThisSizeTable({5,8,20,24,28,32,36,40})
+        -- hasuitDoThis_Group_Roster_UpdateColumnsChanged =     getDoThisSizeTable({5,8,20,24,28,32,36,40})
         hasuitDoThis_Group_Roster_UpdateGroupSize_5 =        getDoThisSizeTable({5,40})
         hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 =      getDoThisSizeTable({5,8,40})
     end
@@ -336,7 +338,7 @@ do
         end
         for i=1,#danDoThisRelevantSizes do
             local sizeTable = danDoThisRelevantSizes[i]
-            sizeTable.activeRelevantSize = sizeTable[hasuitGroupSize]
+            sizeTable.activeRelevantSize = sizeTable[hasuitGlobal_GroupSize]
             local sizeFunctions = sizeTable.functions
             for j=1,#sizeFunctions do
                 sizeFunctions[j]()
@@ -347,17 +349,17 @@ do
         end
         
         
-        do
-            local columnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
-            tinsert(hasuitDoThis_Group_Roster_UpdateColumnsChanged.functions, 1, function()
-                hasuitRaidFrameColumns = columnsForGroupSize[hasuitGroupSize]
-            end)
-        end
+        -- do
+            -- local columnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
+            -- tinsert(hasuitDoThis_Group_Roster_UpdateColumnsChanged.functions, 1, function()
+                -- hasuitGlobal_RaidFrameColumns = columnsForGroupSize[hasuitGlobal_GroupSize]
+            -- end)
+        -- end
     end)
     
     local GetNumGroupMembers = GetNumGroupMembers
     local realGetNumGroupMembers = GetNumGroupMembers
-    function hasuitMakeFakeGetNumGroupMembers(fakeFunction)
+    function hasuitMakeFakeGetNumGroupMembers(fakeFunction) --this was a mistake
         GetNumGroupMembers = fakeFunction or realGetNumGroupMembers
     end
     local danUpdateGroupUnitFrames
@@ -370,8 +372,8 @@ do
         if groupSize == 0 then
             groupSize = 1
         end
-        if groupSize~=hasuitGroupSize then
-            hasuitGroupSize = groupSize
+        if groupSize~=hasuitGlobal_GroupSize then
+            hasuitGlobal_GroupSize = groupSize
             
             for i=1,#hasuitDoThis_Group_Roster_UpdateGroupSizeChanged do
                 hasuitDoThis_Group_Roster_UpdateGroupSizeChanged[i]()
@@ -389,9 +391,9 @@ do
                 end
             end
         end
-        -- for i=1,#hasuitDoThis_Group_Roster_UpdateAlways do --does nothing atm
-            -- hasuitDoThis_Group_Roster_UpdateAlways[i]()
-        -- end
+        for i=1,#hasuitDoThis_Group_Roster_UpdateAlways do --doesn't do anything atm
+            hasuitDoThis_Group_Roster_UpdateAlways[i]()
+        end
         danUpdateGroupUnitFrames() --instant now up to 2 times per gettime then it sets a C_Timer to go again after a delay. The way it works is a unittype update function can be triggered and then steal frames from a different unittype, then the update function for that unittype will go right afterward to try to fill things that got stolen, which can trigger the same unittype function from the beginning. Sometimes party and arena units can be the same thing so without some precaution it's probably possible to freeze the game. Sometimes frames got passed back and forth between shuffle rounds, switching places every gettime for a bit when new shuffle round. Would probably work the sameish way now, just got rid of the delay to hopefully make unit events more accurate when units change, at the cost of temporarily breaking a bunch of random things and having to figure out order of things again
     
     end
@@ -401,6 +403,37 @@ do
         danFrame:SetScript("OnEvent", fakeFunction or hasuitGroupRosterUpdateFunction)
     end
 end
+
+
+do
+    local C_Timer_After = C_Timer.After
+    local hasuitGroupRosterUpdateFunction = hasuitGroupRosterUpdateFunction
+    local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
+    local function checkAgainAfterLeavingGroup() --attempt to fix a bug where party doesn't update when leaving an instance group into a real group? idk
+        local groupSize = GetNumGroupMembers()
+        if groupSize==0 then
+            groupSize = 1
+        end
+        if #groupUnitFrames~=groupSize then
+            print(hasuitRed, "THING")
+            hasuitGroupRosterUpdateFunction()
+        end
+    end
+    local function checkAgainAfterLeavingGroup2()
+        C_Timer_After(0, checkAgainAfterLeavingGroup)
+    end
+    local function checkAgainAfterLeavingGroup3()
+        C_Timer_After(0, checkAgainAfterLeavingGroup2)
+    end
+    
+    local danFrame = CreateFrame("Frame")
+    danFrame:SetScript("OnEvent", function(_,event)
+        C_Timer_After(0, checkAgainAfterLeavingGroup3)
+    end)
+    danFrame:RegisterEvent("GROUP_LEFT")
+    danFrame:RegisterEvent("GROUP_JOINED")
+end
+
 
 
 hasuitRaidFrameWidthForGroupSize = { --hasuitDoThis_Group_Roster_UpdateWidthChanged
@@ -455,7 +488,7 @@ hasuitRaidFrameWidthForGroupSize = { --hasuitDoThis_Group_Roster_UpdateWidthChan
     78,--40
 }
 hasuitRaidFrameHeightForGroupSize = { --hasuitDoThis_Group_Roster_UpdateHeightChanged
-    [0]=90,--0 --bored todo make it so that hasuitGroupSize can be 0 and not matter, maybe already could remove the check that makes it 1?
+    [0]=90,--0 --bored todo make it so that hasuitGlobal_GroupSize can be 0 and not matter, maybe already could remove the check that makes it 1?
     90,--1
     90,--2
     90,--3
@@ -661,17 +694,17 @@ end
 
 
 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
-hasuitInstanceType = instanceType --none, arena, pvp, scenario, party, raid
-hasuitInstanceId = instanceId
+hasuitGlobal_InstanceType = instanceType --none, arena, pvp, scenario, party, raid
+hasuitGlobal_InstanceId = instanceId
 
 local groupSize = GetNumGroupMembers()
 if groupSize == 0 then
     groupSize = 1
 end
-hasuitGroupSize = groupSize
-hasuitRaidFrameWidth = hasuitRaidFrameWidthForGroupSize[groupSize]
-hasuitRaidFrameHeight = hasuitRaidFrameHeightForGroupSize[groupSize]
-hasuitRaidFrameColumns = hasuitRaidFrameColumnsForGroupSize[groupSize]
+hasuitGlobal_GroupSize = groupSize
+hasuitGlobal_RaidFrameWidth = hasuitRaidFrameWidthForGroupSize[groupSize]
+hasuitGlobal_RaidFrameHeight = hasuitRaidFrameHeightForGroupSize[groupSize]
+-- hasuitGlobal_RaidFrameColumns = hasuitRaidFrameColumnsForGroupSize[groupSize]
 
 
 
@@ -922,7 +955,7 @@ end)
 
 
 
-
+local _G = _G
 tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi enforced naturally. todo add things that stay global and don't get set to nil as comments. This should hopefully be a comprehensive list of things that can be accessed from outside of the addon, not a full list of internal functions
     C_Timer.After(0, function() --hasuitSetupSpellOptions
         hasuitDoThis_Addon_Loaded = nil
@@ -934,13 +967,13 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = nil
         hasuitDoThis_Group_Roster_UpdateWidthChanged = nil
         hasuitDoThis_Group_Roster_UpdateHeightChanged = nil
-        hasuitDoThis_Group_Roster_UpdateColumnsChanged = nil
+        -- hasuitDoThis_Group_Roster_UpdateColumnsChanged = nil
         hasuitDoThis_Group_Roster_UpdateGroupSize_5 = nil
         hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 = nil
         
         -- hasuitDoThis_GroupUnitFramesUpdate_before = nil
-        -- hasuitDoThis_GroupUnitFramesUpdate = nil
-        -- hasuitDoThis_GroupUnitFramesUpdate_after = nil
+        hasuitDoThis_GroupUnitFramesUpdate = nil
+        hasuitDoThis_GroupUnitFramesUpdate_after = nil
         -- hasuitDoThis_GroupUnitFramesUpdate_Positions_before = nil
         hasuitDoThis_GroupUnitFramesUpdate_Positions = nil
         hasuitDoThis_GroupUnitFramesUpdate_Positions_after = nil
@@ -1192,6 +1225,8 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitActiveCustomUnitFrameFunctions = nil
         
         hasuitUninterruptibleBorderSize = nil
+        
+        _G["hasuitFramesParent"] = nil
     end)
 end)
 

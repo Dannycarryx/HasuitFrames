@@ -79,8 +79,8 @@ do --instanceType only arena
     
     local loadOn = {}
     local function loadOnCondition()
-        -- if hasuitInstanceType=="arena" and enableMiddleCastBars then --should load
-        if hasuitInstanceType=="arena" then --should load
+        -- if hasuitGlobal_InstanceType=="arena" and enableMiddleCastBars then --should load
+        if hasuitGlobal_InstanceType=="arena" then --should load
             -- if not loadOn.shouldLoad then
                 loadOn.shouldLoad = true
             -- end
@@ -207,10 +207,6 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
                               {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallDamageMiddleCastBarsSpellOptions["arena"]},
     }
     hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
-    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
-    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
-    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
-    hasuitFramesInitializeMulti(740) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
 end)
 --]]
 

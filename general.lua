@@ -21,7 +21,7 @@ local trackedPveSpells_Auras = trackedPveSubevents["SPELL_AURA_APPLIED"]
 do --instanceType none
     local loadOn = {}
     local function loadOnCondition()
-        if hasuitInstanceType=="none" then --should load
+        if hasuitGlobal_InstanceType=="none" then --should load
             loadOn.shouldLoad = true
         else --should NOT load
             loadOn.shouldLoad = false
@@ -35,7 +35,7 @@ local loadOnNone = hasuitLoadOn_InstanceTypeNone
 do --instanceType pvp, (bg only)
     local loadOn = {}
     local function loadOnCondition()
-        if hasuitInstanceType=="pvp" then --should load
+        if hasuitGlobal_InstanceType=="pvp" then --should load
             loadOn.shouldLoad = true
         else --should NOT load
             loadOn.shouldLoad = false
@@ -51,7 +51,7 @@ do --arena or not arena loadons
     local loadOn = {}
     local loadOn2 = {}
     local function loadOnCondition()
-        if hasuitInstanceType~="arena" then --should load
+        if hasuitGlobal_InstanceType~="arena" then --should load
             if not loadOn.shouldLoad then
                 loadOn.shouldLoad = true
                 loadOn2.shouldLoad = false
@@ -182,7 +182,7 @@ do
     local function danRbgFunction()
         local bigGroupDebuffsRaidForSize = bigGroupDebuffsRaid[sizeTable.activeRelevantSize]
         if lastGroupSize<6 then
-            hasuitKICKTextKey = "KICKRbg"
+            hasuitGlobal_KICKTextKey = "KICKRbg"
             rootAuraSpellOptionsBreak1["textKey"] = "rootRbg"
             rootAuraSpellOptionsBreak175["textKey"] = "rootRbg"
             rootAuraSpellOptions2["textKey"] = "rootRbg"
@@ -208,10 +208,10 @@ do
     end
     local hasuitSpecialAuraFunction_CcBreakThreshold = hasuitSpecialAuraFunction_CcBreakThreshold
     tinsert(sizeTable.functions, function()
-        if hasuitGroupSize>5 then
+        if hasuitGlobal_GroupSize>5 then
             danRbgFunction()
         else
-            hasuitKICKTextKey = "KICKArena"
+            hasuitGlobal_KICKTextKey = "KICKArena"
             rootAuraSpellOptionsBreak1["textKey"] = "rootArena"
             rootAuraSpellOptionsBreak175["textKey"] = "rootArena"
             rootAuraSpellOptions2["textKey"] = "cdProc" --same as rootArena but yoffset 1 instead of 6
@@ -485,7 +485,7 @@ initialize(445134) --Shape of Flame, next attack will miss, physical debuff, fro
 
 hasuitFramesCenterSetEventType("cleu")
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterrupted,         ["priority"]=-48,["duration"]=2,            ["group"]=danCommonBigGroupDebuffs[4], ["arena"]=danCommonBigBottomLeftArena[4],} --interrupts, hasuitKICKTextKey = "KICKArena" or "KICKRbg" gets set in loading profile above
+hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterrupted,         ["priority"]=-48,["duration"]=2,            ["group"]=danCommonBigGroupDebuffs[4], ["arena"]=danCommonBigBottomLeftArena[4],} --interrupts, hasuitGlobal_KICKTextKey = "KICKArena" or "KICKRbg" gets set in loading profile above
 initialize(91807) --Shambling Rush
 initialize(57994) --Wind Shear
 hasuitSetupSpellOptions = {hasuitSpellFunction_CleuInterrupted,         ["priority"]=-48,["duration"]=3,            ["group"]=danCommonBigGroupDebuffs[4], ["arena"]=danCommonBigBottomLeftArena[4],} --, todo low priority spell schools, maybe hide completely
@@ -1201,7 +1201,7 @@ hasuitDanCommonTopLeftArenaDebuffs = danCommonTopLeftArenaDebuffs
 do --groupSize 5 or less
     local loadOn = {}
     local function loadOnCondition()
-        if hasuitGroupSize<=5 then --should load
+        if hasuitGlobal_GroupSize<=5 then --should load
             if not loadOn.shouldLoad then
                 loadOn.shouldLoad = true
                 mainLoadOnFunctionSpammable()

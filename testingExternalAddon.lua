@@ -36,7 +36,7 @@ local function customUpdateGroupUnitFrameFunction(unitFrame) --will update when 
         local middleIcon = middleController.frames[1]
         if middleIcon then
             local setPointOn = middleController.setPointOn
-            middleIcon:SetPoint("TOPLEFT", setPointOn, "TOPLEFT", floor(setPointOn.width/2-middleIcon.size/2), floor(-setPointOn.height/2+middleIcon.size/2)) --.height instead of hasuitRaidFrameHeight because of mana bar
+            middleIcon:SetPoint("TOPLEFT", setPointOn, "TOPLEFT", floor(setPointOn.width/2-middleIcon.size/2), floor(-setPointOn.height/2+middleIcon.size/2)) --.height instead of hasuitGlobal_RaidFrameHeight because of mana bar
         end
     end
 end
@@ -45,7 +45,7 @@ local function removeAfter()
     repositioningFunctionIsActive = false
 end
 local function ifUnitFramesSizeChangesFunction()
-    if hasuitInstanceType=="pvp" and not repositioningFunctionIsActive then --middle icon can only be active in bgs atm, hopefully hasuitInstanceType is always set correctly here. I think it will be. todo look into this, will actually be easy to see the exact earliest time that instancetype changes now that I think about it
+    if hasuitGlobal_InstanceType=="pvp" and not repositioningFunctionIsActive then --middle icon can only be active in bgs atm, hopefully hasuitGlobal_InstanceType is always set correctly here. I think it will be. todo look into this, will actually be easy to see the exact earliest time that instancetype changes now that I think about it
         repositioningFunctionIsActive = true
         tinsert(hasuitDoThis_GroupUnitFramesUpdate_Positions, customUpdateGroupUnitFrameFunction)
         tinsert(hasuitDoThis_GroupUnitFramesUpdate_Positions_after, removeAfter)

@@ -176,6 +176,7 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
     end
     
     local pixelWarningMessage = "changing the scale from 1 could make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually"
+    local hasuitFramesParent = hasuitFramesParent
     hasuitFramesParent:SetScale(savedUserOptions["scale"]*activeScaleMultiplier)
     function scaleChangeFunction()
         local scale = savedUserOptions["scale"]
@@ -330,7 +331,7 @@ local UIParent = UIParent
 local danDoThisAfterCombat = hasuitDoThis_AfterCombat
 local danDoThisOnUpdate = hasuitDoThis_OnUpdate
 local InCombatLockdown = InCombatLockdown
-local userOptionsFrame = CreateFrame("Frame", "hasuitFramesOptionsFrame", UIParent, "BackdropTemplate")
+local userOptionsFrame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
 userOptionsFrame:SetPropagateKeyboardInput(true)
 local userOptionsShown
 local optionsPages = {}

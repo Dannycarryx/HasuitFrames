@@ -60,21 +60,21 @@ do --cooldowns loadon
     
     local loadOn = {}
     local function loadOnCondition()
-        local instanceType = hasuitInstanceType
-        if hasuitGroupSize<=5 and (instanceType=="none" or instanceType=="arena" or instanceType=="party" or instanceType=="scenario") then --should load, --hasuitGroupSize and hasuitInstanceType should probably both get set even from the other event happening, or put every loadOnCondition on a delay to make sure everything is always set correctly when there are checks for multiple things like this? I don't think this will actually break here but it could probably load and instantly unload or the other way around for no good reason
+        local instanceType = hasuitGlobal_InstanceType
+        if hasuitGlobal_GroupSize<=5 and (instanceType=="none" or instanceType=="arena" or instanceType=="party" or instanceType=="scenario") then --should load, --hasuitGlobal_GroupSize and hasuitGlobal_InstanceType should probably both get set even from the other event happening, or put every loadOnCondition on a delay to make sure everything is always set correctly when there are checks for multiple things like this? I don't think this will actually break here but it could probably load and instantly unload or the other way around for no good reason
             if not loadOn.shouldLoad then
                 loadOn.shouldLoad = true
                 arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_CROWD_CONTROL_SPELL_UPDATE")
                 arenaCrowdControlSpellUpdateFrame:RegisterEvent("ARENA_COOLDOWNS_UPDATE")
-                if hasuitCooldownDisplayActiveGroup==false then
+                if hasuitGlobal_CooldownDisplayActiveGroup==false then
                     hasuitDoThis_OnUpdate(danRestoreCooldowns2)
                 end
-                hasuitCooldownDisplayActiveGroup = true
+                hasuitGlobal_CooldownDisplayActiveGroup = true
             end
         else --should NOT load
             if loadOn.shouldLoad~=false then
                 loadOn.shouldLoad = false
-                if hasuitCooldownDisplayActiveGroup then
+                if hasuitGlobal_CooldownDisplayActiveGroup then
                     arenaCrowdControlSpellUpdateFrame:UnregisterAllEvents()
                     for i=1,#hasuitUnitFramesForUnitType_Array do
                         local unitTable = hasuitUnitFramesForUnitType_Array[i]
@@ -94,7 +94,7 @@ do --cooldowns loadon
                         end
                     end
                 end
-                hasuitCooldownDisplayActiveGroup = false
+                hasuitGlobal_CooldownDisplayActiveGroup = false
             end
         end
     end
@@ -271,7 +271,7 @@ do
         local isPve
         
         local function rosterUpdate4or5Function()
-            local groupSize = hasuitGroupSize --doesn't matter: could be delayed or something. this will be active and changing things sometimes where cooldowns aren't even loaded like battlegrounds when group is forming or disbanding, or no1 is online and bg can't fill. Ideally just check the loadon variable for whether cooldowns are shown. could do that better if hasuitDoThis_Group_Roster_UpdateGroupSize_5 came before hasuitDoThis_Group_Roster_UpdateGroupSizeChanged. even better use new hasuitDoThis_GroupUnitFramesUpdate system too
+            local groupSize = hasuitGlobal_GroupSize --doesn't matter: could be delayed or something. this will be active and changing things sometimes where cooldowns aren't even loaded like battlegrounds when group is forming or disbanding, or no1 is online and bg can't fill. Ideally just check the loadon variable for whether cooldowns are shown. could do that better if hasuitDoThis_Group_Roster_UpdateGroupSize_5 came before hasuitDoThis_Group_Roster_UpdateGroupSizeChanged. even better use new hasuitDoThis_GroupUnitFramesUpdate system too
             if groupSize==4 or groupSize==5 then --bored todo cooldowns hidden by 4/5 system should really be disabled completely so they aren't using any resources, and reenabled to the correct time based on savedvariables system when that gets made. As is this is especially inefficient for m+/anything where groupsize is 4 or 5 and won't change
                 if lastSize~="fourOrFive" then
                     lastSize = "fourOrFive"
@@ -316,7 +316,7 @@ do
             end
         end
         local function enteringWorld4or5Function()
-            local instanceType = hasuitInstanceType --should really just pass this as an arg
+            local instanceType = hasuitGlobal_InstanceType --should really just pass this as an arg
             if instanceType=="party" or instanceType=="scenario" then
                 if not isPve then
                     isPve = true
