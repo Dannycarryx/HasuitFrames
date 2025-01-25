@@ -203,12 +203,12 @@ tinsert(hasuitDoThis_UserOptionsLoaded, 1, function()
     end
     hasuitActiveScaleMultiplier = activeScaleMultiplier
     
-    local pixelWarningMessage = "changing the scale from 1 could make some borders not show or show 2 pixels instead of 1 and stuff like that. will be improved eventually"
+    local pixelWarningMessage = "reducing the scale below 1 could make some borders not show. will be improved eventually"
     local hasuitFramesParent = hasuitFramesParent
     hasuitFramesParent:SetScale(savedUserOptions["scale"]*activeScaleMultiplier)
     function scaleChangeFunction()
         local scale = savedUserOptions["scale"]
-        if pixelWarningMessage and usePixelPerfectModifier and scale~=1 then
+        if pixelWarningMessage and usePixelPerfectModifier and scale<1 then
             print(pixelWarningMessage)
             pixelWarningMessage = nil
         end
