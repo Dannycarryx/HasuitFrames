@@ -150,12 +150,12 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
     end
     
     local currentVersion = 2
-    local version = savedUserOptions["version"] or 0
-    if version~=currentVersion then --way to add default values for new options or give info on new updates or whatever
+    local savedVersion = savedUserOptions["version"] or 0
+    if savedVersion~=currentVersion then
         savedUserOptions["version"] = currentVersion
         
         
-        if version<2 then
+        if savedVersion<2 then
             savedUserOptions["cdScale"] = 1
         end
         

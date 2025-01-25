@@ -1,121 +1,35 @@
-Hey, thanks for using my addon! 
+Welcome! 
 
-To get started if you play anything other than rdruid you should double check that every spell you care about seeing on raidframes is 
-showing. If anything is missing/broken/doesn't make sense just let me know and I'll change it. The discord for the addon is HasuitFrames, 
-https://discord.gg/suzM65wjK8, or you can dm me at dannycarryx, or email HasuitFrames@gmail.com. I've pretty thoroughly tested everything 
-that shows when playing rdruid, but other classes are mostly untested. This includes things like your own atonement showing on raidframes 
-if you're on a disc priest, or the drs that show on arena frames. Those are also unique per class. example drs: if on a warlock you'll 
-only be tracking stun fear and incap, and those will always show as Shadowfury, Fear, or Mortal Coil, regardless of what spell caused the 
-DR (and they'll always be in the same dedicated spots per dr, stun first, fear 2nd, sheep third). So those are the kinds of things that 
-might have problems, like if i made stun drs show as polymorph for warlock instead of shadowfury on accident, or if I forgot about tracking 
-an important DR for a class (conflag root? etc). Those problems will be easy to fix as long as I know there's a problem. Also if you think 
-a spec's hots would make more sense to prioritize differently or something let me know. I'm not very familiar with other classes' 
-rotations and mostly just guessed what I thought the displays should look like based on looking through class spellbooks on tournament 
-realm. 
+Here are a few things: 
 
 
-Here's a link for the editmode profile I use if you want it. It's mostly just the classic preset with a few things changed. Also I don't 
-use default actionbars at all except for one on the right of the screen for misc stuff. So anything about actionbars in this editmode 
-profile should be ignored and you should revert those back to the way you had them. I use 1920x1080 resolution, if that matters here. 
 
+The addon currently doesn't show enemy offensive cooldowns. I personally use gladiatorlossa for that with a lot of abilities filtered, 
+but mes weakauras would work too. 
+
+
+
+
+Here's a link for the editmode profile I use if you want it.
 1 39 0 0 1 7 7 UIParent 0.0 45.0 -1 ##$$%/&('%)$+#,# 0 1 1 7 7 UIParent 0.0 45.0 -1 ##$$%/&('%(#,# 0 2 1 6 0 MultiBarBottomLeft 0.0 5.0 -1 ##$$%/&('%(#,$ 0 3 1 5 5 UIParent -5.0 -77.0 -1 #$$$%/&('%(#,$ 0 4 1 2 0 MultiBarRight -5.0 0.0 -1 #$$$%+&('%(%,$ 0 5 0 0 0 UIParent 0.0 -0.0 -1 ##$$%/&('%(#,$ 0 6 0 0 0 UIParent 0.0 -45.0 -1 ##$$%/&('%(#,$ 0 7 0 0 0 UIParent 0.0 -90.0 -1 ##$$%/&('%(#,$ 0 10 0 0 0 UIParent 0.0 -0.0 -1 ##$$&('% 0 11 0 7 7 UIParent 400.0 94.0 -1 ##$$&('%,# 0 12 0 7 7 UIParent 187.5 94.0 -1 ##$$&('% 1 -1 0 7 7 UIParent 0.0 106.0 -1 ##$#%# 2 -1 1 2 2 UIParent 0.0 0.0 -1 ##$$%& 3 0 1 0 0 UIParent 4.0 -4.0 -1 $#3# 3 1 1 0 0 UIParent 250.0 -4.0 -1 %#3# 3 2 0 3 3 UIParent 82.0 221.5 -1 %#&#3# 3 3 1 0 2 CompactRaidFrameManager 0.0 -7.0 -1 '$(#)$-M.G/#1$3# 3 4 0 0 0 UIParent 16.0 -1044.0 -1 ,#-#.#/#0&1$2( 3 5 1 5 5 UIParent 0.0 0.0 -1 &#*$3# 3 6 1 5 5 UIParent 0.0 0.0 -1 -#.#/#4& 3 7 1 4 4 UIParent 0.0 0.0 -1 3# 4 -1 0 5 5 UIParent -362.0 -421.8 -1 # 5 -1 0 6 6 UIParent 356.0 189.0 -1 # 6 0 1 2 0 MinimapCluster -10.0 -10.0 -1 ##$#%#&.(()( 6 1 1 2 8 BuffFrame -13.0 -15.0 -1 ##$#%#'+(()( 7 -1 0 4 4 UIParent 0.0 462.5 -1 # 8 -1 0 6 6 UIParent 32.0 128.0 -1 #'$#%$&S 9 -1 0 7 7 UIParent -423.5 95.0 -1 # 10 -1 1 0 0 UIParent 16.0 -116.0 -1 # 11 -1 0 8 8 UIParent -98.0 87.0 -1 # 12 -1 1 2 2 UIParent -110.0 -275.0 -1 #K$#%# 13 -1 1 8 8 MicroButtonAndBagsBar 0.0 0.0 -1 ##$#%)&- 14 -1 1 2 2 MicroButtonAndBagsBar 0.0 0.0 -1 ##$#%( 15 0 1 7 7 StatusTrackingBarManager 0.0 0.0 -1 # 15 1 1 7 1 MainStatusTrackingBarContainer 0.0 0.0 -1 # 16 -1 1 5 5 UIParent 0.0 0.0 -1 #< 17 -1 1 1 1 UIParent 0.0 -100.0 -1 ## 18 -1 1 5 5 UIParent 0.0 0.0 -1 #- 19 -1 1 7 7 UIParent 0.0 0.0 -1 ##
 
 
-I recommend typing /hf or /hasuitframes in-game and running test functions for different group/arena sizes and seeing if you need to move 
-anything. To do this, click a text box in the /hf menu next to Test Size, optionally change the number in the box, and hit enter. 
-If needed, you can end a test by changing the number to 0 and hitting enter. 
-You should probably move your castbar down to make it not overlap raid frames if groupsize>6, but depends on your setup. The raid frames 
-probably won't be very nice to try to position things if you use several action bars at the bottom of the screen. I could come up with a 
-better solution for that if that's a big problem for people, but I also think centered raidframes below player is just the best place to 
-show them and it's worth moving some things around to get that. Let me know if you disagree/can't find a good way to position things and 
-I'll work on an option for fitting raidframes into the bottom left or something like that. Worst case right now is you could just shove 
-the raid frames off-screen and use whatever you were using before, and just use my addon for party/arena frames. Let me know if you 
-do that though because I don't want my addon to be wasting your computer's resources on things it isn't being used for. You could also 
-turn the addon off in areas you don't want it, but not ideal. 
-
-There's a second page with more options you can go to to the left of the close button, but options for moving/positioning/sizing are kind 
-of limited for now until I work on them more. 
 
 
-
-
-
-A couple less obvious features: 
-
-You can target frames with macros. /click d1-1 will target player, /click d2-1 will target party1 etc or the raid unit in that position 
-if in a raid with <6 people but groups are split up. /click d2-1 will also target column 2 row 1 in a raid, so the frame immediately to 
-the right of player's raid frame. The addon supports keybinding up to 20 raidframes this way. 5 columns/4 rows (let me know if anyone wants 
-more). I personally have 1-5 bound to target row 1, shift 1-5 for row 2, alt-shift 1-5 for row 3, and ctrl 1-5 for row 4. It's just as 
-natural as clicking the frames after a while. But ya you don't need everything bound. Just having a few can be very helpful like whatever 
-you use to target party 1-4 in smaller groups. If you have target/focus arena macros those can be used to target friendly frames in raids. 
-shift 1-5 and ctrl 1-5 are focus/target arena 1-5 for me as well as target raid. 
-
-My macros look like this: (if re-using arena binds you'll want   /stopmacro [@raid6,exists]   so it won't change focus in bgs)
-
+You can target frames with macros by row/column. Example:
 /click d2-2
 /stopmacro [@raid6,exists]
 /focus [@arena2]
-
-That macro targets friendly column2, row2 in a raid, and focuses arena2 in arena. 
-
-Macros for targeting arena frames are just plain old /tar [@arena1] etc. 
-There will be an option in the future to always sort healer on top of arenaframes, but low on the list of priorities for now. 
-
-
-
-You can move the camera/player by clicking through the raidframes. I'm still experimenting with this but it seems good. It gives you more 
-mobility when clicking frames by letting you move through frames instead of constantly flinging the cursor around every time you want to 
-target someone and/or move player or camera. More options will be added for this in the future, like disabling targeting and only relying 
-on mouseover for certain groupsize/instance type (for pve?), but I need to work on it to allow mouse buttons like button5 to be usable as 
-a mouseover bind at all. The only small downside here is you can't (only) turn the camera. Left click will act like a right click as far 
-as turning the actual player with the camera and not just turning the camera. Still seems really good though, especially for a mouseover-
-only gamer, when that option gets made. 
+Now you can truly stop being a clicker and keybind /target raid1-20.
 
 
 
 
+You can move the camera/player by clicking through the raidframes. This way you can be more mobile in raids if the frames aren't keybound.
 
-Let me know what you think or if you have any questions, or especially if you have any problems, either HasuitFrames discord, 
-https://discord.gg/suzM65wjK8, or dm me dannycarryx. Or email HasuitFrames@gmail.com. I'm curious what people will think about different 
-things, like the colored backgrounds in groupsize 4+ (by default). 
 
-Basically everything I've written here has been about raids but don't be mislead by that. The majority of time and effort put into the 
-addon has gone into arena. I've just also put a lot of effort into other areas of the game because I want the addon to cover everything, and 
-it was relatively easy to make things for bgs/pve after I made similar things/systems for arena (minus some of the big things like colored 
-backgrounds for raids which was a lot of extra work, but that was just too good to not make). 
 
-Some important future updates: 
--Full nameplate replacement (with an option to disable) 
--Pet frames 
--Options to change size of frames/icons/castbars and options to grow raidframes in different directions/change number of columns etc 
--Audio warnings for some things (with an option to disable) 
--Option to show fewer abilities to make things less chaotic and more focused on things that matter the most, but disabled by default 
--Customization through personal addon along with guides 
--Use inspected talents of friendly players to modify their cooldowns if cooldowns are showing 
--Ability to show certain auras if missing from each unit they're missing from, like motw if playing Druid (or important dots on arena frames 
-possibly?) 
--Maybe an option to change all cvars/options for the default ui to what I think they should be, and something to remember what you had before 
-the change/change it back 
--Custom keybinding addon to match more closely what my action bars look like right now/make things easy to switch between multiple of the same 
-class/easy to change specs and save stuff/increase the macro limit significantly above 255 with a new technique for tww+. 
 
-If you're curious there's a much bigger list of ideas I have for the addon or things I'm working on. It's something I've been using as I 
-make things to keep a list of priorities and not forget about anything. This is a place to look if you want to know whether I have plans 
-for adding something, or feel free to just message on Discord. 
-It's in   addon idea list.txt
-
-There's also a bunch of stuff I wrote below about customization. That has been more work than I expected but I've made a lot of progress 
-toward it. I'm putting that off until later just because when I allow customization like that it'll be harder to make updates to the addon 
-because I'll have to be careful to not break custom stuff that people make. The addon will eventually allow basically any customization you 
-can think of, including custom scripts for anything, like custom icons, or custom places where icons go, or custom scripts interacting with 
-unitFrames efficiently, or ways to disable things you don't like that don't have options in /hf
-
-One final thing is if you decide not to use HasuitFrames, you should type /console scriptProfile 0 and hit enter in-game after removing the 
-addon and reloading the game with the addon disabled. It won't make a huge difference but it should make the game just a little bit faster. 
-No other addons use that for anything except what it's actually for, which is showing cpu usage per addon and other stuff like that, but mine 
-relies on it for almost everything to work at all, for now. 
-
-I hope you enjoy the addon. 
 
 
 
@@ -130,105 +44,3 @@ bc1qjqpp2xq5kj68t0xpe5q6qfdl73cca6glrn44wa
 
 Donate XMR: 
 84mjo15ytuQJqvZNXWqjpbUpiRKn45xb3GPbHVGLJRJSjQ563KuHkE6c2JXf66YsWhADAFbwSL969gWrBGZzPAcLBNYLUEr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-COMING SOON (nothing anywhere below has been finished): 
-
-(Coming soon) Alternatively to messaging about missing spells, you can use the template in HasuitFramesTemplate.lua and add everything 
-yourself. Doing this can disable any spells from the main addon for the class/spec you're playing if you want it to, or you can disable 
-specific ones, so you can have your own personalized setup. You'll be adding stuff in your own addon with functions from mine. The template 
-has detailed instructions on how to make your own blank addon and how to get started adding custom stuff into my addon through it. The 
-first thing there after showing how to make a blank addon is something simple you can copy paste and add spells to. 
-
-(Coming soon) Below that is a description of how to customize things a bit more, like changing size or opacity of an icon, or how to track 
-an icon in a different location. 
-
-(Coming soon) I tried to make it easy to get everything set up and working well, even with no experience programming. 
-Don't be afraid of using a text editor instead of a normal gui from an addon. I personally used default notepad++ (Windows 10) to make 
-100% of the addon, so that's what I'd recommend, although I've also never tried anything else. ctrl-f find in files is extremely helpful 
-to be able to find something across many files instead of ctrl-fing each one one at a time, (find in all opened documents is good too) 
-
-
-
-(Coming soon) Guide for more advanced things like if you want to make your own functions or controllers and add spells with those, like 
-making a new controller in the middle of the screen somewhere tracking enemy cooldown auras that are active (I have plans for adding audio 
-warnings to the main addon for certain things like this in the future that will have an easy option to disable in /hf), or if there's some 
-custom function you want to run every time the game sends a certain event for a spell, like changing the frame's border color if they have 
-a magic debuff, or print something to chat when some event is seen. Pretty much anything will be possible. The guide will also show how to 
-access certain parts of the addon's unit frame update functions from your external addon and efficiently run a custom function on every unit 
-frame every time some condition changes, like once every time unitFrame width changes, or just every time they get updated at all. 
-
-(Coming soon) Guide for adding or removing cooldowns, this should already be possible and pretty easy if you know how it works? Not 100% 
-sure though. You could also create new cooldown controllers and put cooldowns somewhere new. 
-
-(Coming soon) In-depth guide for how the addon works, as well as a full list of functions/variables, and intended ways of adding customization 
-along with individual guides for those if needed. 
-
-(Coming soon) And potentially new features that make more of the addon accessible from outside for more customization, let me know if you 
-have ideas for things you'd want to do but the addon doesn't allow it. 
-
-
-
-(Coming soon) The addon is like a motorcycle. As Terry Davis said, if you lean over on a motorcycle, it crashes. If something breaks in my 
-addon, even if it seems small, it can have cascading effects and quickly make the game unplayable. I like the motorcycle approach, but part 
-of that is that people's personal addons are going to be putting things into shared arrays of functions and if there are any errors the rest 
-of the array and anything after will get canceled. If that becomes a problem I have an easy backup plan of updating the addon and 
-temporarily(tm) pcalling everything that might be shared with an external addon, and then working on making a new system of only pcalling 
-things that were added from outside just to be a bit more efficient. 
-
-(Coming soon) With all that being said, I hope to eventually get everything made 100% so that no customization is needed, and I also want 
-to get to a point where this is the only addon needed to be downloaded to play the game competitively, but that's in the future. 
-
-
-
-
-
-
-
-
-
-
-
-(Coming soon) Why this setup instead of the normal way of doing everything in-game?: 
-It's much more freeing using a text editor instead, and saves a lot of effort from me and also saves computer resources. 
-Creating everything from savedvariables, especially custom functions, is pretty inefficient and an ugly way of doing it in my opinion. 
-Copy pasting 20 spells directly into an addon at the same time can be nice compared to slowly copy pasting one at a time and hitting enter, 
-or just putting down a random function you want to have or run something whenever. You could make something quickly that might not even be 
-related to my addon if you want. There's no limitation on anything whatsoever like there is in any addon's gui. (except locals that might 
-not be accessible from outside, which I plan on reducing) This way you can also build up knowledge incrementally over time and be able to 
-make more and better things. Not to mention you could create 10x more custom stuff than the addon currently has and block out the sun with 
-ui and not come close to lagging, even in 40man raids. 
-
-(Coming soon) downsides I can think of: 
-Harder to visualize what you're doing and what options might be available (there will be guides though) 
-Extra step for sharing things of getting everyone to open a text editor and copy paste into their unique addon somewhere, although for 
-this default notepad would be fine? People might share entire addons they made, which is fine and probably a good way of doing it, but 
-that could lead to addon spam in the addon list (talking about you dbm). Hopefully people will put HasuitFrames as the beginning of the 
-name for any addon they make related to it at least. No enforcement of using the correct values for things. Someone could try to track 
-a spell with an existing hasuitSpellFunction_ but put a number in the spellOptions table for something instead of a string and they'd 
-only find out later, possibly causing errors. Not an inherent problem here but easier to check for the other way. 
