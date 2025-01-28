@@ -435,6 +435,14 @@ do
 end
 
 
+-- do
+    -- local danFrame = CreateFrame("Frame")
+    -- danFrame:SetScript("OnEvent", function(...)
+        -- print(...)
+    -- end)
+    -- danFrame:RegisterEvent("CVAR_UPDATE")
+-- end
+
 
 hasuitRaidFrameWidthForGroupSize = { --hasuitDoThis_Group_Roster_UpdateWidthChanged
     [0]=114,

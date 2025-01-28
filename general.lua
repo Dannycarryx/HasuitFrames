@@ -1344,6 +1344,8 @@ initializeMulti(353128) --Arcanosphere, channel
 initializeMulti(436358) --Demolish, channel, todo gets 2 casts like eye beam
 
 hasuitFramesCenterSetEventType("unitCasting")
+hasuitSetupSpellOptions = hasuitYellowMiddleCastBarsSpellOptions
+initialize(32375) --Mass Dispel
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 initialize(386997) --Soul Rot --priority_2 cast-only
 initialize(34914) --Vampiric Touch

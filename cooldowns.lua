@@ -750,7 +750,8 @@ do
                 {cdCle2,["spellId"]=31224,  ["priority"]=21,    ["duration"]=120},--Cloak of Shadows, todo [Bait and Switch]
                 hasuitVanish120, --Vanish, todo if they don't have subterfuge make it 1 charge for that rogue, todo make it possible to show same spellid twice? maybe this should be in offensive too for sub rogue because of the cd reduction
                 {cdCle2,["spellId"]=5277,   ["priority"]=23,    ["duration"]=120},--Evasion, elusiveness also reduces damage by 20%
-                {cleAura,["spellId"]=45182, ["priority"]=24,    ["duration"]=360},--Cheating Death
+                {cleAura,["spellId"]=45182, ["priority"]=24,    ["duration"]=360,--Cheating Death
+                    ["startAlpha"]=lowStartAlpha},
             }
             -- defensiveCooldowns[259]={--Assassination
             -- }

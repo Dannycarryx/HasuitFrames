@@ -1471,18 +1471,22 @@ function powerBarOnEvent(powerBar, event, unit)
     end
 end
 
-function danFullPowerUpdate(powerBar, unit)
-    powerBar:SetMinMaxValues(0, UnitPowerMax(unit))
-    powerBar:SetValue(UnitPower(unit))
-    local _, powerType = UnitPowerType(unit)
-    if not powerType then
-        return
+do
+    local UnitPowerType = UnitPowerType
+    local PowerBarColor = PowerBarColor
+    PowerBarColor["POWER_TYPE_FOCUS"] = PowerBarColor["FOCUS"]
+    function danFullPowerUpdate(powerBar, unit)
+        powerBar:SetMinMaxValues(0, UnitPowerMax(unit))
+        powerBar:SetValue(UnitPower(unit))
+        local _, powerType = UnitPowerType(unit)
+        if not powerType then
+            return
+        end
+        local color = PowerBarColor[powerType]
+        powerBar:SetStatusBarColor(color.r, color.g, color.b)
+        return true
     end
-    local color = PowerBarColor[powerType]
-    powerBar:SetStatusBarColor(color.r, color.g, color.b)
-    return true
 end
-
 
 
 
