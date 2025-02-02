@@ -99,12 +99,19 @@ initialize(391889)  --Adaptive Swarm dot
 
 
 
+hasuitSetupSpellOptions_CycloneTimerBar["specialAuraFunction"]=hasuitSpecialAuraFunction_CycloneTimerBar
+hasuitSetupSpellOptions_CycloneTimerBar["specialIconType"]="cycloneTimerBar"
+hasuitLocal10(33786) --Cyclone
+
+
+
+
+
+
 -- hasuitFramesCenterSetEventType("cleu")
 -- hasuitSetupSpellOptions = {hasuitTempSwiftmend}
 -- initialize(18562)
 -- hasuitFramesCenterSetEventType("aura")
-
-
 
 
 

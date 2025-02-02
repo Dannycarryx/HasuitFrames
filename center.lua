@@ -1085,6 +1085,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitSpellFunction_AuraDurationCooldownReduction = nil
         
         hasuitSpecialAuraFunction_CcBreakThreshold = nil
+        hasuitSpecialAuraFunction_CycloneTimerBar = nil
         hasuitSpecialAuraFunction_SmokeBombFunctionForArenaFrames = nil
         hasuitSpecialAuraFunction_SmokeBombForPlayer = nil
         hasuitSpecialAuraFunction_ShadowyDuel = nil
@@ -1099,6 +1100,8 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitSpecialAuraFunction_BlessingOfAutumn = nil
         hasuitBlessingOfAutumnIgnoreList = nil
         
+        
+        hasuitSetupSpellOptions_CycloneTimerBar = nil
         
         hasuitGetIcon = nil
         hasuitGetCastBar = nil
@@ -1196,6 +1199,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitLocal7 = nil
         hasuitLocal8 = nil
         hasuitLocal9 = nil
+        hasuitLocal10 = nil
         
         
         hasuitResetCooldowns = nil

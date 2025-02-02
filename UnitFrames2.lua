@@ -1474,7 +1474,7 @@ end
 do
     local UnitPowerType = UnitPowerType
     local PowerBarColor = PowerBarColor
-    PowerBarColor["POWER_TYPE_FOCUS"] = PowerBarColor["FOCUS"]
+    PowerBarColor["POWER_TYPE_FOCUS"] = PowerBarColor["FOCUS"] --for delves because UnitPowerType returns POWER_TYPE_FOCUS for brann instead of FOCUS
     function danFullPowerUpdate(powerBar, unit)
         powerBar:SetMinMaxValues(0, UnitPowerMax(unit))
         powerBar:SetValue(UnitPower(unit))

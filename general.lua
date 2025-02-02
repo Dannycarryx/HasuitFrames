@@ -272,6 +272,7 @@ initializeMultiPlusDiminish(710) --Banish
 
 hasuitFramesCenterSetDrType("incapacitate") --sheep
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
+hasuitSetupSpellOptions_CycloneTimerBar = hasuitSetupSpellOptions
 initializePlusDiminish(221527) --imprison immune
 initializePlusDiminish(203337) --freezing trap
 

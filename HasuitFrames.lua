@@ -998,6 +998,7 @@ unusedIcons["optionalBorder"] = {}
 unusedIcons[true] = {}
 unusedIcons["trueNoReverse"] = {}
 unusedIcons["ccBreak"] = {}
+unusedIcons["cycloneTimerBar"] = {}
 
 
 
@@ -1239,7 +1240,7 @@ do
             -- iconFramesCreated = iconFramesCreated+1
             
             local icon = CreateFrame("Frame")
-            if iconType=="optionalBorder" or iconType=="ccBreak" then
+            if iconType=="optionalBorder" or iconType=="ccBreak" or iconType=="cycloneTimerBar" then
                 icon.border = CreateFrame("Frame", nil, icon, "BackdropTemplate")
                 icon.border:SetBackdrop(danBorderBackdrop)
                 icon.border:SetAllPoints()
@@ -1291,6 +1292,21 @@ do
                 ccBreakBar:SetScript("OnEvent", ccBreakOnEvent)
                 local background = ccBreakBar:CreateTexture(nil, "BACKGROUND")
                 ccBreakBar.background = background
+                background:SetAllPoints()
+                background:SetColorTexture(0,0,0)
+                
+            elseif iconType=="cycloneTimerBar" then
+                icon.border:SetAlpha(1)
+                local cycloneTimerBar = CreateFrame("StatusBar", nil, icon)
+                icon.cycloneTimerBar = cycloneTimerBar
+                cycloneTimerBar:SetStatusBarTexture("Interface\\ChatFrame\\ChatFrameBackground")
+                cycloneTimerBar:SetPoint("TOPLEFT", icon, "TOPLEFT", 1, -1)
+                cycloneTimerBar:SetPoint("TOPRIGHT", icon, "TOPRIGHT", -1, -1)
+                cycloneTimerBar:SetHeight(4)
+                cycloneTimerBar:SetFrameLevel(25)
+                cycloneTimerBar.icon = icon
+                local background = cycloneTimerBar:CreateTexture(nil, "BACKGROUND")
+                cycloneTimerBar.background = background
                 background:SetAllPoints()
                 background:SetColorTexture(0,0,0)
                 
@@ -1720,6 +1736,158 @@ do
     end)
     danMainAuraFunction = hasuitSpellFunction_AuraMainFunction
 end
+
+
+
+
+
+
+
+do --hasuitSpecialAuraFunction_CycloneTimerBar
+    local GetSpellInfo = C_Spell.GetSpellInfo
+    local cycloneSpellId --set in class file, 33786 for druid
+    local UnitCastingInfo = UnitCastingInfo
+    hasuitLocal10 = function(asd)
+        cycloneSpellId = asd
+    end
+    local function cycloneTimerBarOnUpdateFunction(cycloneTimerBar, elapsed) --castBar --could be a lot better
+        local currentValue = cycloneTimerBar.currentValue-elapsed
+        cycloneTimerBar.currentValue = currentValue
+        cycloneTimerBar:SetValue(currentValue)
+        
+        local cycloneCastTime = GetSpellInfo(cycloneSpellId)["castTime"]/1000 --todo register event for haste change instead of checking cast time onupdate
+        if cycloneTimerBar.cycloneCastTime~=cycloneCastTime then
+            cycloneTimerBar.cycloneCastTime = cycloneCastTime
+            cycloneTimerBar:SetMinMaxValues(cycloneCastTime, 4) --assumes immune cc debuff can never change duration after applied
+        end
+        
+        if currentValue<-1 then
+            cycloneTimerBar:SetScript("OnUpdate", nil)
+        end
+        
+        local _,_,_,_,castedEndTimeMS,_,_,_,castingSpellId = UnitCastingInfo("player")
+        if castingSpellId==cycloneSpellId then
+            local icon = cycloneTimerBar.icon
+            if castedEndTimeMS<=icon.expirationTime*1000 then --current casted clone is too early, todo find correct target of clone from combat log
+                cycloneTimerBar.iconBorder:SetBackdropBorderColor(1,1,1)
+                cycloneTimerBar.white = true
+            end
+        elseif cycloneTimerBar.white then
+            cycloneTimerBar.white = nil
+            local colors = cycloneTimerBar.colors
+            cycloneTimerBar.iconBorder:SetBackdropBorderColor(colors.r,colors.g,colors.b)
+        end
+    end
+    
+    function hasuitSpecialAuraFunction_CycloneTimerBar()
+        local danCurrentEvent = danCurrentEvent
+        if danCurrentEvent=="recycled" then --danCurrentIcon
+            danCurrentIcon.cycloneTimerBar:SetScript("OnUpdate", nil)
+            
+        elseif danCurrentEvent=="added" then --danCurrentFrame, danCurrentIcon
+            
+            local cycloneTimerBar = danCurrentIcon.cycloneTimerBar
+            local colors = iconTypes[danCurrentAura["dispelName"] or ""]
+            local border = danCurrentIcon.border
+            border:SetBackdropBorderColor(colors.r,colors.g,colors.b)
+            
+            if danCurrentFrame.unitType=="arena" then
+                cycloneTimerBar:SetAlpha(1)
+                local startTime = danCurrentIcon.startTime
+                local endTime = danCurrentIcon.expirationTime
+                local duration = endTime-startTime
+                local cycloneCastTime = GetSpellInfo(cycloneSpellId)["castTime"]/1000
+                
+                cycloneTimerBar:SetMinMaxValues(cycloneCastTime, 4)
+                cycloneTimerBar.currentValue = duration
+                cycloneTimerBar:SetScript("OnUpdate", cycloneTimerBarOnUpdateFunction)
+                
+                cycloneTimerBar.cycloneCastTime = cycloneCastTime
+                
+                cycloneTimerBar.iconBorder = border
+                cycloneTimerBar.colors = colors
+                cycloneTimerBar:SetStatusBarColor(colors.r,colors.g,colors.b)
+            else
+                cycloneTimerBar:SetAlpha(0)
+                danCurrentIcon.specialFunction = nil
+            end
+        -- elseif danCurrentEvent=="updated" then 
+            
+            
+        end
+    end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function hasuitSpellFunction_AuraMainFunctionPveUnknown()
     local spellId = danCurrentAura["spellId"]

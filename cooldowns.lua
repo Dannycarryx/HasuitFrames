@@ -853,6 +853,9 @@ do
             hasuitSetupSpellOptions = {hasuitSpellFunction_AuraPoints1HidesOther,["points1"]=-40,["hideSpellId"]=184662,["loadOn"]=hasuitLoadOn_CooldownDisplay} --Shield of Vengeance
             initialize(403876) --Divine Protection
             
+            
+            hasuitFramesCenterSetEventType("cleu")
+            
         end
     end
     
@@ -1480,7 +1483,6 @@ do
     
     
     
-    hasuitFramesCenterSetEventType("cleu")
     
     if #shiftingPowerAffectedSpells>0 then
         hasuitSetupSpellOptions = {hasuitSpellFunction_CleuSuccessCooldownReduction,["CDr"]=3,["affectedSpells"]=shiftingPowerAffectedSpells,["loadOn"]=hasuitLoadOn_CooldownDisplay}
