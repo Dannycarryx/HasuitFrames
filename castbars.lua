@@ -2,7 +2,7 @@
 
 
 
-local hasuitSpellFunction_UnitCastingMiddleCastBars = hasuitSpellFunction_UnitCastingMiddleCastBars
+local hasuitSpellFunction_UnitCasting_MiddleCastBars = hasuitSpellFunction_UnitCasting_MiddleCastBars
 local tremove = tremove
 local CreateFrame = CreateFrame
 local hasuitUninterruptibleBorderSize = hasuitUninterruptibleBorderSize
@@ -106,7 +106,7 @@ local hasuitLoadOn_PvpEnemyMiddleCastBars = hasuitLoadOn_PvpEnemyMiddleCastBars
 -- most controllers are attached to individual unitFrames, but this one is separated from unitFrames and in the upper middle of the screen, and created differently. It allows things from multiple units to all be combined there, instead of on unitFrames
 -- hasuitController_Separate_UpperScreenCastBars = {} --middle castbars
 local middleCastBarsController = CreateFrame("Frame", nil, hasuitFramesParent)
--- local controllerOptions = hasuitController_Separate_UpperScreenCastBars --hasuitSpellFunction_UnitCastingMiddleCastBars
+-- local controllerOptions = hasuitController_Separate_UpperScreenCastBars --hasuitSpellFunction_UnitCasting_MiddleCastBars
 -- controllerOptions.controller = middleCastBarsController --controllerOptions seems pointless here, maybe for future separated controllers too, but it might be even better to get this system to be good and interchangeable with normal controllers somehow. should work on it again
 middleCastBarsController.frames = {}
 -- middleCastBarsController:SetFrameStrata("MEDIUM")
@@ -118,7 +118,7 @@ middleCastBarsController:SetSize(1,1)
 
 
 local middleCastBarsFrames = middleCastBarsController.frames
-function hasuitMiddleCastBarsGrow(controller) --hasuitSpellFunction_UnitCastingMiddleCastBars
+function hasuitMiddleCastBarsGrow(controller) --hasuitSpellFunction_UnitCasting_MiddleCastBars
     local nonArenaCount = 0
     for i=1, #middleCastBarsFrames do
         local castBar = middleCastBarsFrames[i]
@@ -155,37 +155,37 @@ hasuitCastBarFont14:SetFont("Fonts/FRIZQT__.TTF", 14, "OUTLINE")
 
 
 local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=36,  ["fontObject"]=hasuitCastBarFont20, ["fontObjectArenaBox"]=hasuitCastBarFont26, r=1,    g=0,    b=0} --big red cc, width should stay even for all of these otherwise pixels can get ugly because of setpoint center in the grow function
-hasuitBigRedMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
+hasuitBigRedMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCasting_MiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 
 local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=30,  ["fontObject"]=hasuitCastBarFont18, ["fontObjectArenaBox"]=hasuitCastBarFont24, r=0.5,  g=1,    b=0} --medium greenish defensive
-hasuitGreenishDefensiveMiddleCastBarsSpellOptions = {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
+hasuitGreenishDefensiveMiddleCastBarsSpellOptions = {hasuitSpellFunction_UnitCasting_MiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 
 local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=30,  ["fontObject"]=hasuitCastBarFont18, ["fontObjectArenaBox"]=hasuitCastBarFont24, r=1,    g=0.4,  b=0} --medium orange, stuff like searing glare, maybe add things like turn undead here for dks until a better system is made for that
-hasuitOrangeMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
+hasuitOrangeMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCasting_MiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 
 local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=28,  ["fontObject"]=hasuitCastBarFont18, ["fontObjectArenaBox"]=hasuitCastBarFont24, r=1,    g=1,    b=0} --medium yellow significant damage ability
-hasuitYellowMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
+hasuitYellowMiddleCastBarsSpellOptions =            {hasuitSpellFunction_UnitCasting_MiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 
 local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=20,  ["fontObject"]=hasuitCastBarFont14, ["fontObjectArenaBox"]=hasuitCastBarFont20, r=0.7,  g=1,    b=0} --small yellowish misc
-hasuitSmallMiscMiddleCastBarsSpellOptions =         {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
+hasuitSmallMiscMiddleCastBarsSpellOptions =         {hasuitSpellFunction_UnitCasting_MiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=20,  ["fontObject"]=hasuitCastBarFont14, ["fontObjectArenaBox"]=hasuitCastBarFont20, r=0.7,  g=1,    b=0} --small yellowish misc
-hasuitUntrackedMiddleCastBarsSpellOptions =         {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon} --for people with ranged kicks to see untracked casts, todo ignore list?
+hasuitUntrackedMiddleCastBarsSpellOptions =         {hasuitSpellFunction_UnitCasting_MiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon} --for people with ranged kicks to see untracked casts, todo ignore list?
 if hasuitLocal7 then
     hasuitLocal7(hasuitUntrackedMiddleCastBarsSpellOptions)
 end
 
 local danCommon = {controller=middleCastBarsController, ["width"]=220,  ["height"]=20,  ["fontObject"]=hasuitCastBarFont14, ["fontObjectArenaBox"]=hasuitCastBarFont20, r=0,    g=1,    b=0} --small green damage
-hasuitSmallDamageMiddleCastBarsSpellOptions =       {hasuitSpellFunction_UnitCastingMiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
+hasuitSmallDamageMiddleCastBarsSpellOptions =       {hasuitSpellFunction_UnitCasting_MiddleCastBars,["loadOn"]=hasuitLoadOn_PvpEnemyMiddleCastBars,   ["arena"]=danCommon}
 
 
 -- initialized in general.lua
@@ -198,15 +198,15 @@ hasuitSmallDamageMiddleCastBarsSpellOptions =       {hasuitSpellFunction_UnitCas
 --[[
 tinsert(hasuitDoThis_Addon_Loaded, function()
     hasuitSetupSpellOptionsMulti = {
-                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitBigRedMiddleCastBarsSpellOptions["arena"]},
-                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitGreenishDefensiveMiddleCastBarsSpellOptions["arena"]},
-                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitOrangeMiddleCastBarsSpellOptions["arena"]},
-                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitYellowMiddleCastBarsSpellOptions["arena"]},
-                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallMiscMiddleCastBarsSpellOptions["arena"]},
-                              -- {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitUntrackedMiddleCastBarsSpellOptions["arena"]},
-                              {hasuitSpellFunction_UnitCastingMiddleCastBars,    ["group"]=hasuitSmallDamageMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCasting_MiddleCastBars,    ["group"]=hasuitBigRedMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCasting_MiddleCastBars,    ["group"]=hasuitGreenishDefensiveMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCasting_MiddleCastBars,    ["group"]=hasuitOrangeMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCasting_MiddleCastBars,    ["group"]=hasuitYellowMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCasting_MiddleCastBars,    ["group"]=hasuitSmallMiscMiddleCastBarsSpellOptions["arena"]},
+                              -- {hasuitSpellFunction_UnitCasting_MiddleCastBars,    ["group"]=hasuitUntrackedMiddleCastBarsSpellOptions["arena"]},
+                              {hasuitSpellFunction_UnitCasting_MiddleCastBars,    ["group"]=hasuitSmallDamageMiddleCastBarsSpellOptions["arena"]},
     }
-    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCastingMiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting = addMultiFunction(function()
+    hasuitFramesInitializeMulti(8936) --    hasuitSpellFunction_UnitCasting_MiddleCastBars = addMultiFunction(function()                         , hasuitSpellFunction_UnitCasting_IconsOnDest = addMultiFunction(function()
 end)
 --]]
 

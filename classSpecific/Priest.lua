@@ -39,10 +39,10 @@ hasuitHots_1["loadOn"] = loadOn_SpecIs_Discipline
 hasuitSetupSpellOptions = hasuitHots_1
 initialize(194384)  --Atonement, disc loadon, should make this bigger?/move everything accordingly while disc
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_1["group"], ["loadOn"]=loadOn_SpecIs_Holy}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_1["group"], ["loadOn"]=loadOn_SpecIs_Holy}
 initialize(139)     --Renew, holy loadon
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_1["group"], ["loadOn"]=loadOn_SpecIs_Shadow}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_1["group"], ["loadOn"]=loadOn_SpecIs_Shadow}
 initialize(17)      --Power Word: Shield, shadow loadon
 
 
@@ -52,10 +52,10 @@ hasuitHots_2["loadOn"] = loadOn_SpecIs_Discipline
 hasuitSetupSpellOptions = hasuitHots_2
 initialize(139)     --Renew, disc loadon
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_2["group"], ["loadOn"]=loadOn_SpecIs_Holy}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_2["group"], ["loadOn"]=loadOn_SpecIs_Holy}
 initialize(41635)   --Prayer of Mending, holy loadon, can stick between swapping specs and cause an overlap with hots 3, but doesn't really matter? could chain push controllers but kind of inefficient?
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_2["group"], ["loadOn"]=loadOn_SpecIs_Shadow}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_2["group"], ["loadOn"]=loadOn_SpecIs_Shadow}
 initialize(139)     --Renew, shadow loadon, people don't take this/prayer of mending for shadow? doesn't seem like there's anything else to show anyway
 
 
@@ -66,11 +66,11 @@ hasuitHots_3["priority"] = 2
 hasuitSetupSpellOptions = hasuitHots_3
 initialize(41635)   --Prayer of Mending, disc loadon, idk how strong mending/renew/shield are or how they should be shown to begin with. Maybe mending is more of a trash debuff? maybe even if it's good it isn't very useful to show it in a prominent place on frames because you just press it on cd? No idea on this one, or how to prioritize renew vs shield
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_3["group"], ["loadOn"]=loadOn_SpecIs_Discipline}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_3["group"], ["loadOn"]=loadOn_SpecIs_Discipline}
 initialize(17)      --Power Word: Shield, disc loadon
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_3["group"], ["loadOn"]=loadOn_SpecIs_Holy}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_3["group"], ["loadOn"]=loadOn_SpecIs_Holy}
 initialize(17)      --Power Word: Shield, holy loadon
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_3["group"], ["loadOn"]=loadOn_SpecIs_Shadow}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=1,                     ["group"]=hasuitHots_3["group"], ["loadOn"]=loadOn_SpecIs_Shadow}
 initialize(41635)   --Prayer of Mending, shadow loadon
 
 
@@ -81,10 +81,10 @@ hasuitController_Hots4_BottomRight_BottomRight["xOffset"] = hasuitController_Hot
 hasuitSetupSpellOptions = hasuitHots_4 --converge and share the same spells between all 3 specs from here on
 initialize(10060)   --Power Infusion
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_4["group"]} --priority 2
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_4["group"]} --priority 2
 initialize(64844)  --Divine Hymn, 30% healing increase from all sources for 25 sec? undispellable. Something like this should be visible from other healers in group but I think too spammy to be worth showing? Not sure what's best, maybe ideally show it on the priest that cast it but don't spam other frames?
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=3,                     ["group"]=hasuitHots_4["group"]} --priority 3
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=3,                     ["group"]=hasuitHots_4["group"]} --priority 3
 initialize(121557)  --Angelic Feather
 initialize(111759)  --Levitate
 

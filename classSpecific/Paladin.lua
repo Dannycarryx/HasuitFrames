@@ -16,7 +16,7 @@ trackDiminishTypeAndTexture("incapacitate", 135942) --Repentance, you can add/de
 
 -- you can put a spell name in quotes instead of the number as long as it's in your spellbook. capitalization matters. example: trackDiminishTypeAndTexture("stun", "Mighty Bash"), if using a number here it needs to be the spell texture, not a spellId
 
-hasuitAddCycloneTimerBars(20066) --Repentance
+hasuitAddCycloneTimerBars(20066) --Repentance, todo only if playing the talent
 
 
 
@@ -47,7 +47,7 @@ hasuitSetupSpellOptions = hasuitHots_3
 initialize(156322)  --Eternal Flame
 initialize(461432)  --Eternal Flame?, should Sun Sear be tracked? random short hot after holy shock crit
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_3["group"]}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_3["group"]}
 initialize(148039)  --Barrier of Faith
 
 
@@ -57,7 +57,7 @@ hasuitController_Hots3_BottomRight_BottomRight["pushesOtherController"]=hasuitCo
 hasuitSetupSpellOptions = hasuitHots_4
 initialize(1044)    --Blessing of Freedom
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_4["group"]}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_4["group"]}
 initialize(388007)  --Blessing of Summer, similar to nature's vigil but external? and affects both healing and damage
 initialize(388011)  --Blessing of Winter, mana over time
 initialize(388010)  --Blessing of Autumn, cd reduction
@@ -67,7 +67,7 @@ initialize(388010)  --Blessing of Autumn, cd reduction
 --------------------------------hots 5, above hots 1/grows left
 hasuitHots_5["group"]["size"]=16
 hasuitHots_5["group"]["hideCooldownText"]=nil
-hasuitHots_5[1] = hasuitSpellFunction_AuraMainFunction
+hasuitHots_5[1] = hasuitSpellFunction_Aura_MainFunction
 hasuitSetupSpellOptions = hasuitHots_5
 initialize(25771)   --Forbearance
 

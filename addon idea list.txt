@@ -10,6 +10,8 @@ make something to help track how accurate cooldowns.lua is
 
 
 other important:
+re-organize cooldowns some. I don't like misc stuff like tremor being in the same group as defensives
+Show freedoms/movement stuff on nameplates
 fix the way icons hide when too many are showing? or whatever the new bug is that's making icon's cooldown swipe show up when they're supposed to be hidden, or whatever's causing that --only ever saw this once
 put welcome message in /hf instead of print
 unit_target on pve casts after new system, or maybe onupdate for that

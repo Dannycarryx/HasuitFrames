@@ -51,7 +51,7 @@ hasuitController_Hots4_BottomRight_BottomRight["yMinimum"] = 2 --^
 hasuitSetupSpellOptions = hasuitHots_4
 initialize(198533)  --Soothing Mist from statue, todo fake duration? buffs enveloping or something the same way as normal soothing, or that's how it worked last xpac. Fun fact you can split the beams if you los the statue to buff two envelops at once. Preferably re-cast soothing to give the statue higher duration before lining it
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_4["group"]} --priority 2 instead of 1
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_4["group"]} --priority 2 instead of 1
 initialize(116841)  --Tiger's Lust
 
 
@@ -66,7 +66,7 @@ initialize(411036)  --Sphere of Hope, 15%
 hasuitSetupSpellOptions = hasuitHots_6
 initialize(353503)  --Counteract Magic, 10% per stack up to 3?
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_6["group"]} --priority 2 instead of 1
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=2,                     ["group"]=hasuitHots_6["group"]} --priority 2 instead of 1
 initialize(205655)  --Dome of Mist, 40% while absorb lasts? this is passive now, also for some reason my data collection addon shows enveloping mist as undispellable but that can't be right. Or actually it's showing it as undispellable in the first half of the season. Recently it shows as dispellable again?
 
 --end hots
@@ -106,7 +106,7 @@ initialize(116095)  --Disable 50% slow
 
 -- local hasuitController_BottomRight_BottomRight2   = {["xDirection"]=-1, ["yDirection"]= 1,  ["xMinimum"]=1, ["yMinimum"]=1, ["xLimit"]=1,   ["yLimit"]=0.33,["ownPoint"]="BOTTOMRIGHT", ["targetPoint"]="BOTTOMRIGHT",  ["xOffset"]=0,  ["yOffset"]=19, ["frameLevel"]=21,  ["sort"]=hasuitSortPriorityExpirationTime,  ["grow"]=normalGrow}
 -- local danCommonHelpful = {["controllerOptions"]=hasuitController_BottomRight_BottomRight2,["size"]=15,    ["hideCooldownText"]=true,  ["alpha"]=1}
--- hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=1,     ["group"]=danCommonHelpful}
+-- hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=1,     ["group"]=danCommonHelpful}
 
 
 

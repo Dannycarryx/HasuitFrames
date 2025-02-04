@@ -43,7 +43,7 @@ initialize(204361)  --Bloodlust 10 sec/20% from ele/enh?
 
 --------------------------------hots 3
 hasuitController_Hots3_BottomRight_BottomRight["xOffset"] = hasuitController_Hots3_BottomRight_BottomRight["xOffset"]-3
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,                 ["priority"]=0,                     ["group"]=hasuitHots_3["group"]} --priority 0 instead of 1
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,                 ["priority"]=0,                     ["group"]=hasuitHots_3["group"]} --priority 0 instead of 1
 initialize(382024)  --Earthliving Weapon --should this show? here?
 
 hasuitSetupSpellOptions = hasuitHots_3

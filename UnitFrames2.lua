@@ -2603,7 +2603,7 @@ end
 
 
 local initialize = hasuitFramesInitialize
-local hasuitSpellFunction_CleuDiminish = hasuitSpellFunction_CleuDiminish
+local hasuitSpellFunction_Cleu_Diminish = hasuitSpellFunction_Cleu_Diminish
 local trackedDiminishSpells = hasuitTrackedDiminishSpells
 tinsert(hasuitDoThis_Addon_Loaded, function()
     hasuitFramesCenterSetEventType("cleu")
@@ -2628,7 +2628,7 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
     end
     for drType, spellOptions in pairs(hasuitDiminishSpellOptionsTable) do
         arenaDiminishTextures[spellOptions["arena"]] = spellOptions["texture"]
-        spellOptions[1] = hasuitSpellFunction_CleuDiminish
+        spellOptions[1] = hasuitSpellFunction_Cleu_Diminish
         spellOptions["loadOn"] = drLoadOn
         hasuitSetupSpellOptions = spellOptions
         local drSpellTable = trackedDiminishSpells[drType]
@@ -3216,7 +3216,7 @@ do
     end)
 end
 hasuitFramesCenterSetEventType("unitCastSucceeded")
-hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCastSucceededChangedTalents}
+hasuitSetupSpellOptions = {hasuitSpellFunction_UnitCastSucceeded_ChangedTalents}
 initialize(200749) --Activating Specialization, maybe not needed now that spec change event is being tracked, todo?
 initialize(384255) --Changing Talents
 

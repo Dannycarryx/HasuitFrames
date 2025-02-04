@@ -30,7 +30,7 @@ initialize(188550)  --lifebloom
 initialize(33763)   --lifebloom, todo only cd text if low duration?
 
 local danCommon = {["controllerOptions"]=hasuitController_Hots1_BottomRight_BottomRight,["size"]=14,["alpha"]=1,    ["hideCooldownText"]=true}
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2, ["group"]=danCommon} --applying a real lifebloom at the end of one of these doesn't make it bloom so that's why there's no red function. not 100% sure that's best but ya
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=danCommon} --applying a real lifebloom at the end of one of these doesn't make it bloom so that's why there's no red function. not 100% sure that's best but ya
 initialize(290754)  --Lifebloom from Full Bloom (early spring) --also applying this on the end of a real lifebloom doesn't make the real lifebloom bloom either
 
 
@@ -61,7 +61,7 @@ hasuitHots_4["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulHots
 hasuitSetupSpellOptions = hasuitHots_4
 initialize(48438)   --wild growth
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_4["group"]} --difference is priority 2 instead of 1, and no special icon stuff for soul
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_4["group"]} --difference is priority 2 instead of 1, and no special icon stuff for soul
 initialize(383193)  --Grove Tending
 initialize(157982)  --Tranquility
 
@@ -73,7 +73,7 @@ initialize(468152)  --Reactive Resin
 initialize(391891)  --adaptive swarm
 
 local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=10,["alpha"]=1,    ["hideCooldownText"]=true}
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
 initialize(429222)  --Minor Cenarion Ward
 
 --end hots

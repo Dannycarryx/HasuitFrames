@@ -1,7 +1,7 @@
 
-
---GetBuildInfo
-
+if hasuitTestAllSpellTablesBefore then
+    hasuitTestAllSpellTablesBefore()
+end
 
 local CreateFrame = CreateFrame
 local hasuitFramesParent = CreateFrame("Frame", "hasuitFramesParent", UIParent)
@@ -606,6 +606,7 @@ local pairs = pairs
 local tremove = tremove
 
 local allTable = {}
+hasuitAllTable = allTable
 
 
 local function mainLoadOnFunction()
@@ -672,7 +673,9 @@ hasuitMainLoadOnFunctionSpammable = mainLoadOnFunctionSpammable
 
 
 local allTablePairsLoaded = {}
+hasuitAllTablePairsLoaded = allTablePairsLoaded
 local allTablePairsUnloaded = {}
+hasuitAllTablePairsUnloaded = allTablePairsUnloaded
 function hasuitFramesCenterAddToAllTable(tableForEventType, eventType)
     tinsert(allTable, {tableForEventType, {}})
     local dan = allTable[#allTable]
@@ -966,6 +969,10 @@ end)
 local _G = _G
 tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi enforced naturally. todo add things that stay global and don't get set to nil as comments. This should hopefully be a comprehensive list of things that can be accessed from outside of the addon, not a full list of internal functions
     C_Timer.After(0, function() --hasuitSetupSpellOptions
+        if hasuitTestAllSpellTablesAfter then
+            hasuitTestAllSpellTablesAfter()
+        end
+        
         hasuitDoThis_Addon_Loaded = nil
         hasuitDoThis_Player_Login = nil
         hasuitDoThis_Player_Entering_WorldFirstOnly = nil
@@ -1034,55 +1041,57 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitTrackedPveSubevents = nil
         
         
-        hasuitSpellFunction_CleuCcBreakThreshold = nil
-        hasuitSpellFunction_CleuInterrupted = nil
-        hasuitSpellFunction_CleuINC = nil
-        hasuitSpellFunction_CleuDiminish = nil
-        hasuitSpellFunction_CleuSpellSummon = nil
-        hasuitSpellFunction_CleuSuccessCooldownReduction = nil
-        hasuitSpellFunction_CleuInterruptCooldownReduction = nil
-        hasuitSpellFunction_CleuHealCooldownReduction = nil
-        hasuitSpellFunction_CleuEnergizeCooldownReduction = nil
-        hasuitSpellFunction_CleuAppliedCooldownReduction = nil
-        hasuitSpellFunction_CleuSpellEmpowerInterruptCooldownReduction = nil
-        hasuitSpellFunction_CleuAppliedCooldownReductionSourceIsDest = nil
-        hasuitSpellFunction_CleuSuccessCooldownReductionSpec = nil
-        hasuitSpellFunction_CleuInterruptCooldownReductionSolarBeam = nil
-        hasuitSpellFunction_CleuAppliedCooldownReductionThiefsBargain354827 = nil
-        hasuitSpellFunction_CleuSuccessCooldownStart1 = nil
-        hasuitSpellFunction_CleuSuccessCooldownStart2 = nil
-        hasuitSpellFunction_CleuHealCooldownStart = nil
-        hasuitSpellFunction_CleuHealCooldownStart = nil
-        hasuitSpellFunction_CleuSpellEmpowerStartCooldownStart2 = nil
-        hasuitSpellFunction_CleuAppliedCooldownStart = nil
-        hasuitSpellFunction_CleuRemovedCooldownStart = nil
-        hasuitSpellFunction_CleuAppliedCooldownStartPreventMultiple = nil
-        hasuitSpellFunction_CleuSuccessCooldownStartSolarBeam = nil
-        hasuitSpellFunction_CleuSuccessCooldownStartPvPTrinket = nil
-        hasuitSpellFunction_CleuAppliedCooldownStartRacial = nil
-        hasuitSpellFunction_CleuAppliedRacialNotTrackedAffectingPvpTrinket = nil
-        hasuitSpellFunction_Cleu378441TimeStop = nil
-        hasuitSpellFunction_CleuCooldownStartPet = nil
-        hasuitSpellFunction_CleuCasting = nil
+        hasuitSpellFunction_Cleu_CcBreakThreshold = nil
+        hasuitSpellFunction_Cleu_Interrupted = nil
+        hasuitSpellFunction_Cleu_INC = nil
+        hasuitSpellFunction_Cleu_Diminish = nil
+        hasuitSpellFunction_Cleu_SpellSummon = nil
+        hasuitSpellFunction_Cleu_SuccessCooldownReduction = nil
+        hasuitSpellFunction_Cleu_InterruptCooldownReduction = nil
+        hasuitSpellFunction_Cleu_HealCooldownReduction = nil
+        hasuitSpellFunction_Cleu_EnergizeCooldownReduction = nil
+        hasuitSpellFunction_Cleu_AppliedCooldownReduction = nil
+        hasuitSpellFunction_Cleu_SpellEmpowerInterruptCooldownReduction = nil
+        hasuitSpellFunction_Cleu_AppliedCooldownReductionSourceIsDest = nil
+        hasuitSpellFunction_Cleu_SuccessCooldownReductionSpec = nil
+        hasuitSpellFunction_Cleu_InterruptCooldownReductionSolarBeam = nil
+        hasuitSpellFunction_Cleu_AppliedCooldownReductionThiefsBargain354827 = nil
+        hasuitSpellFunction_Cleu_SuccessCooldownStart1 = nil
+        hasuitSpellFunction_Cleu_SuccessCooldownStart2 = nil
+        hasuitSpellFunction_Cleu_HealCooldownStart = nil
+        hasuitSpellFunction_Cleu_SpellEmpowerStartCooldownStart2 = nil
+        hasuitSpellFunction_Cleu_AppliedCooldownStart = nil
+        hasuitSpellFunction_Cleu_RemovedCooldownStart = nil
+        hasuitSpellFunction_Cleu_AppliedCooldownStartPreventMultiple = nil
+        hasuitSpellFunction_Cleu_SuccessCooldownStartSolarBeam = nil
+        hasuitSpellFunction_Cleu_SuccessCooldownStartPvPTrinket = nil
+        hasuitSpellFunction_Cleu_AppliedCooldownStartRacial = nil
+        hasuitSpellFunction_Cleu_AppliedRacialNotTrackedAffectingPvpTrinket = nil
+        hasuitSpellFunction_Cleu_378441TimeStop = nil
+        hasuitSpellFunction_Cleu_CooldownStartPet = nil
+        hasuitSpellFunction_Cleu_Casting = nil
+        hasuitSpellFunction_Cleu_UNIT_DIED = nil
+        hasuitSpellFunction_Cleu_SoulEmpoweredHots1 = nil
+        hasuitSpellFunction_Cleu_SoulEmpoweredHots2 = nil
         
-        hasuitSpellFunction_UnitCastSucceededCooldownStart = nil
-        hasuitSpellFunction_UnitCastSucceededChangedTalents = nil
+        hasuitSpellFunction_UnitCastSucceeded_CooldownStart = nil
+        hasuitSpellFunction_UnitCastSucceeded_ChangedTalents = nil
         
-        hasuitSpellFunction_UnitCastingMiddleCastBars = nil
-        hasuitSpellFunction_UnitCasting = nil
+        hasuitSpellFunction_UnitCasting_MiddleCastBars = nil
+        hasuitSpellFunction_UnitCasting_IconsOnDest = nil
         
-        hasuitSpellFunction_AuraMainFunction = nil
-        hasuitSpellFunction_AuraMainFunctionPveUnknown = nil
-        hasuitSpellFunction_AuraSourceIsPlayer = nil
-        hasuitSpellFunction_AuraSourceIsNotPlayer = nil
-        hasuitSpellFunction_AuraPoints1Required = nil
-        hasuitSpellFunction_AuraPoints2Required = nil
-        hasuitSpellFunction_AuraHypoCooldownFunction = nil
-        hasuitSpellFunction_AuraPoints1CooldownReduction = nil
-        hasuitSpellFunction_AuraPoints2CooldownReduction = nil
-        hasuitSpellFunction_AuraPoints2CooldownReductionExternal = nil
-        hasuitSpellFunction_AuraPoints1HidesOther = nil
-        hasuitSpellFunction_AuraDurationCooldownReduction = nil
+        hasuitSpellFunction_Aura_MainFunction = nil
+        hasuitSpellFunction_Aura_MainFunctionPveUnknown = nil
+        hasuitSpellFunction_Aura_SourceIsPlayer = nil
+        hasuitSpellFunction_Aura_SourceIsNotPlayer = nil
+        hasuitSpellFunction_Aura_Points1Required = nil
+        hasuitSpellFunction_Aura_Points2Required = nil
+        hasuitSpellFunction_Aura_HypoCooldownFunction = nil
+        hasuitSpellFunction_Aura_Points1CooldownReduction = nil
+        hasuitSpellFunction_Aura_Points2CooldownReduction = nil
+        hasuitSpellFunction_Aura_Points2CooldownReductionExternal = nil
+        hasuitSpellFunction_Aura_Points1HidesOther = nil
+        hasuitSpellFunction_Aura_DurationCooldownReduction = nil
         
         hasuitSpecialAuraFunction_CcBreakThreshold = nil
         hasuitSpecialAuraFunction_CycloneTimerBar = nil
@@ -1097,6 +1106,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitSpecialAuraFunction_SoulHots = nil
         hasuitSpecialAuraFunction_RedLifebloom = nil
         hasuitSpecialAuraFunction_CanChangeTexture = nil
+        hasuitSpecialAuraFunction_AuraBlessingOfSac = nil
         hasuitSpecialAuraFunction_BlessingOfAutumn = nil
         hasuitBlessingOfAutumnIgnoreList = nil
         
@@ -1221,6 +1231,9 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitMainLoadOnFunctionSpammable = nil
         hasuitMainLoadOnFunction = nil
         hasuitUnitAuraIsFullUpdate = nil
+        hasuitAllTable = nil
+        hasuitAllTablePairsLoaded = nil
+        hasuitAllTablePairsUnloaded = nil
         
         hasuitCooldownTextFonts = nil
         hasuit1PixelBorderBackdrop = nil

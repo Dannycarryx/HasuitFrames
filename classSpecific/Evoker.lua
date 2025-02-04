@@ -34,7 +34,7 @@ initialize(364343)  --Echo, 2 essence instant cast: buffs next non-echo healing 
 hasuitSetupSpellOptions = hasuitHots_2
 initialize(366155)  --Reversion
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_2["group"]} --doing this to prevent it from switching places with other reversion randomly
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_2["group"]} --doing this to prevent it from switching places with other reversion randomly
 initialize(367364)  --Reversion, echo duplicate? has a unique icon
 
 
@@ -49,7 +49,7 @@ hasuitController_Hots4_BottomRight_BottomRight["xOffset"] = hasuitController_Hot
 hasuitSetupSpellOptions = hasuitHots_4
 initialize(409895)  --Spiritbloom hot
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_AuraSourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_4["group"]} --priority 2 instead of 1
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_4["group"]} --priority 2 instead of 1
 initialize(355941)  --Dream Breath, should maybe show for others too in top-left?
 initialize(376788)  --Dream Breath, 1/3rd as common? probably echo duplicate
 
