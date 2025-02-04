@@ -1102,6 +1102,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         
         
         hasuitSetupSpellOptions_CycloneTimerBar = nil
+        hasuitAddCycloneTimerBars = nil
         
         hasuitGetIcon = nil
         hasuitGetCastBar = nil
@@ -1199,7 +1200,6 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitLocal7 = nil
         hasuitLocal8 = nil
         hasuitLocal9 = nil
-        hasuitLocal10 = nil
         
         
         hasuitResetCooldowns = nil

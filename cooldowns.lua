@@ -1420,8 +1420,8 @@ do
 
         crowdControlCooldowns["PALADIN"]={
             {cdCle2,["spellId"]=853,    ["priority"]=3, ["duration"]=60},--Hammer of Justice
-            {cdCle2,["spellId"]=115750, ["priority"]=4, ["duration"]=90},--Blinding Light
-            {cdCle2,["spellId"]=20066,  ["priority"]=4, ["duration"]=15},--Repentance
+            {cdCle2,["spellId"]=115750, ["priority"]=4, ["duration"]=75},--Blinding Light --talent that reduces cd by 15 sec now, was 90
+            {cdCle2,["spellId"]=20066,  ["priority"]=4, ["duration"]=1},--Repentance --talent that reduces cd by 15 sec now, was 15
         }
         -- crowdControlCooldowns[65]={--Holy
         -- }

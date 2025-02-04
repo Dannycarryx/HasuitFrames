@@ -16,6 +16,7 @@ trackDiminishTypeAndTexture("incapacitate", 135942) --Repentance, you can add/de
 
 -- you can put a spell name in quotes instead of the number as long as it's in your spellbook. capitalization matters. example: trackDiminishTypeAndTexture("stun", "Mighty Bash"), if using a number here it needs to be the spell texture, not a spellId
 
+hasuitAddCycloneTimerBars(20066) --Repentance
 
 
 

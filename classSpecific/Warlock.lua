@@ -18,6 +18,7 @@ trackDiminishTypeAndTexture("incapacitate", 607853) --Mortal Coil, you can add/d
 
 --warlock doesn't have roots anymore right?
 
+hasuitAddCycloneTimerBars(5782) --Fear, todo seduce if playing the pet?
 
 
 -- hots from you are shown bottom right on friendly frames

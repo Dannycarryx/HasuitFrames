@@ -15,6 +15,7 @@ trackDiminishTypeAndTexture("disorient", 136022) --Cyclone
 trackDiminishTypeAndTexture("root", 136100) --Entangling Roots, you can put a spell name in quotes instead of the number as long as it's in your spellbook. capitalization matters. example: trackDiminishTypeAndTexture("stun", "Mighty Bash"), if using a number here it needs to be the spell texture, not a spellId
 trackDiminishTypeAndTexture("incapacitate", 136071) --Polymorph, you can add/delete or move drs around depending on what you want, just copy paste a line with the values you want, or remove the whole line for whatever you don't want to track
 
+hasuitAddCycloneTimerBars(33786) --Cyclone
 
 
 
@@ -92,16 +93,6 @@ initialize(1079)    --Rip
 initialize(155722)  --Rake
 initialize(391889)  --Adaptive Swarm dot
 
-
-
-
-
-
-
-
-hasuitSetupSpellOptions_CycloneTimerBar["specialAuraFunction"]=hasuitSpecialAuraFunction_CycloneTimerBar
-hasuitSetupSpellOptions_CycloneTimerBar["specialIconType"]="cycloneTimerBar"
-hasuitLocal10(33786) --Cyclone
 
 
 

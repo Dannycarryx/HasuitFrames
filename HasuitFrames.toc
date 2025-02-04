@@ -9,12 +9,13 @@ HasuitFrames.lua
 castbars.lua
 general.lua
 
-classSpecific\Druid.lua
-classSpecific\Monk.lua
 classSpecific\DeathKnight.lua
 classSpecific\DemonHunter.lua
+classSpecific\Druid.lua
 classSpecific\Evoker.lua
 classSpecific\Hunter.lua
+classSpecific\Mage.lua
+classSpecific\Monk.lua
 classSpecific\Paladin.lua
 classSpecific\Priest.lua
 classSpecific\Rogue.lua

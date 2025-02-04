@@ -15,6 +15,7 @@ trackDiminishTypeAndTexture("incapacitate", 237579) --Hex
 trackDiminishTypeAndTexture("root", 136100) --Earthgrab, you can add/delete or move drs around depending on what you want, just copy paste a line with the values you want, or remove the whole line for whatever you don't want to track
 trackDiminishTypeAndTexture("disorient", 136183) --Fear, you can put a spell name in quotes instead of the number as long as it's in your spellbook. capitalization matters. example: trackDiminishTypeAndTexture("stun", "Mighty Bash"), if using a number here it needs to be the spell texture, not a spellId
 
+hasuitAddCycloneTimerBars(51514, C_Spell.GetSpellName(51514)) --Hex
 
 
 

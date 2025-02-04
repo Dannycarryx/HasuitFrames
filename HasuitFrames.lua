@@ -1310,6 +1310,11 @@ do
                 background:SetAllPoints()
                 background:SetColorTexture(0,0,0)
                 
+                local text = cycloneTimerBar:CreateFontString()
+                text:SetFontObject(hasuitFont9)
+                text:SetPoint("TOP", icon, "TOP", 1, -5)
+                cycloneTimerBar.immuneText = text
+                
             end
             
             --todo reset cds when entering arena?
@@ -1738,157 +1743,6 @@ do
 end
 
 
-
-
-
-
-
-do --hasuitSpecialAuraFunction_CycloneTimerBar
-    local GetSpellInfo = C_Spell.GetSpellInfo
-    local cycloneSpellId --set in class file, 33786 for druid
-    local UnitCastingInfo = UnitCastingInfo
-    hasuitLocal10 = function(asd)
-        cycloneSpellId = asd
-    end
-    local function cycloneTimerBarOnUpdateFunction(cycloneTimerBar, elapsed) --castBar --could be a lot better
-        local currentValue = cycloneTimerBar.currentValue-elapsed
-        cycloneTimerBar.currentValue = currentValue
-        cycloneTimerBar:SetValue(currentValue)
-        
-        local cycloneCastTime = GetSpellInfo(cycloneSpellId)["castTime"]/1000 --todo register event for haste change instead of checking cast time onupdate
-        if cycloneTimerBar.cycloneCastTime~=cycloneCastTime then
-            cycloneTimerBar.cycloneCastTime = cycloneCastTime
-            cycloneTimerBar:SetMinMaxValues(cycloneCastTime, 4) --assumes immune cc debuff can never change duration after applied
-        end
-        
-        if currentValue<-1 then
-            cycloneTimerBar:SetScript("OnUpdate", nil)
-        end
-        
-        local _,_,_,_,castedEndTimeMS,_,_,_,castingSpellId = UnitCastingInfo("player")
-        if castingSpellId==cycloneSpellId then
-            local icon = cycloneTimerBar.icon
-            if castedEndTimeMS<=icon.expirationTime*1000 then --current casted clone is too early, todo find correct target of clone from combat log
-                cycloneTimerBar.iconBorder:SetBackdropBorderColor(1,1,1)
-                cycloneTimerBar.white = true
-            end
-        elseif cycloneTimerBar.white then
-            cycloneTimerBar.white = nil
-            local colors = cycloneTimerBar.colors
-            cycloneTimerBar.iconBorder:SetBackdropBorderColor(colors.r,colors.g,colors.b)
-        end
-    end
-    
-    function hasuitSpecialAuraFunction_CycloneTimerBar()
-        local danCurrentEvent = danCurrentEvent
-        if danCurrentEvent=="recycled" then --danCurrentIcon
-            danCurrentIcon.cycloneTimerBar:SetScript("OnUpdate", nil)
-            
-        elseif danCurrentEvent=="added" then --danCurrentFrame, danCurrentIcon
-            
-            local cycloneTimerBar = danCurrentIcon.cycloneTimerBar
-            local colors = iconTypes[danCurrentAura["dispelName"] or ""]
-            local border = danCurrentIcon.border
-            border:SetBackdropBorderColor(colors.r,colors.g,colors.b)
-            
-            if danCurrentFrame.unitType=="arena" then
-                cycloneTimerBar:SetAlpha(1)
-                local startTime = danCurrentIcon.startTime
-                local endTime = danCurrentIcon.expirationTime
-                local duration = endTime-startTime
-                local cycloneCastTime = GetSpellInfo(cycloneSpellId)["castTime"]/1000
-                
-                cycloneTimerBar:SetMinMaxValues(cycloneCastTime, 4)
-                cycloneTimerBar.currentValue = duration
-                cycloneTimerBar:SetScript("OnUpdate", cycloneTimerBarOnUpdateFunction)
-                
-                cycloneTimerBar.cycloneCastTime = cycloneCastTime
-                
-                cycloneTimerBar.iconBorder = border
-                cycloneTimerBar.colors = colors
-                cycloneTimerBar:SetStatusBarColor(colors.r,colors.g,colors.b)
-            else
-                cycloneTimerBar:SetAlpha(0)
-                danCurrentIcon.specialFunction = nil
-            end
-        -- elseif danCurrentEvent=="updated" then 
-            
-            
-        end
-    end
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function hasuitSpellFunction_AuraMainFunctionPveUnknown()
     local spellId = danCurrentAura["spellId"]
     if danCurrentAura["isBossAura"] then
@@ -2104,10 +1958,121 @@ function hasuitSpellFunction_AuraDurationCooldownReduction()
 end
 
 
-local outOfRangeAlpha = hasuitOutOfRangeAlpha
-local danPlayerFrame
 
+
+
+
+
+
+function hasuitAddCycloneTimerBars(mainCastedCCSpellId, spellName) --hasuitSpecialAuraFunction_CycloneTimerBar --todo this could show IMMUNE from any cast, and on friendly targets, like if regrowthing too early. bar should still only show on arena
+    local currentTargetUnitNameOfMainCastedCCSpellId
+    local danFrame = CreateFrame("Frame")
+    danFrame:RegisterEvent("UNIT_SPELLCAST_SENT") --happens on the same GetTime as UNIT_SPELLCAST_START, but before it --wouldn't work as RegisterUnitEvent --UNIT_SPELLCAST_DELAYED needed somewhere to be optimal probably
+    if spellName then
+        danFrame:SetScript("OnEvent", function(_,_,_,target,_,spellId2)
+            if spellName==GetSpellName(spellId2) then
+                currentTargetUnitNameOfMainCastedCCSpellId = target --target is the unit's name, doesn't seem possible to get a real unit or GUID here. Not sure of a way to reliably tell one unit from another if they share the same name, but I guess it doesn't matter anyway, since it'll just make immune show on two different icons if that's the case. Not sure how this interacts with things that can change their name like certain buffs or debuffs or whatever, but probably doesn't happen in arena? Thinking of UnitNameUnmodified
+            end
+        end)
+    else
+        danFrame:SetScript("OnEvent", function(_,_,_,target,_,spellId2)
+            if mainCastedCCSpellId==spellId2 then
+                currentTargetUnitNameOfMainCastedCCSpellId = target --target is the unit's name, doesn't seem possible to get a real unit or GUID here. Not sure of a way to reliably tell one unit from another if they share the same name, but I guess it doesn't matter anyway, since it'll just make immune show on two different icons if that's the case. Not sure how this interacts with things that can change their name like certain buffs or debuffs or whatever, but probably doesn't happen in arena? Thinking of UnitNameUnmodified
+            end
+        end)
+    end
+    local danFrame = CreateFrame("Frame")
+    danFrame:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player")
+    danFrame:SetScript("OnEvent", function()
+        currentTargetUnitNameOfMainCastedCCSpellId = false
+    end)
+    
+    local UnitCastingInfo = UnitCastingInfo
+    local GetSpellInfo = C_Spell.GetSpellInfo
+    local function cycloneTimerBarOnUpdateFunction(cycloneTimerBar, elapsed) --castBar --could be better
+        local currentValue = cycloneTimerBar.currentValue-elapsed
+        cycloneTimerBar.currentValue = currentValue
+        cycloneTimerBar:SetValue(currentValue)
+        
+        local cycloneCastTime = GetSpellInfo(mainCastedCCSpellId)["castTime"]/1000 --todo register event for haste change instead of checking cast time onupdate
+        if cycloneTimerBar.cycloneCastTime~=cycloneCastTime then
+            cycloneTimerBar.cycloneCastTime = cycloneCastTime
+            cycloneTimerBar:SetMinMaxValues(cycloneCastTime, 4) --assumes immune cc debuff can never change duration after applied --hardcoded 4 to make the bar's progress consistent across different duration debuffs. I didn't like how the bar moved a lot faster on DR'd clone or incaps that are 4 seconds --todo make the 4 change slightly based on clone cast time? to make the bar's movement as consistent as possible
+        end
+        if currentValue<-1 then
+            cycloneTimerBar:SetScript("OnUpdate", nil) --should be unnecessary (as in this probably does nothing useful ever) but this eliminates the possibility of leaving this onupdate function running when it shouldn't be
+        end
+        
+        if currentTargetUnitNameOfMainCastedCCSpellId==cycloneTimerBar.unitName then
+            local _,_,_,_,castedEndTimeMS = UnitCastingInfo("player")
+            castedEndTimeMS = castedEndTimeMS or (GetTime()+cycloneCastTime)*1000 --not sure why this can be nil here but didn't look at it very closely, just added this after seeing one error
+            if castedEndTimeMS<=cycloneTimerBar.icon.expirationTime*1000 then --current casted clone is too early
+                cycloneTimerBar.iconBorder:SetBackdropBorderColor(1,1,1)
+                cycloneTimerBar.white = true --todo make icon border white if casting a root too early too
+                cycloneTimerBar.immuneText:SetText("IMMUNE") --should probably have been SetAlpha(1) and SetText once above
+            end
+            
+        elseif cycloneTimerBar.white then
+            cycloneTimerBar.white = nil
+            cycloneTimerBar.immuneText:SetText("")
+            local colors = cycloneTimerBar.colors
+            cycloneTimerBar.iconBorder:SetBackdropBorderColor(colors.r,colors.g,colors.b)
+            
+        end
+    end
+    
+    function hasuitSpecialAuraFunction_CycloneTimerBar()
+        if danCurrentEvent=="recycled" then --danCurrentIcon
+            danCurrentIcon.cycloneTimerBar:SetScript("OnUpdate", nil)
+            
+        elseif danCurrentEvent=="added" then --danCurrentFrame, danCurrentIcon
+            
+            local cycloneTimerBar = danCurrentIcon.cycloneTimerBar
+            local colors = iconTypes[danCurrentAura["dispelName"] or ""]
+            local border = danCurrentIcon.border
+            border:SetBackdropBorderColor(colors.r,colors.g,colors.b)
+            
+            if danCurrentFrame.unitType=="arena" then
+                cycloneTimerBar:SetAlpha(1)
+                local startTime = danCurrentIcon.startTime
+                local endTime = danCurrentIcon.expirationTime
+                local duration = endTime-startTime
+                local cycloneCastTime = GetSpellInfo(mainCastedCCSpellId)["castTime"]/1000
+                
+                cycloneTimerBar:SetMinMaxValues(cycloneCastTime, 4)
+                cycloneTimerBar.currentValue = duration
+                cycloneTimerBar:SetScript("OnUpdate", cycloneTimerBarOnUpdateFunction)
+                
+                cycloneTimerBar.cycloneCastTime = cycloneCastTime
+                
+                cycloneTimerBar.iconBorder = border
+                cycloneTimerBar.colors = colors
+                cycloneTimerBar:SetStatusBarColor(colors.r,colors.g,colors.b)
+                cycloneTimerBar.white = nil
+                cycloneTimerBar.immuneText:SetText("")
+                
+                cycloneTimerBar.unitName = danCurrentFrame.unitName
+                
+            else
+                cycloneTimerBar:SetAlpha(0)
+                danCurrentIcon.specialFunction = nil
+            end
+        -- elseif danCurrentEvent=="updated" then 
+            
+            
+        end
+    end
+    
+    hasuitSetupSpellOptions_CycloneTimerBar["specialAuraFunction"]=hasuitSpecialAuraFunction_CycloneTimerBar
+    hasuitSetupSpellOptions_CycloneTimerBar["specialIconType"]="cycloneTimerBar"
+    
+end
+
+
+
+local danPlayerFrame
 do --smoke bomb, technically not going to be reliable if player is in a different bomb than other players, could be condensed probably, just realized maybe IsSpellInRange or something like that isn't bugged..? would have been easier than this, although spells would have to be per class and subject to change
+    local outOfRangeAlpha = hasuitOutOfRangeAlpha
     local UnitInRange = UnitInRange
     local function smokeBombRangeMissingOnTarget(frame) --todo different border for friendly bomb? also todo timer for bomb auras, make it look like a normal aura instead of duration 0, should be easy
         if not frame.hideTimer then
@@ -3291,7 +3256,7 @@ do
     local danDoThisOnUpdate = hasuitDoThis_OnUpdate
     
     local function unitDiedFunction(frame)
-        frame.text:SetText(danClassColors[frame.unitClass]..frame.unitName) --bored todo make .unitName this string to begin with, forgot why i changed it away from that, probably when frames were just completely breaking after trying to make unit died function with old unit_health setup
+        frame.text:SetText(danClassColors[frame.unitClass]..frame.unitName)
         
         local maxHealth = frame.maxHealth
         if maxHealth>=1e6 then --copied in other file ctrlf 1e6

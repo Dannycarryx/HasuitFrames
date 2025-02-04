@@ -15,6 +15,7 @@ trackDiminishTypeAndTexture("incapacitate", 629534) --Paralysis
 trackDiminishTypeAndTexture("root", 132316) --Disable, you can put a spell name in quotes instead of the number as long as it's in your spellbook. capitalization matters. example: trackDiminishTypeAndTexture("stun", "Mighty Bash"), if using a number here it needs to be the spell texture, not a spellId
 trackDiminishTypeAndTexture("disorient", 332402) --Song of Chi-Ji, you can add/delete or move drs around depending on what you want, just copy paste a line with the values you want, or remove the whole line for whatever you don't want to track
 
+-- hasuitAddCycloneTimerBars(1111) --song of chi-ji? not sure if there's a delay after that finishes though and also rarely played. todo this only when playing the talent
 
 
 
