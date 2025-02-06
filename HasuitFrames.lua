@@ -1862,7 +1862,7 @@ local cooldownOnCooldownDone
 function hasuitLocal6(func)
     cooldownOnCooldownDone = func
 end
-local function auraRemovedHypoCooldownFunction(frame) --this function is bad
+local function auraRemovedHypoCooldownFunction(frame) --this function is bad, todo
     local cooldowns = frame.cooldowns
     if cooldowns then
         local affectedSpells = frame.hypoAffectedSpells
@@ -1970,55 +1970,63 @@ end
 
 
 
-function hasuitAddCycloneTimerBars(mainCastedCCSpellId, spellName) --hasuitSpecialAuraFunction_CycloneTimerBar --todo this could show IMMUNE from any cast, and on friendly targets, like if regrowthing too early. bar should still only show on arena?
-    local currentTargetUnitNameOfMainCastedCCSpellId
+
+function hasuitAddCycloneTimerBars(mainCastedCCSpellId) --hasuitSpecialAuraFunction_CycloneTimerBar --todo this could show IMMUNE on friendly targets, like if regrowthing too early
+    local spellIdSentTargetTable = {}
     local danFrame = CreateFrame("Frame")
-    danFrame:RegisterEvent("UNIT_SPELLCAST_SENT") --happens on the same GetTime as UNIT_SPELLCAST_START, but before it --wouldn't work as RegisterUnitEvent --UNIT_SPELLCAST_DELAYED needed somewhere to be optimal probably
-    if spellName then
-        danFrame:SetScript("OnEvent", function(_,_,_,target,_,spellId)
-            if spellName==GetSpellName(spellId) then
-                currentTargetUnitNameOfMainCastedCCSpellId = target --target is the unit's name, doesn't seem possible to get a real unit or GUID here. Not sure of a way to reliably tell one unit from another if they share the same name, but I guess it doesn't matter anyway, since it'll just make immune show on two different icons if that's the case. Not sure how this interacts with things that can change their name like certain buffs or debuffs or whatever, but probably doesn't happen in arena? Thinking of UnitNameUnmodified
-            end
-        end)
-    else
-        danFrame:SetScript("OnEvent", function(_,_,_,target,_,spellId)
-            if mainCastedCCSpellId==spellId then --todo this should be any cast, not just 1. But then it needs to be verified that it's a cast and not instant. That would get rid of the need for spellName too. Also need something extra for ring of frost/song of chi-ji since they don't have a dest target
-                currentTargetUnitNameOfMainCastedCCSpellId = target
-            end
-        end)
-    end
+    danFrame:RegisterEvent("UNIT_SPELLCAST_SENT") --happens on the same GetTime as UNIT_SPELLCAST_START, but before it --wouldn't work as RegisterUnitEvent
+    danFrame:SetScript("OnEvent", function(_,_,_,targetNamePlusServer,_,spellId) --need something extra for ring of frost/song of chi-ji since they don't have a dest target
+        spellIdSentTargetTable[spellId] = targetNamePlusServer --doesn't seem possible to get a real unit or GUID here
+    end)
     
+    local currentTargetNamePlusServerOfCastedCCSpellId = false
+    local currentEndTimeOfPlayerCastMS
+    local UnitCastingInfo = UnitCastingInfo
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player")
-    danFrame:SetScript("OnEvent", function(_,_,_,_,spellId)
-        if mainCastedCCSpellId==spellId then
-            currentTargetUnitNameOfMainCastedCCSpellId = false
+    danFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player")
+    danFrame:RegisterUnitEvent("UNIT_SPELLCAST_DELAYED", "player")
+    danFrame:SetScript("OnEvent", function(_,event,_,_,spellId)
+        if event=="UNIT_SPELLCAST_STOP" then
+            spellIdSentTargetTable={} --good?
+            currentTargetNamePlusServerOfCastedCCSpellId = false
+        else --UNIT_SPELLCAST_DELAYED or UNIT_SPELLCAST_START
+            local _,_,_,_,endTimeMS = UnitCastingInfo("player")
+            if endTimeMS then
+                currentEndTimeOfPlayerCastMS = endTimeMS
+                if event=="UNIT_SPELLCAST_START" then
+                    currentTargetNamePlusServerOfCastedCCSpellId = spellIdSentTargetTable[spellId] --or false --could do or false here but probably useless
+                end
+            else
+                spellIdSentTargetTable={} --good?
+                currentTargetNamePlusServerOfCastedCCSpellId = false
+                
+            end
         end
     end)
     
-    local UnitCastingInfo = UnitCastingInfo
     local GetSpellInfo = C_Spell.GetSpellInfo
-    local function cycloneTimerBarOnUpdateFunction(cycloneTimerBar, elapsed) --castBar --could be better
+    local function cycloneTimerBarOnUpdateFunction(cycloneTimerBar, elapsed) --castBar --could be better --todo maybe do something based on latency?
         local currentValue = cycloneTimerBar.currentValue-elapsed
         cycloneTimerBar.currentValue = currentValue
         cycloneTimerBar:SetValue(currentValue)
+        
         
         if currentValue<-1 then
             cycloneTimerBar:SetScript("OnUpdate", nil) --should be unnecessary (as in this probably does nothing useful ever) but this eliminates the possibility of leaving this onupdate function running when it shouldn't be
         end
         
-        local cycloneCastTime = GetSpellInfo(mainCastedCCSpellId)["castTime"]/1000 --todo register event for haste change instead of checking cast time onupdate
+        local cycloneCastTime = GetSpellInfo(mainCastedCCSpellId)["castTime"] --can't use UNIT_SPELL_HASTE because stuff like heart of the wild doesn't change haste, but still changes clone cast time. This is just the easiest/best way to do this I think
         if cycloneTimerBar.cycloneCastTime~=cycloneCastTime then
             cycloneTimerBar.cycloneCastTime = cycloneCastTime
-            cycloneTimerBar:SetMinMaxValues(cycloneCastTime, 4) --assumes immune cc debuff can never change duration after applied --hardcoded 4 to make the bar's progress consistent across different duration debuffs. I didn't like how the bar moved a lot faster on DR'd clone or incaps that are 4 seconds --todo make the 4 change slightly based on clone cast time? to make the bar's movement as consistent as possible. maybe do 3 or 3.5 instead of 4 too. Also maybe do something based on latency
+            local cycloneCastTime2 = cycloneCastTime/1000
+            cycloneTimerBar:SetMinMaxValues(cycloneCastTime2, cycloneCastTime2+1.5) --assumes immune cc debuff can never change duration after applied --trying to make the bar's progress consistent across different duration debuffs/cc cast times. I didn't like how the bar moved a lot faster on DR'd clone or incaps that are 4 seconds
         end
         
-        if currentTargetUnitNameOfMainCastedCCSpellId==cycloneTimerBar.unitNamePlusServer then
-            local _,_,_,_,castedEndTimeMS = UnitCastingInfo("player")
-            castedEndTimeMS = castedEndTimeMS or (GetTime()+cycloneCastTime)*1000 --not sure why this can be nil here but didn't look at it very closely, just added this after seeing one error
-            if castedEndTimeMS<=cycloneTimerBar.icon.expirationTime*1000 then --current casted clone is too early
-                cycloneTimerBar.iconBorder:SetBackdropBorderColor(1,1,1)
+        if currentTargetNamePlusServerOfCastedCCSpellId==cycloneTimerBar.unitNamePlusServer and currentEndTimeOfPlayerCastMS<=cycloneTimerBar.icon.expirationTime*1000 then --current casted clone is too early
+            if not cycloneTimerBar.white then
                 cycloneTimerBar.white = true --todo make icon border white if casting a root too early too
+                cycloneTimerBar.iconBorder:SetBackdropBorderColor(1,1,1)
                 cycloneTimerBar.immuneText:SetText("IMMUNE") --should probably have been SetAlpha(1) and SetText once above
             end
             
@@ -2037,7 +2045,6 @@ function hasuitAddCycloneTimerBars(mainCastedCCSpellId, spellName) --hasuitSpeci
             danCurrentIcon.cycloneTimerBar:SetScript("OnUpdate", nil)
             
         elseif danCurrentEvent=="added" then --danCurrentFrame, danCurrentIcon
-            
             local cycloneTimerBar = danCurrentIcon.cycloneTimerBar
             local colors = iconTypes[danCurrentAura["dispelName"] or ""]
             danCurrentIcon.border:SetBackdropBorderColor(colors.r,colors.g,colors.b)
@@ -2047,9 +2054,10 @@ function hasuitAddCycloneTimerBars(mainCastedCCSpellId, spellName) --hasuitSpeci
                 local duration = danCurrentIcon.expirationTime-danCurrentIcon.startTime
                 cycloneTimerBar.currentValue = duration
                 
-                local cycloneCastTime = GetSpellInfo(mainCastedCCSpellId)["castTime"]/1000
-                cycloneTimerBar:SetMinMaxValues(cycloneCastTime, 4)
+                local cycloneCastTime = GetSpellInfo(mainCastedCCSpellId)["castTime"]
                 cycloneTimerBar.cycloneCastTime = cycloneCastTime
+                local cycloneCastTime2 = cycloneCastTime/1000
+                cycloneTimerBar:SetMinMaxValues(cycloneCastTime2, cycloneCastTime2+1.5)
                 
                 cycloneTimerBar.colors = colors
                 cycloneTimerBar:SetStatusBarColor(colors.r,colors.g,colors.b)
@@ -2075,6 +2083,9 @@ function hasuitAddCycloneTimerBars(mainCastedCCSpellId, spellName) --hasuitSpeci
     hasuitSetupSpellOptions_CycloneTimerBar["specialIconType"]="cycloneTimerBar"
     
 end
+
+
+
 
 
 

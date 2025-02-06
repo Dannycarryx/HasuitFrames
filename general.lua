@@ -268,7 +268,7 @@ hasuitSetupSpellOptionsMulti = {
                           hasuitBigRedMiddleCastBarsSpellOptions,
 }
 initializeMultiPlusDiminish(33786) --Cyclone
-initializeMultiPlusDiminish(710) --Banish
+initializeMultiPlusDiminish(710) --Banish --? never seen
 
 hasuitFramesCenterSetDrType("incapacitate") --sheep
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
@@ -450,7 +450,7 @@ hasuitFramesCenterSetDrType("incapacitate") --sheep
 initializeMultiPlusDiminish(GetSpellName(118)) --Polymorph
 initializeMultiPlusDiminish(GetSpellName(383121)) --Mass Polymorph, rare so not sure if there are other spellids
 initializeMultiPlusDiminish(20066) --Repentance
-initializePlusDiminish("Hibernate") --?
+initializePlusDiminish(2637) --Hibernate, never seen but tested and exists
 initializePlusDiminish(213691) --Scatter Shot
 initializePlusDiminish(115078) --Paralysis
 initializePlusDiminish(1776) --Gouge
