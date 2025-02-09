@@ -1631,3 +1631,14 @@ function hasuitResetCooldowns(frame) --not great but works now
     end
 end
 
+do
+    local hasuitResetCooldowns = hasuitResetCooldowns
+    local groupUnitFrames = hasuitUnitFramesForUnitType["group"]
+    tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, function() --when joining arena
+        if hasuitGlobal_InstanceType=="arena" then
+            for i=1,#groupUnitFrames do
+                hasuitResetCooldowns(groupUnitFrames[i])
+            end
+        end
+    end)
+end

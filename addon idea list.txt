@@ -7,6 +7,8 @@ on new unit events system, change functions while main loadon is waiting to be r
 option for minimum icon size?
 fix random error that happened from unit_aura, maybe fixed? we'll see
 make something to help track how accurate cooldowns.lua is
+could show cyclone timing bars on other hard cc/drs too? and only show it when relevant instead of sitting on the icon at full value for a while?
+show the gap between end of cyclone debuff and cast, would be nice to see like 0.08 or whatever to know whether they're likely to get a gcd, also basing it on latency is probably good?
 
 
 other important:

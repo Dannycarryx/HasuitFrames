@@ -4103,7 +4103,7 @@ end
 local GetInstanceInfo = GetInstanceInfo
 
 danArenaUpdateFrame:RegisterEvent("PVP_MATCH_STATE_CHANGED")
-danArenaUpdateFrame:RegisterEvent("PVP_MATCH_INACTIVE") --leaving a skirmish didn't do PVP_MATCH_STATE_CHANGED, and PVP_MATCH_INACTIVE happened after loading screen enabled
+-- danArenaUpdateFrame:RegisterEvent("PVP_MATCH_INACTIVE") --leaving a skirmish didn't do PVP_MATCH_STATE_CHANGED, and PVP_MATCH_INACTIVE happened after loading screen enabled
 danArenaUpdateFrame:RegisterEvent("PLAYER_ENTERING_BATTLEGROUND")
 function updateArena(_, event, arg1, arg2) --bored todo this should be remade, one of the few things that survived from UnitFrames1
     if event=="PLAYER_ENTERING_BATTLEGROUND" then --fixing/avoiding potential problems with an arena frame with the wrong class getting used, can happen if frames fail to hide like a wargame that ended 3v1 in the starting gates and then the 1 frame persisted and caused the next game to show 2 ferals when it should've been 1 feral 1 pally
@@ -4166,19 +4166,19 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
             end
         end
         
-    elseif event=="PVP_MATCH_STATE_CHANGED" or event=="PLAYER_ENTERING_BATTLEGROUND" or event=="PVP_MATCH_INACTIVE" then
+    elseif event=="PVP_MATCH_STATE_CHANGED" or event=="PLAYER_ENTERING_BATTLEGROUND" then
         if hasuitGlobal_InstanceType=="arena" then
             local state = C_PvP.GetActiveMatchState()
             if state==2 then --starting gates
                 if hasuitArenaGatesActive~=nil then
                     C_Timer_After(3, danRefreshFramesInShuffle)
                 end
-            elseif state==5 or event=="PVP_MATCH_INACTIVE" then
-                if hasuitArenaGatesActive~=nil then
-                    hasuitArenaGatesActive = nil
-                    danArenaUpdateFrame:RegisterEvent("LOADING_SCREEN_ENABLED")
-                    danArenaUpdateFrame:RegisterEvent("LOADING_SCREEN_DISABLED")
-                end
+            elseif state==5 then
+                -- if hasuitArenaGatesActive~=nil then
+                    -- hasuitArenaGatesActive = nil
+                    -- danArenaUpdateFrame:RegisterEvent("LOADING_SCREEN_ENABLED")
+                    -- danArenaUpdateFrame:RegisterEvent("LOADING_SCREEN_DISABLED")
+                -- end
                 return
             end
             if hasuitArenaGatesActive==nil then
@@ -4194,26 +4194,29 @@ function updateArena(_, event, arg1, arg2) --bored todo this should be remade, o
             end
         end
         
-    elseif event=="LOADING_SCREEN_ENABLED" or event=="LOADING_SCREEN_DISABLED" then --arena ended
-        firstSeen = nil
-        hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
-        for i=1,#arenaUnitFrames do
-            hasuitUnitFrameForUnit["arena"..i] = nil
-        end
-        danHideInactiveFrames() --shouldn't need to go through every unit type table here? todo
-        
-        danHideTargetLines()
-        
-        danArenaUpdateFrame:UnregisterEvent("LOADING_SCREEN_ENABLED")
-        danArenaUpdateFrame:UnregisterEvent("LOADING_SCREEN_DISABLED")
-        danArenaUpdateFrame:UnregisterEvent("ARENA_OPPONENT_UPDATE")
-        danArenaUpdateFrame:UnregisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
+    -- elseif event=="LOADING_SCREEN_ENABLED" or event=="LOADING_SCREEN_DISABLED" then --arena ended --this was broken i think? it's definitely randomly broken in the past at least. arena lines weren't showing from party on consecutive real 3s
+        --put this into arenaEndedFunction
         
     end
 end
 danArenaUpdateFrame:SetScript("OnEvent", updateArena)
 
-
+hasuitLocal10(function() --arenaEndedFunction
+    firstSeen = nil
+    hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
+    for i=1,#arenaUnitFrames do
+        hasuitUnitFrameForUnit["arena"..i] = nil
+    end
+    danHideInactiveFrames() --shouldn't need to go through every unit type table here? todo
+    
+    danHideTargetLines()
+    
+    hasuitArenaGatesActive = nil
+    -- danArenaUpdateFrame:UnregisterEvent("LOADING_SCREEN_ENABLED")
+    -- danArenaUpdateFrame:UnregisterEvent("LOADING_SCREEN_DISABLED")
+    danArenaUpdateFrame:UnregisterEvent("ARENA_OPPONENT_UPDATE")
+    danArenaUpdateFrame:UnregisterEvent("ARENA_PREP_OPPONENT_SPECIALIZATIONS")
+end)
 
 
 

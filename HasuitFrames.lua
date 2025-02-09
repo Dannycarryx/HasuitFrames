@@ -271,13 +271,13 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     do --loadon for pve, todo fully delete all saved pve stuff on unload? todo auto attack timers maybe?
         local loadOn = {}
         local function loadOnCondition()
-            local instanceId = hasuitGlobal_InstanceId
-            local instanceType = hasuitGlobal_InstanceType
-            if instanceType=="none" or instanceType=="party" or instanceType=="raid" or instanceType=="scenario" or instanceId==2177 then --should load, --2177 is comp stomp, untested, pve mobs spellids in comp stomp are all different than pvp so nothing will show up without considering it to be pve
+            local hasuitGlobal_InstanceId = hasuitGlobal_InstanceId
+            local hasuitGlobal_InstanceType = hasuitGlobal_InstanceType
+            if hasuitGlobal_InstanceType=="none" or hasuitGlobal_InstanceType=="party" or hasuitGlobal_InstanceType=="raid" or hasuitGlobal_InstanceType=="scenario" or hasuitGlobal_InstanceId==2177 then --should load, --2177 is comp stomp, untested, pve mobs spellids in comp stomp are all different than pvp so nothing will show up without considering it to be pve
                 if not loadOn.shouldLoad then
                     danGeneralCleuFrameSetScriptOnEvent(pveCleuFunc)
                     loadOn.shouldLoad = true
-                    if instanceId==2177 then --assuming instanceid will almost never be used for anything, also assuming i got this part right, atm any instance type change will prompt a main loadon function but instanceid change won't. so if going from instancetype pvp directly into a comp stomp the pve loadon needs this to properly run the main function. maybe impossible and group size would probably take care of it anyway, but this should be solid.. should probably make this setup less complicated. it's kind of simple in that every other load condition except instancetype changing needs to call the main loadon function when a .shouldLoad changes but ya we'll see in the future i guess, or if someone else tries to make a loadon and hates it
+                    if hasuitGlobal_InstanceId==2177 then --assuming instanceid will almost never be used for anything, also assuming i got this part right, atm any instance type change will prompt a main loadon function but instanceid change won't. so if going from instancetype pvp directly into a comp stomp the pve loadon needs this to properly run the main function. maybe impossible and group size would probably take care of it anyway, but this should be solid.. should probably make this setup less complicated. it's kind of simple in that every other load condition except instancetype changing needs to call the main loadon function when a .shouldLoad changes but ya we'll see in the future i guess, or if someone else tries to make a loadon and hates it
                         hasuitMainLoadOnFunctionSpammable()
                     end
                 end
@@ -1979,7 +1979,7 @@ function hasuitAddCycloneTimerBars(mainCastedCCSpellId) --hasuitSpecialAuraFunct
         spellIdSentTargetTable[spellId] = targetNamePlusServer --doesn't seem possible to get a real unit or GUID here
     end)
     
-    local currentTargetNamePlusServerOfCastedCCSpellId = false
+    local currentTargetNamePlusServerOfPlayerCast = false
     local currentEndTimeOfPlayerCastMS
     local UnitCastingInfo = UnitCastingInfo
     local danFrame = CreateFrame("Frame")
@@ -1989,17 +1989,17 @@ function hasuitAddCycloneTimerBars(mainCastedCCSpellId) --hasuitSpecialAuraFunct
     danFrame:SetScript("OnEvent", function(_,event,_,_,spellId)
         if event=="UNIT_SPELLCAST_STOP" then
             spellIdSentTargetTable={} --good?
-            currentTargetNamePlusServerOfCastedCCSpellId = false
+            currentTargetNamePlusServerOfPlayerCast = false
         else --UNIT_SPELLCAST_DELAYED or UNIT_SPELLCAST_START
             local _,_,_,_,endTimeMS = UnitCastingInfo("player")
             if endTimeMS then
                 currentEndTimeOfPlayerCastMS = endTimeMS
                 if event=="UNIT_SPELLCAST_START" then
-                    currentTargetNamePlusServerOfCastedCCSpellId = spellIdSentTargetTable[spellId] --or false --could do or false here but probably useless
+                    currentTargetNamePlusServerOfPlayerCast = spellIdSentTargetTable[spellId] --or false --could do or false here but probably useless
                 end
             else
                 spellIdSentTargetTable={} --good?
-                currentTargetNamePlusServerOfCastedCCSpellId = false
+                currentTargetNamePlusServerOfPlayerCast = false
                 
             end
         end
@@ -2020,14 +2020,14 @@ function hasuitAddCycloneTimerBars(mainCastedCCSpellId) --hasuitSpecialAuraFunct
         if cycloneTimerBar.cycloneCastTime~=cycloneCastTime then
             cycloneTimerBar.cycloneCastTime = cycloneCastTime
             local cycloneCastTime2 = cycloneCastTime/1000
-            cycloneTimerBar:SetMinMaxValues(cycloneCastTime2, cycloneCastTime2+1.5) --assumes immune cc debuff can never change duration after applied --trying to make the bar's progress consistent across different duration debuffs/cc cast times. I didn't like how the bar moved a lot faster on DR'd clone or incaps that are 4 seconds
+            cycloneTimerBar:SetMinMaxValues(cycloneCastTime2, cycloneCastTime2+1.5) --assumes immune cc debuff can never change duration after applied
         end
         
-        if currentTargetNamePlusServerOfCastedCCSpellId==cycloneTimerBar.unitNamePlusServer and currentEndTimeOfPlayerCastMS<=cycloneTimerBar.icon.expirationTime*1000 then --current casted clone is too early
+        if currentTargetNamePlusServerOfPlayerCast==cycloneTimerBar.unitNamePlusServer and currentEndTimeOfPlayerCastMS<=cycloneTimerBar.icon.expirationTime*1000 then --current casted clone is too early
             if not cycloneTimerBar.white then
-                cycloneTimerBar.white = true --todo make icon border white if casting a root too early too
+                cycloneTimerBar.white = true
                 cycloneTimerBar.iconBorder:SetBackdropBorderColor(1,1,1)
-                cycloneTimerBar.immuneText:SetText("IMMUNE") --should probably have been SetAlpha(1) and SetText once above
+                cycloneTimerBar.immuneText:SetText("IMMUNE")
             end
             
         elseif cycloneTimerBar.white then
@@ -2051,13 +2051,7 @@ function hasuitAddCycloneTimerBars(mainCastedCCSpellId) --hasuitSpecialAuraFunct
             
             if danCurrentFrame.unitType=="arena" then
                 cycloneTimerBar:SetAlpha(1)
-                local duration = danCurrentIcon.expirationTime-danCurrentIcon.startTime
-                cycloneTimerBar.currentValue = duration
-                
-                local cycloneCastTime = GetSpellInfo(mainCastedCCSpellId)["castTime"]
-                cycloneTimerBar.cycloneCastTime = cycloneCastTime
-                local cycloneCastTime2 = cycloneCastTime/1000
-                cycloneTimerBar:SetMinMaxValues(cycloneCastTime2, cycloneCastTime2+1.5)
+                cycloneTimerBar.currentValue = danCurrentAura["duration"]
                 
                 cycloneTimerBar.colors = colors
                 cycloneTimerBar:SetStatusBarColor(colors.r,colors.g,colors.b)
@@ -2073,8 +2067,7 @@ function hasuitAddCycloneTimerBars(mainCastedCCSpellId) --hasuitSpecialAuraFunct
                 danCurrentIcon.specialFunction = nil
                 
             end
-        -- elseif danCurrentEvent=="updated" then 
-            
+        -- elseif danCurrentEvent=="updated" then --todo do something if icon duration changes
             
         end
     end

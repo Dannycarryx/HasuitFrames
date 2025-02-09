@@ -181,6 +181,10 @@ local GetInstanceInfo = GetInstanceInfo
 local mainLoadOnFunctionSpammable
 local tinsert = table.insert
 do
+    local arenaEndedFunction
+    function hasuitLocal10(asd)
+        arenaEndedFunction = asd
+    end
     local danDoThisAddonLoaded = hasuitDoThis_Addon_Loaded
     local danDoThisPlayerLogin = hasuitDoThis_Player_Login
     local danDoThisEnteringFirst = hasuitDoThis_Player_Entering_WorldFirstOnly
@@ -213,6 +217,9 @@ do
                 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
                 hasuitGlobal_InstanceId = instanceId
                 if instanceType~=hasuitGlobal_InstanceType then
+                    if hasuitGlobal_InstanceType=="arena" then --WAS arena
+                        arenaEndedFunction()
+                    end
                     hasuitGlobal_InstanceType = instanceType
                     mainLoadOnFunctionSpammable() --maybe just move this to loadons only to make it less confusing
                 end
@@ -1202,14 +1209,15 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitDanCommonTopLeftArenaDebuffs = nil
         
         
-        hasuitLocal1 = nil --inaccessible from outside, todo --no they aren't? most of them are useless from outside though
+        hasuitLocal1 = nil --useless from outside
         hasuitLocal2 = nil
         hasuitLocal3 = nil
         hasuitLocal5 = nil
         hasuitLocal6 = nil
         hasuitLocal7 = nil
         hasuitLocal8 = nil
-        hasuitLocal9 = nil
+        hasuitLocal9 = nil --^
+        hasuitLocal10 = nil
         
         
         hasuitResetCooldowns = nil
