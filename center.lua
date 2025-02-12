@@ -217,7 +217,7 @@ do
                 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
                 hasuitGlobal_InstanceId = instanceId
                 if instanceType~=hasuitGlobal_InstanceType then
-                    if hasuitGlobal_InstanceType=="arena" then --WAS arena
+                    if hasuitGlobal_InstanceType=="arena" then --WAS arena, still saw arenaLines bug once I think
                         arenaEndedFunction()
                     end
                     hasuitGlobal_InstanceType = instanceType

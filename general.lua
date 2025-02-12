@@ -578,6 +578,7 @@ initializeMulti(91807) --Shambling Rush, no dr, breaks
 
 hasuitSetupSpellOptionsMulti[3] = hasuitOrangeMiddleCastBarsSpellOptions
 initializeMultiPlusDiminish(339) --Entangling Roots
+initializeMultiPlusDiminish(460614) --Entangling Roots, 3 sec from ursol's vortex talent
 
 
 hasuitSetupSpellOptionsMulti = { --higher damage threshold
@@ -937,6 +938,7 @@ initialize(33763) --lifebloom
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=80,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,  ["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulHots, ["specialIconType"]="optionalBorder"}
 initialize(774) --rejuvenation
 initialize(155777) --germination
+initialize(439530) --Symbiotic Blooms --big hot from druid wildstalker, counts as 1 hot for mastery +20% per stack, so gets both bonuses at 1 stack. Extra stacks don't count as extra hots for mastery. the stacks don't affect treants
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=81,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
 -- initialize(974) --Earth Shield, ele/enh?
@@ -1229,10 +1231,10 @@ end
 
 hasuitFramesCenterSetEventType("cleu")
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_INC,                ["priority"]=-45,               ["group"]=danCommonBigGroupDebuffs[5],      ["arena"]=danCommonBigBottomLeftArena[7],  ["ignoreSource"]=true,  ["duration"]=2.5,["spellINCType"]="aura",   } --SPELL INC ___
+hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_INC,                ["priority"]=-46,               ["group"]=danCommonBigGroupDebuffs[5],      ["arena"]=danCommonBigBottomLeftArena[7],  ["ignoreSource"]=true,  ["duration"]=2.5,["spellINCType"]="aura",   } --SPELL INC ___
 initialize(89766) --axe toss stun
 initialize(119914) --axe toss cast success
-hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_INC,                ["priority"]=-45,               ["group"]=danCommonBigGroupDebuffs[5],      ["arena"]=danCommonBigBottomLeftArena[7],  ["duration"]=2.5,["spellINCType"]="aura",   }
+hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_INC,                ["priority"]=-46,               ["group"]=danCommonBigGroupDebuffs[5],      ["arena"]=danCommonBigBottomLeftArena[7],  ["duration"]=2.5,["spellINCType"]="aura",   }
 initialize(6789) --Mortal Coil
 initialize(107570) --Storm Bolt cast and damage, damage unused here
 initialize(132169) --Storm Bolt aura
@@ -1253,6 +1255,8 @@ initializeMulti(117014) --Elemental Blast
 initializeMulti(274283) --Full Moon
 initializeMulti(199786) --Glacial Spike cast
 initializeMulti(116858) --Chaos Bolt
+initializeMulti(48181)  --Haunt
+initializeMulti(686)    --Shadow Bolt, from warlock
 initializeMulti(370965) --The Hunt
 hasuitSetupSpellOptionsMulti[3] = hasuitOrangeMiddleCastBarsSpellOptions
 initializeMulti(410126, 2) --Searing Glare cast --showing on unitframes, should it be?
@@ -1297,7 +1301,6 @@ initializeMulti(228598, 2) -- Ice Lance damage
 initializeMulti(431044) --Frostfire Bolt
 initializeMulti(468655, 2) --Frostfire Bolt damage/aura
 initializeMulti(51505) --Lava Burst cast
-initializeMulti(686) --Shadow Bolt, from warlock
 initializeMulti(285452, 2) --Lava Burst damage
 initializeMulti(29722) --Incinerate --todo track if big dam somehow? that could be very useful for a bunch of stuff but very specific and probably short term effectiveness. probably reserve that for things that are either weak/normal sometimes and very strong sometimes depending on an aura or whatever. some things like chaos bolt could get a % modifier number on the icon that changes based on how many procs they get, like a trinket proc adds a 1.13 multiplier/weapon enchant adds another etc, or could possibly do that for all non-dot casts as long as it doesn't obscure the icon texture too much
 initializeMulti(210714, 2) --Icefury. aura
@@ -1308,7 +1311,6 @@ initializeMulti(394354, 2) --Wrecking Throw damage
 initializeMulti(392060) --Wailing Arrow cast
 initializeMulti(392058, 2) --Wailing Arrow damage
 initializeMulti(19434) --aimed shot
-initializeMulti(48181) --Haunt
 initializeMulti(228260) --Void Eruption --does this have a travel time?
 initializeMulti(6353) --Soul Fire
 initializeMulti(104316) --Call Dreadstalkers cast

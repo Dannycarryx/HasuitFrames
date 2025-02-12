@@ -66,7 +66,7 @@ local danGeneralCleuFrameSetScriptOnEvent
 local danGetHasuitCleuSpellIdFunctions
 
 local d1anCleuTimestamp, d2anCleuSubevent, d3anCleuHideCaster, d4anCleuSourceGuid, d5anCleuSourceName, d6anCleuSourceFlags, d7anCleuSourceRaidFlags, d8anCleuDestGuid, d9anCleuDestName, 
-d10anCleuDestFlags, d11anCleuDestRaidFlags, d12anCleuSpellId, d13anCleuSpellName, d14anCleuSpellSchool, d15anCleuOther, d16anCleuOther, d17anCleuOther --these were originally all global and it worked well scattering functions all over. made sense to just put all the cleu functions in this file and make these local though
+d10anCleuDestFlags, d11anCleuDestRaidFlags, d12anCleuSpellId, d13anCleuSpellName, d14anCleuSpellSchool, d15anCleuOther, d16anCleuOther, d17anCleuOther, d18anCleuOther --these were originally all global and it worked well scattering functions all over. made sense to just put all the cleu functions in this file and make these local though
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 
 do
@@ -76,7 +76,7 @@ do
     hasuitGeneralCleuFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     local function hasuitGeneralCleuFrameFunction()
         d1anCleuTimestamp, d2anCleuSubevent, d3anCleuHideCaster, d4anCleuSourceGuid, d5anCleuSourceName, d6anCleuSourceFlags, d7anCleuSourceRaidFlags, d8anCleuDestGuid, d9anCleuDestName, 
-        d10anCleuDestFlags, d11anCleuDestRaidFlags, d12anCleuSpellId, d13anCleuSpellName, d14anCleuSpellSchool, d15anCleuOther, d16anCleuOther, d17anCleuOther = CombatLogGetCurrentEventInfo()
+        d10anCleuDestFlags, d11anCleuDestRaidFlags, d12anCleuSpellId, d13anCleuSpellName, d14anCleuSpellSchool, d15anCleuOther, d16anCleuOther, d17anCleuOther, d18anCleuOther = CombatLogGetCurrentEventInfo()
         
         
         local stuff = hasuitCleuSpellIdFunctions[d12anCleuSpellId] or hasuitCleuSpellIdFunctions[d13anCleuSpellName] --be careful to not initialize a spellid and a spellname for the same spell
@@ -146,6 +146,33 @@ do --hasuitTempSwiftmend
 end
 --]]
 
+--[[
+do
+    local max = 0
+    function hasuitSpellFunction_Cleu_TestingHealingNumbers()
+        -- if d2anCleuSubevent=="SPELL_PERIODIC_HEAL" or d2anCleuSubevent=="SPELL_HEAL" then
+        if d2anCleuSubevent=="SPELL_HEAL" then
+            if type(d15anCleuOther)~="number" then
+                print(hasuitRed2, (d15anCleuOther), d13anCleuSpellName..d12anCleuSpellId)
+            else
+                local amount = d18anCleuOther and d15anCleuOther/1.5 or d15anCleuOther
+                amount = amount-amount%1
+                -- if max<amount then
+                    -- max = amount
+                    -- print("new max:", amount, d13anCleuSpellName)
+                -- end
+                
+                print(amount, d13anCleuSpellName)
+            end
+        end
+    end
+end
+--]]
+
+
+
+
+
 local UnitGUID = UnitGUID
 
 
@@ -183,7 +210,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     local hasuitFramesCenterNamePlateGUIDs = hasuitFramesCenterNamePlateGUIDs
     local function pveCleuFunc() --seems to work pretty well? weird though. example 434830 is coded so that player is the source of the cast for unit_aura and unit_spellcast_succeeded but source/dest are empty strings on cleu success and empty string for source/normal dest for spell_aura_applied
         d1anCleuTimestamp, d2anCleuSubevent, d3anCleuHideCaster, d4anCleuSourceGuid, d5anCleuSourceName, d6anCleuSourceFlags, d7anCleuSourceRaidFlags, d8anCleuDestGuid, d9anCleuDestName, 
-        d10anCleuDestFlags, d11anCleuDestRaidFlags, d12anCleuSpellId, d13anCleuSpellName, d14anCleuSpellSchool, d15anCleuOther, d16anCleuOther, d17anCleuOther = CombatLogGetCurrentEventInfo()
+        d10anCleuDestFlags, d11anCleuDestRaidFlags, d12anCleuSpellId, d13anCleuSpellName, d14anCleuSpellSchool, d15anCleuOther, d16anCleuOther, d17anCleuOther, d18anCleuOther = CombatLogGetCurrentEventInfo()
         
         
         local stuff = hasuitCleuSpellIdFunctionsPve[d12anCleuSpellId] or hasuitCleuSpellIdFunctionsPve[d13anCleuSpellName]

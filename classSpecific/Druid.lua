@@ -69,11 +69,14 @@ initialize(157982)  --Tranquility
 
 --------------------------------hots 5, above hots 1/grows left
 hasuitSetupSpellOptions = hasuitHots_5
-initialize(468152)  --Reactive Resin
+initialize(439530)  --Symbiotic Blooms
 initialize(391891)  --adaptive swarm
 
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_5["group"]} 
+initialize(468152)  --Reactive Resin
+
 local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=10,["alpha"]=1,    ["hideCooldownText"]=true}
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=3, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
 initialize(429222)  --Minor Cenarion Ward
 
 --end hots
@@ -106,7 +109,16 @@ initialize(391889)  --Adaptive Swarm dot
 
 
 
-
+-- hasuitFramesCenterSetEventType("cleu")
+-- hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_TestingHealingNumbers}
+-- initialize(774) --
+-- initialize(155777) --germ
+-- initialize(188550)  --lifebloom
+-- initialize(33763) --lifebloom
+-- initialize(422090) --treant nourish
+-- initialize(8936) --regr
+-- initialize(50464) --Nourish proc
+-- hasuitFramesCenterSetEventType("aura")
 
 
 
