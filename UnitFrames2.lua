@@ -974,7 +974,7 @@ local danHideInactiveFrames
 local danGetUnit_HealthFunctionLines
 
 local healthBarLineOnEvent
-local hasuitHealthBarTargetLinesForUnits
+local hasuitHealthBarTargetLinesForUnits = {}
 local danMakeHealthBarTargetLine
 local danHideTargetLines
 do
@@ -1027,31 +1027,30 @@ do
             line:SetValue(UnitHealth(unit))
         end
     end
-        
-    hasuitHealthBarTargetLinesForUnits = {}
+    
     local danNumberOfGroupLines = 0
     local danNumberOfArenaLines = 0
     local danLineWidth = hasuitRaidFrameWidthForGroupSize[3] --todo do something when useroptions can change size
-    function danMakeHealthBarTargetLine() --target indicator healthbars in arena
+    function danMakeHealthBarTargetLine(unit, unitType) --target indicator healthbars in arena
         local line = danGetHealthBar()
         line:SetAlpha(0)
         line:Show()
         line:SetSize(danLineWidth, danLineHeight)
         line.border:Hide()
         line.background:Hide()
-        hasuitHealthBarTargetLinesForUnits[danCurrentUnit] = line
-        line.unitType = danCurrentUnitType.."Line"
-        line:RegisterUnitEvent("UNIT_TARGET", danCurrentUnit)
+        hasuitHealthBarTargetLinesForUnits[unit] = line
+        line.unitType = unitType.."Line"
+        line:RegisterUnitEvent("UNIT_TARGET", unit)
         line.healthFunctionLines = danGetUnit_HealthFunctionLines(line)
         line:SetScript("OnEvent", healthBarLineOnEvent)
-        if danCurrentUnitType=="group" then
+        if unitType=="group" then
             line.lineNumber = danNumberOfGroupLines
             danNumberOfGroupLines = danNumberOfGroupLines+1
-        else --danCurrentUnitType=="arena"
+        else --unitType=="arena"
             line.lineNumber = danNumberOfArenaLines
             danNumberOfArenaLines = danNumberOfArenaLines+1
         end
-        healthBarLineOnEvent(line, "UNIT_TARGET", danCurrentUnit)
+        healthBarLineOnEvent(line, "UNIT_TARGET", unit)
     end
     
     function danHideTargetLines()
@@ -1796,6 +1795,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
             end
         end
         
+        local RegisterUnitWatch = RegisterUnitWatch
         for i=1,#buttonUnits do
             local unit = buttonUnits[i]
             local button = CreateFrame("Button", nil, hasuitFramesParent, "SecureUnitButtonTemplate")
@@ -2580,13 +2580,13 @@ danUpdateUnitSpecial["group"] = function()
         end
     end
     
-    if hasuitGlobal_InstanceType=="arena" then --bored todo, should only need to check hasuitGlobal_InstanceType once?, not for multiple frames each roster update, here and arenaframes
-        if not hasuitHealthBarTargetLinesForUnits[danCurrentUnit] then
-            danMakeHealthBarTargetLine()
-        else
-            hasuitHealthBarTargetLinesForUnits[danCurrentUnit].colorSet = false
-        end
-    end
+    -- if hasuitGlobal_InstanceType=="arena" then --bored todo, should only need to check hasuitGlobal_InstanceType once?, not for multiple frames each roster update, here and arenaframes
+        -- if not hasuitHealthBarTargetLinesForUnits[danCurrentUnit] then
+            -- danMakeHealthBarTargetLine()
+        -- else
+            -- hasuitHealthBarTargetLinesForUnits[danCurrentUnit].colorSet = false
+        -- end
+    -- end
     
     
     if not danCurrentFrame.inspected then
@@ -2710,13 +2710,13 @@ danUpdateUnitSpecial["arena"] = function()
     end
     
     
-    if hasuitGlobal_InstanceType=="arena" then
-        if not hasuitHealthBarTargetLinesForUnits[danCurrentUnit] then
-            danMakeHealthBarTargetLine()
-        else
-            hasuitHealthBarTargetLinesForUnits[danCurrentUnit].colorSet = false
-        end
-    end
+    -- if hasuitGlobal_InstanceType=="arena" then
+        -- if not hasuitHealthBarTargetLinesForUnits[danCurrentUnit] then
+            -- danMakeHealthBarTargetLine()
+        -- else
+            -- hasuitHealthBarTargetLinesForUnits[danCurrentUnit].colorSet = false
+        -- end
+    -- end
     
     
     if not danCurrentFrame.arenaStuff then
@@ -3574,6 +3574,31 @@ function updateAllOtherUnits()
     end
     
     
+    if hasuitGlobal_InstanceType=="arena" then --arenaLines
+        local unitType = "group"
+        for i=2,#groupUnitFrames do
+            local unit = groupUnitFrames[i].unit
+            if not hasuitHealthBarTargetLinesForUnits[unit] then
+                danMakeHealthBarTargetLine(unit, unitType)
+            else
+                hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
+            end
+        end
+        
+        local unitType = "arena"
+        for i=1,#arenaUnitFrames do
+            local unit = arenaUnitFrames[i].unit
+            
+            if not hasuitHealthBarTargetLinesForUnits[unit] then
+                danMakeHealthBarTargetLine(unit, unitType)
+            else
+                hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
+            end
+        end
+    end
+    
+    
+    
     
     
     updateTargetBorder() --todo different color on blue map?
@@ -3837,7 +3862,7 @@ do
                 if unitTargetGUID then
                     local frame = hasuitUnitFrameForUnit[unitTargetGUID]
                     if frame then
-                        frame.targetOf[UnitGUID(unit)] = UnitIsPlayer(unit)
+                        frame.targetOf[UnitGUID(unit)] = UnitIsPlayer(unit) --error happened here, targetOf was nil
                     end
                 end
             end

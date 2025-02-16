@@ -217,7 +217,7 @@ do
                 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
                 hasuitGlobal_InstanceId = instanceId
                 if instanceType~=hasuitGlobal_InstanceType then
-                    if hasuitGlobal_InstanceType=="arena" then --WAS arena, still saw arenaLines bug once I think
+                    if hasuitGlobal_InstanceType=="arena" then --WAS arena, still saw arenaLines bug once I think --should be fixed?, problem was danUpdateUnitSpecial not getting called when joining arena with same team/frames already exist i think. Now it checks once per main unitType update whether it's arena or not and loops through all group and arena frames if it is arena, making sure a line is made for each unit. Would do a lot of things differently if I remade UnitFrames2.lua
                         arenaEndedFunction()
                     end
                     hasuitGlobal_InstanceType = instanceType
