@@ -185,9 +185,9 @@ do
     function hasuitLocal10(asd)
         arenaEndedFunction = asd
     end
-    local danDoThisAddonLoaded = hasuitDoThis_Addon_Loaded
-    local danDoThisPlayerLogin = hasuitDoThis_Player_Login
-    local danDoThisEnteringFirst = hasuitDoThis_Player_Entering_WorldFirstOnly
+    local hasuitDoThis_Addon_Loaded = hasuitDoThis_Addon_Loaded
+    local hasuitDoThis_Player_Login = hasuitDoThis_Player_Login
+    local hasuitDoThis_Player_Entering_WorldFirstOnly = hasuitDoThis_Player_Entering_WorldFirstOnly
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("ADDON_LOADED")
     danFrame:RegisterEvent("PLAYER_LOGIN")
@@ -196,23 +196,23 @@ do
         if event=="ADDON_LOADED" then
             if addonName=="HasuitFrames" then
                 danFrame:UnregisterEvent("ADDON_LOADED")
-                for i=1,#danDoThisAddonLoaded do
-                    danDoThisAddonLoaded[i]()
+                for i=1,#hasuitDoThis_Addon_Loaded do
+                    hasuitDoThis_Addon_Loaded[i]()
                 end
             end
             
         elseif event=="PLAYER_LOGIN" then
             danFrame:UnregisterEvent("PLAYER_LOGIN")
-            for i=1,#danDoThisPlayerLogin do
-                danDoThisPlayerLogin[i]()
+            for i=1,#hasuitDoThis_Player_Login do
+                hasuitDoThis_Player_Login[i]()
             end
             
         elseif event=="PLAYER_ENTERING_WORLD" then
-            for i=1,#danDoThisEnteringFirst do
-                danDoThisEnteringFirst[i]()
+            for i=1,#hasuitDoThis_Player_Entering_WorldFirstOnly do
+                hasuitDoThis_Player_Entering_WorldFirstOnly[i]()
             end
             mainLoadOnFunctionSpammable() --not really necessary since every groupsize loadon will also call this initially but oh well
-            local danDoThisEnteringWorld = hasuitDoThis_Player_Entering_WorldSkipsFirst
+            local hasuitDoThis_Player_Entering_WorldSkipsFirst = hasuitDoThis_Player_Entering_WorldSkipsFirst
             danFrame:SetScript("OnEvent", function()
                 local _, instanceType, _, _, _, _, _, instanceId = GetInstanceInfo()
                 hasuitGlobal_InstanceId = instanceId
@@ -223,8 +223,8 @@ do
                     hasuitGlobal_InstanceType = instanceType
                     mainLoadOnFunctionSpammable() --maybe just move this to loadons only to make it less confusing
                 end
-                for i=1,#danDoThisEnteringWorld do
-                    danDoThisEnteringWorld[i]()
+                for i=1,#hasuitDoThis_Player_Entering_WorldSkipsFirst do
+                    hasuitDoThis_Player_Entering_WorldSkipsFirst[i]()
                 end
             end)
             danFrame:RegisterEvent("WALK_IN_DATA_UPDATE") --delves?, maybe make this only happen once per gettime?
@@ -909,7 +909,7 @@ end)
 
 
 do
-    local danDoThis = hasuitDoThis_Player_Target_Changed
+    local hasuitDoThis_Player_Target_Changed = hasuitDoThis_Player_Target_Changed
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
     danFrame:SetScript("OnEvent", function()
@@ -919,8 +919,8 @@ do
         else
             danUnitFrameForUnit["target"] = nil
         end
-        for i=1,#danDoThis do
-            danDoThis[i]()
+        for i=1,#hasuitDoThis_Player_Target_Changed do
+            hasuitDoThis_Player_Target_Changed[i]()
         end
     end)
 end
@@ -974,13 +974,42 @@ end)
 
 
 local _G = _G
-tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi enforced naturally. todo add things that stay global and don't get set to nil as comments. This should hopefully be a comprehensive list of things that can be accessed from outside of the addon, not a full list of internal functions
-    C_Timer.After(0, function() --hasuitSetupSpellOptions
+tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list of global things you can grab and use in an external addon. If you want something to be global that isn't here let me know and I'll add it.
+    C_Timer.After(0, function()
         if hasuitTestAllSpellTablesAfter then
             hasuitTestAllSpellTablesAfter()
         end
         
-        hasuitDoThis_Addon_Loaded = nil
+        -- things that stay global and don't get set nil:
+        -- hasuitPlayerFrame
+        -- hasuitGlobal_InstanceType
+        -- hasuitGlobal_InstanceId
+        -- hasuitGlobal_GroupSize
+        -- hasuitGlobal_RaidFrameWidth
+        -- hasuitGlobal_RaidFrameHeight
+        
+        -- hasuitGlobal_CooldownDisplayActiveGroup
+        -- hasuitGlobal_KICKTextKey
+        
+        -- hasuitSavedUserOptions
+        -- hasuitSavedVariables
+        
+        -- d1-1
+        -- d5-1
+        -- d1-4
+        -- d5-4
+        -- and in between, 20 total. These are for targeting macros to target by column/row in raid, or row/column in party. /click d1-1 etc
+        
+        -- SLASH_HasuitFrames#
+        -- hasuitFont#
+        -- hasuitUserOptionsFont#
+        -- hasuitCooldownFont#
+        -- hasuitCastBarFont#
+        -- hasuitSetupSpellOptions --always changes before initialize
+        
+        
+        hasuitDoThis_Addon_Loaded = nil --not useful from outside?
+        hasuitDoThis_UserOptionsLoaded = nil --not useful from outside?
         hasuitDoThis_Player_Login = nil
         hasuitDoThis_Player_Entering_WorldFirstOnly = nil
         hasuitDoThis_Player_Entering_WorldSkipsFirst = nil
@@ -1003,11 +1032,9 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitDoThis_OnUpdate = nil
         hasuitDoThis_OnUpdatePosition1 = nil
         -- hasuitDoThis_OnUpdateSpecificPosition = nil
-        hasuitDoThis_PlayerTargetChanged = nil
         hasuitDoThis_AfterCombat = nil
         
         hasuitDoThis_Player_Target_Changed = nil
-        hasuitDoThis_UserOptionsLoaded = nil --todo separate stuff that can't actually be accessed from outside like this, and probably some things that there isn't much of a use for and exist to put things from one file into another. 3 categories in total i think
         hasuitUserOptionsOnChanged = nil
         
         hasuitRaidFrameWidthForGroupSize = nil
@@ -1198,26 +1225,11 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitSmallMiscMiddleCastBarsSpellOptions = nil
         hasuitUntrackedMiddleCastBarsSpellOptions = nil
         hasuitSmallDamageMiddleCastBarsSpellOptions = nil
-        hasuitCastBarFont20 = nil
-        hasuitCastBarFont18 = nil
-        hasuitCastBarFont14 = nil
-        hasuitCastBar1Font = nil
         hasuitMiddleCastBarsAllowChannelingForSpellId = nil
         hasuitMiddleCastBarsAllowHostileNonPlayersForSpellId = nil
         
         hasuitDanCommonTopRightGroupDebuffs = nil
         hasuitDanCommonTopLeftArenaDebuffs = nil
-        
-        
-        hasuitLocal1 = nil --useless from outside
-        hasuitLocal2 = nil
-        hasuitLocal3 = nil
-        hasuitLocal5 = nil
-        hasuitLocal6 = nil
-        hasuitLocal7 = nil
-        hasuitLocal8 = nil
-        hasuitLocal9 = nil --^
-        hasuitLocal10 = nil
         
         
         hasuitResetCooldowns = nil
@@ -1257,10 +1269,28 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --a list, semi e
         hasuitDoThis_EachUnitFrameForOneUpdate = nil
         hasuitActiveCustomUnitFrameFunctions = nil
         
-        hasuitUninterruptibleBorderSize = nil
-        hasuitActiveScaleMultiplier = nil
-        
         _G["hasuitFramesParent"] = nil
+        
+        
+        
+        
+        
+        
+        --things that might not be useful externally: --Some others should be moved to here too
+        hasuitLocal1 = nil
+        hasuitLocal2 = nil
+        hasuitLocal3 = nil
+        hasuitLocal5 = nil
+        hasuitLocal6 = nil
+        hasuitLocal7 = nil
+        hasuitLocal8 = nil
+        hasuitLocal9 = nil
+        hasuitLocal10 = nil
+        
+        hasuitActiveScaleMultiplier = nil
+        hasuitUninterruptibleBorderSize = nil
+        
+        
     end)
 end)
 

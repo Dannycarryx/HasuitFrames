@@ -1,5 +1,5 @@
 if hasuitPlayerClass~="DEATHKNIGHT" then
-	return
+    return
 end
 local initialize = hasuitFramesInitialize
 local trackDiminishTypeAndTexture = hasuitFramesTrackDiminishTypeAndTexture

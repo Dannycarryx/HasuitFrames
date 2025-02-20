@@ -579,7 +579,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
     
     
     
-    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
+    local hasuitDoThis_OnUpdate = hasuitDoThis_OnUpdate
     hasuitFramesCenterSetEventType("cleu")
     hasuitSpellFunction_Cleu_CcBreakThreshold = addMultiFunction(function()
         if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
@@ -588,7 +588,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                 local unit = frame.unit
                 frame.ccBreakPreStartingHealth = UnitHealth(unit)
                 frame.ccBreakPreStartingAbsorb = UnitGetTotalAbsorbs(unit)
-                danDoThisOnUpdate(function() --based on assumption that damage can happen between cleu aura applied and unit_aura
+                hasuitDoThis_OnUpdate(function() --based on assumption that damage can happen between cleu aura applied and unit_aura
                     frame.ccBreakPreStartingHealth = nil
                     frame.ccBreakPreStartingAbsorb = nil
                 end)
@@ -3303,7 +3303,7 @@ do
     local UnitIsDeadOrGhost = UnitIsDeadOrGhost
     local danClassColors = hasuitClassColorsHexList
     
-    local danDoThisOnUpdate = hasuitDoThis_OnUpdate
+    local hasuitDoThis_OnUpdate = hasuitDoThis_OnUpdate
     
     local function unitDiedFunction(frame)
         frame.text:SetText(danClassColors[frame.unitClass]..frame.unitName)

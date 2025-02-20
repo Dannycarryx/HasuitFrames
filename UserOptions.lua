@@ -166,9 +166,9 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
     
     
     
-    local danDoThisUserOptionsLoaded = hasuitDoThis_UserOptionsLoaded
-    for i=1,#danDoThisUserOptionsLoaded do
-        danDoThisUserOptionsLoaded[i]()
+    local hasuitDoThis_UserOptionsLoaded = hasuitDoThis_UserOptionsLoaded
+    for i=1,#hasuitDoThis_UserOptionsLoaded do
+        hasuitDoThis_UserOptionsLoaded[i]()
     end
     
 end)
@@ -357,7 +357,6 @@ end
 
 local UIParent = UIParent
 
-local danDoThisAfterCombat = hasuitDoThis_AfterCombat
 local danDoThisOnUpdate = hasuitDoThis_OnUpdate
 local InCombatLockdown = InCombatLockdown
 local userOptionsFrame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
@@ -380,6 +379,7 @@ local function hideUserOptionsFrame()
     end
     currentOptionsPage:Hide()
 end
+local hasuitDoThis_AfterCombat = hasuitDoThis_AfterCombat
 local function onKeyDown(optionsFrame, key)
     if key=="ESCAPE" then --could verify that escape is bound to menu like normal? actually not a big deal though because this only closes the menu. would be a problem for a small number of players if this toggled the menu instead but ya. should probably verify anyway though
         if InCombatLockdown() then
@@ -391,7 +391,7 @@ local function onKeyDown(optionsFrame, key)
                 if not InCombatLockdown() then
                     userOptionsFrame:SetPropagateKeyboardInput(true)
                 else
-                    danDoThisAfterCombat(function()
+                    hasuitDoThis_AfterCombat(function()
                         userOptionsFrame:SetPropagateKeyboardInput(true)
                     end)
                 end
