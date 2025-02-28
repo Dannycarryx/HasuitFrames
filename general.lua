@@ -762,7 +762,7 @@ initializeMulti(382440) --Shifting Power, not as important as ultimate penitence
 -- initialize("Adaptation") --adapted is the debuff, todo maybe? no unitaura for this
 initialize(354610) --glimpse
 initialize(269513) --Death from Above?
-initialize(206803) --Rain from Above 1 sec immunity
+initialize(206803) --Rain from Above 1 sec immunity --todo metamorphosis immune to cc, what's the aura called?
 initialize(329543) --Divine Ascension 1 sec immunity
 initialize(126389) --Goblin Glider
 initialize(294384) --Horde Glider

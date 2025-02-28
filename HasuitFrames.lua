@@ -150,8 +150,8 @@ end
 do
     local max = 0
     function hasuitSpellFunction_Cleu_TestingHealingNumbers()
-        -- if d2anCleuSubevent=="SPELL_PERIODIC_HEAL" or d2anCleuSubevent=="SPELL_HEAL" then
-        if d2anCleuSubevent=="SPELL_HEAL" then
+        if d2anCleuSubevent=="SPELL_PERIODIC_HEAL" or d2anCleuSubevent=="SPELL_HEAL" then
+        -- if d2anCleuSubevent=="SPELL_HEAL" then
             if type(d15anCleuOther)~="number" then
                 print(hasuitRed2, (d15anCleuOther), d13anCleuSpellName..d12anCleuSpellId)
             else
@@ -2109,7 +2109,7 @@ end
 
 
 
-local danPlayerFrame
+local hasuitPlayerFrame
 do --smoke bomb, technically not going to be reliable if player is in a different bomb than other players, could be condensed probably, just realized maybe IsSpellInRange or something like that isn't bugged..? would have been easier than this, although spells would have to be per class and subject to change
     local outOfRangeAlpha = hasuitOutOfRangeAlpha
     local UnitInRange = UnitInRange
@@ -2208,7 +2208,7 @@ do --smoke bomb, technically not going to be reliable if player is in a differen
                 end
             end
             
-        elseif danCurrentFrame~=danPlayerFrame then
+        elseif danCurrentFrame~=hasuitPlayerFrame then
             danCurrentIcon.specialFunction = nil
             
         -- else --added, updated doesn't exist for this spellid --for now? don't think there will be a problem even if the game sends an "updated" for an aura i don't have tracked yet because the instance id won't be tracked, it'll just get ignored
@@ -2322,7 +2322,6 @@ do
     local hasuitBlessingOfAutumnIgnoreList
     function hasuitLocal2(asd1)
         hasuitBlessingOfAutumnIgnoreList = asd1
-        return asd1
     end
     local danSpellOptions = {["CDr"]=0.3}
     local function asd(timer) --might just work well as is without anything extra needing to be done, one potential problem is enemy stealthing, could fix that easily if a new system is made related to that or todo?: if the fullupdate just gets ignored if enemy is known to have used stealth ability, the setscript hide thing should get disabled for those icons?, other problem is just remembering to add relevant stuff to the ignore list, not sure of a good way to automate that
@@ -2572,17 +2571,17 @@ hasuitSpellFunction_Cleu_INC = addMultiFunction(function() --todo should be rema
 end)
 
 tinsert(hasuitDoThis_Player_Login, function()
-    danPlayerFrame = hasuitPlayerFrame
+    hasuitPlayerFrame = _G["hasuitPlayerFrame"]
 end)
 
 hasuitSpellFunction_Cleu_Diminish = addMultiFunction(function()
     danCurrentFrame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
     if danCurrentFrame then
-        local drType = danCurrentSpellOptions[danCurrentFrame.unitType] or danCurrentFrame==danPlayerFrame and danCurrentSpellOptions["arena"]
+        local drType = danCurrentSpellOptions[danCurrentFrame.unitType] or danCurrentFrame==hasuitPlayerFrame and danCurrentSpellOptions["arena"]
         if drType then
             if d2anCleuSubevent=="SPELL_AURA_APPLIED" or d2anCleuSubevent=="SPELL_AURA_REFRESH" then 
                 danCurrentEvent = "DR"
-                danCurrentIcon = danCurrentFrame.arenaStuff[drType]
+                danCurrentIcon = danCurrentFrame.diminishIcons[drType]
                 danCurrentIcon:SetAlpha(1)
                 
                 local currentTime = GetTime()
@@ -2607,7 +2606,7 @@ hasuitSpellFunction_Cleu_Diminish = addMultiFunction(function()
                 
             elseif d2anCleuSubevent=="SPELL_AURA_REMOVED" then
                 danCurrentEvent = "DR"
-                danCurrentIcon = danCurrentFrame.arenaStuff[drType]
+                danCurrentIcon = danCurrentFrame.diminishIcons[drType]
                 if danCurrentIcon.diminishLevel==0 then
                     danCurrentIcon:SetAlpha(1)
                     danCurrentIcon.diminishLevel = 1

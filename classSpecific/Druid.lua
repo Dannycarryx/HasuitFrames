@@ -109,8 +109,9 @@ initialize(391889)  --Adaptive Swarm dot
 
 
 
--- hasuitFramesCenterSetEventType("cleu")
--- hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_TestingHealingNumbers}
+--[[
+hasuitFramesCenterSetEventType("cleu")
+hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_TestingHealingNumbers}
 -- initialize(774) --
 -- initialize(155777) --germ
 -- initialize(188550)  --lifebloom
@@ -118,8 +119,10 @@ initialize(391889)  --Adaptive Swarm dot
 -- initialize(422090) --treant nourish
 -- initialize(8936) --regr
 -- initialize(50464) --Nourish proc
--- hasuitFramesCenterSetEventType("aura")
-
+initialize(5176) --Wrath
+initialize(190984)--Wrath
+hasuitFramesCenterSetEventType("aura")
+--]]
 
 
 

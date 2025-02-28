@@ -92,7 +92,6 @@ local createOptionsPages = {
 
 
 local print = print
-local activeScaleMultiplier
 
 local savedUserOptions
 local userOptionsOnChanged = {} --or just clicked/pressed enter, value doesn't have to actually change
@@ -189,30 +188,33 @@ tinsert(hasuitDoThis_UserOptionsLoaded, 1, function()
     local usePixelPerfectModifier
     if height==1080 then
         usePixelPerfectModifier = true
-        activeScaleMultiplier = 0.71111111111111
+        hasuitGlobal_ScaleMultiplierFromScreenHeight = 0.71111111111111
     else
         local pixelPerfectMult = 768/height
         usePixelPerfectModifier = savedUserOptions["usePixelPerfectModifier"]
-        activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111111111111
+        hasuitGlobal_ScaleMultiplierFromScreenHeight = usePixelPerfectModifier and pixelPerfectMult or 0.71111111111111
         
         userOptionsOnChanged["usePixelPerfectModifier"] = function()
             usePixelPerfectModifier = savedUserOptions["usePixelPerfectModifier"]
-            activeScaleMultiplier = usePixelPerfectModifier and pixelPerfectMult or 0.71111111111111 --GetDefaultScale?
+            hasuitGlobal_ScaleMultiplierFromScreenHeight = usePixelPerfectModifier and pixelPerfectMult or 0.71111111111111 --GetDefaultScale?
             scaleChangeFunction()
         end
     end
-    hasuitActiveScaleMultiplier = activeScaleMultiplier
     
     local pixelWarningMessage = "reducing the scale below 1 could make some borders not show. will be improved eventually"
     local hasuitFramesParent = hasuitFramesParent
-    hasuitFramesParent:SetScale(savedUserOptions["scale"]*activeScaleMultiplier)
+    hasuitFramesParent:SetScale(savedUserOptions["scale"]*hasuitGlobal_ScaleMultiplierFromScreenHeight)
     function scaleChangeFunction()
         local scale = savedUserOptions["scale"]
+        if scale<=0 then
+            savedUserOptions["scale"] = 100
+            scale = 100
+        end
         if pixelWarningMessage and usePixelPerfectModifier and scale<1 then
             print(pixelWarningMessage)
             pixelWarningMessage = nil
         end
-        hasuitFramesParent:SetScale(scale*activeScaleMultiplier)
+        hasuitFramesParent:SetScale(scale*hasuitGlobal_ScaleMultiplierFromScreenHeight)
     end
     userOptionsOnChanged["scale"] = scaleChangeFunction
     
@@ -252,10 +254,14 @@ do
         local currentText = editBox:GetText()
         local number = tonumber(currentText)
         if number then
-            local previousValue = savedUserOptions[editBox.optionsKey]
-            savedUserOptions[editBox.optionsKey] = number
+            local optionsKey = editBox.optionsKey
+            local previousValue = savedUserOptions[optionsKey]
+            savedUserOptions[optionsKey] = number
             changesMade = changesMade or previousValue~=number
             editBox.optionsOnChangedFunction()
+            if savedUserOptions[optionsKey]~=number then
+                editBox:SetText(savedUserOptions[optionsKey])
+            end
         else
             editBox:SetText(savedUserOptions[editBox.optionsKey])
         end
@@ -493,7 +499,7 @@ local function openMainOptionsFirst()
     closeButton:RegisterForClicks("AnyDown")
     closeButton:SetScript("OnClick", hideUserOptionsFrame)
     
-    local nextButton = CreateFrame("Button", "hasuitFramesOptionsNextButton", userOptionsFrame, "BackdropTemplate") --i don't like this being top right but kind of want different pages to be able to be different heights and not have to click in different spots to hit next page button, not sure
+    local nextButton = CreateFrame("Button", nil, userOptionsFrame, "BackdropTemplate") --i don't like this being top right but kind of want different pages to be able to be different heights and not have to click in different spots to hit next page button, not sure
     nextButton:SetBackdrop(danBackdrop)
     nextButton:SetBackdropColor(0,0.2,0.4)
     nextButton:SetBackdropBorderColor(0,0,0)

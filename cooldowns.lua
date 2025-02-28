@@ -4,7 +4,7 @@
 
 
 
-hasuitBlessingOfAutumnIgnoreList = hasuitLocal2({ --how would this interact with time stop? or other cd reduction like aug thing? if multiply then should combine on unitframe, if not then probably nothing needs to be done?
+hasuitBlessingOfAutumnIgnoreList = { --how would this interact with time stop? or other cd reduction like aug thing? if multiply then should combine on unitframe, if not then probably nothing needs to be done?
     [336126]=true, --Gladiator's Medallion
     [42292]=true, --PvP Trinket, heirloom
     [336135]=true, --Adaptation
@@ -23,8 +23,8 @@ hasuitBlessingOfAutumnIgnoreList = hasuitLocal2({ --how would this interact with
     [45182]=true, --Cheating Death?
     
     [31616]=true, --Nature's Guardian?, what about warlock spell lock vs actual pet cd?
-}) --extra steps to make it more similar to other stuff if trying to add to hasuitBlessingOfAutumnIgnoreList from an external addon
-
+}
+hasuitLocal2(hasuitBlessingOfAutumnIgnoreList)
 
 local tinsert = tinsert
 local pairs = pairs
@@ -194,7 +194,7 @@ do
     hasuitDefensiveCooldowns={}
     hasuitInterruptCooldowns={}
     hasuitCrowdControlCooldowns={}
-    hasuitController_CooldownsControllers = {--some stuff here gets changed around with hardcoded numbers when groupsize goes to 4/5, just below the end of this table
+    hasuitController_CooldownsControllers = {--some stuff here gets changed around with hardcoded numbers when groupsize goes to 4/5, just below the end of this table. This can happen in shuffle because party size can briefly go to 4 or 5 after a round is over
         { --trinket
             ["grow"]=cooldownGrow,
             ["sort"]=danSortCooldowns,
@@ -284,7 +284,7 @@ do
                     defensiveControllerOptions_GroupUnitTypeStuff["limit"] = 5
                     interruptControllerOptions_GroupUnitTypeStuff["limit"] = 0
                     crowdControlControllerOptions_GroupUnitTypeStuff["limit"] = 0
-                    if groupUnitFrames.sort then
+                    if groupUnitFrames.updatingUnitTable then --doesn't make sense anymore? now that unit tables update instantly or after C_Timer
                         hasuitDoThis_OnUpdate(danSortAllGroupCooldowns)
                     else
                         danSortAllGroupCooldowns()
@@ -303,7 +303,7 @@ do
                     defensiveControllerOptions_GroupUnitTypeStuff["limit"] = 7
                     interruptControllerOptions_GroupUnitTypeStuff["limit"] = 1
                     crowdControlControllerOptions_GroupUnitTypeStuff["limit"] = nil
-                    if groupUnitFrames.sort then
+                    if groupUnitFrames.updatingUnitTable then
                         hasuitDoThis_OnUpdate(danSortAllGroupCooldowns)
                     else
                         danSortAllGroupCooldowns()
@@ -326,7 +326,7 @@ do
                     else
                         defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -5
                     end
-                    if groupUnitFrames.sort then
+                    if groupUnitFrames.updatingUnitTable then
                         hasuitDoThis_OnUpdate(danSortAllGroupCooldowns)
                     else
                         danSortAllGroupCooldowns()
@@ -341,7 +341,7 @@ do
                     else
                         defensiveControllerOptions_GroupUnitTypeStuff["xOffset"] = -34
                     end
-                    if groupUnitFrames.sort then
+                    if groupUnitFrames.updatingUnitTable then
                         hasuitDoThis_OnUpdate(danSortAllGroupCooldowns)
                     else
                         danSortAllGroupCooldowns()
@@ -568,7 +568,7 @@ do
             {cleAura,["spellId"]=206803,["priority"]=25,    ["duration"]=90, --Rain From Above hidden new duration from 60
                 ["startAlpha"]=0},
             {cdCle2,["spellId"]=205604,    ["group"]=26,    ["duration"]=60, --Reverse Magic
-                ["startAlpha"]=0},
+                ["startAlpha"]=0,["size"]=22},
             
         }
         -- defensiveCooldowns[577]={--Havoc

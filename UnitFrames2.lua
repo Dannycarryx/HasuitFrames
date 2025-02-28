@@ -33,9 +33,9 @@ local danCurrentGroupSize = hasuitGlobal_GroupSize
 local danCurrentPartySize = GetNumSubgroupMembers()
 
 local InCombatLockdown = InCombatLockdown
-local updateArenaPositions
+local updateArenaPositionsMain
 local updatingGroupPositions
-local danUpdateGroupPositionsButtons
+local danUpdateGroupPositions
 
 local danMakeTestGroupFrames
 local danTestGroupFramesActive
@@ -52,62 +52,70 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function()
     
     
     
-    local function updateGroupPositions()
+    -- local function updateGroupPositions()
+        
+    -- end
+    groupUnitFrames.setSizesAndSetPoints = function()
         if not InCombatLockdown() then
-            danUpdateGroupPositionsButtons()
+            danUpdateGroupPositions()
         elseif not updatingGroupPositions then
             updatingGroupPositions = true
-            hasuitDoThis_AfterCombat(danUpdateGroupPositionsButtons)
+            hasuitDoThis_AfterCombat(danUpdateGroupPositions)
         end
     end
-    
     
     
     partyX = savedUserOptions["partyX"]
     userOptionsOnChanged["partyX"] = function()
         partyX = savedUserOptions["partyX"]
-        updateGroupPositions()
+        groupUnitFrames.setSizesAndSetPoints()
     end
     partyY = savedUserOptions["partyY"]
     userOptionsOnChanged["partyY"] = function()
         partyY = savedUserOptions["partyY"]
-        updateGroupPositions()
+        groupUnitFrames.setSizesAndSetPoints()
     end
     
     raidX = savedUserOptions["raidX"]
     userOptionsOnChanged["raidX"] = function()
         raidX = savedUserOptions["raidX"]
-        updateGroupPositions()
+        groupUnitFrames.setSizesAndSetPoints()
     end
     raidY = savedUserOptions["raidY"]
     raidYForPlayerRaidUnit = raidY-12
     userOptionsOnChanged["raidY"] = function()
         raidY = savedUserOptions["raidY"]
         raidYForPlayerRaidUnit = raidY-12
-        updateGroupPositions()
+        groupUnitFrames.setSizesAndSetPoints()
     end
     
     
     local updatingArenaPositions
     local function arenaPositions2()
         updatingArenaPositions = nil
-        updateArenaPositions()
+        updateArenaPositionsMain()
     end
-    local function arenaPositionsAsd()
-        arenaX = savedUserOptions["arenaX"]
-        arenaY = savedUserOptions["arenaY"]
+    local function arenaPositionsCheckCombat()
         if not InCombatLockdown() then
-            updateArenaPositions()
+            updateArenaPositionsMain()
         elseif not updatingArenaPositions then
             updatingArenaPositions = true
             hasuitDoThis_AfterCombat(arenaPositions2)
         end
     end
+    local function arenaPositionsFromOptions()
+        arenaX = savedUserOptions["arenaX"]
+        arenaY = savedUserOptions["arenaY"]
+        -- arenaPositionsCheckCombat()
+        arenaUnitFrames.setSizesAndSetPoints()
+    end
     arenaX = savedUserOptions["arenaX"]
-    userOptionsOnChanged["arenaX"] = arenaPositionsAsd
+    userOptionsOnChanged["arenaX"] = arenaPositionsFromOptions
     arenaY = savedUserOptions["arenaY"]
-    userOptionsOnChanged["arenaY"] = arenaPositionsAsd
-    
+    userOptionsOnChanged["arenaY"] = arenaPositionsFromOptions
+    -- arenaUnitFrames.setSizesAndSetPoints = function()end
+    arenaUnitFrames.setSizesAndSetPoints = arenaPositionsCheckCombat
+    arenaUnitFrames.sort = function()end
     
     
     groupColoredBackgroundMinimum = savedUserOptions["groupColoredBackgroundMinimum"]
@@ -144,10 +152,13 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function()
     
     
     
-    local activeScaleMultiplier = hasuitActiveScaleMultiplier
-    cdScale = savedUserOptions["cdScale"]*activeScaleMultiplier
+    cdScale = savedUserOptions["cdScale"]*hasuitGlobal_ScaleMultiplierFromScreenHeight
     userOptionsOnChanged["cdScale"] = function()
-        cdScale = savedUserOptions["cdScale"]*activeScaleMultiplier
+        cdScale = savedUserOptions["cdScale"]*hasuitGlobal_ScaleMultiplierFromScreenHeight
+        if cdScale<=0 then
+            savedUserOptions["cdScale"] = 100
+            cdScale = 100*hasuitGlobal_ScaleMultiplierFromScreenHeight
+        end
         for i=1,#cooldownsParentArray do
             cooldownsParentArray[i]:SetScale(cdScale)
         end
@@ -185,7 +196,8 @@ local danAddGroupUnits
 
 local hasuitUnitFrameForUnit = hasuitUnitFrameForUnit
 
-local hasuitButtonForUnit = {}
+hasuitButtonForUnit = {}
+local hasuitButtonForUnit = hasuitButtonForUnit
 local hasuitFramesCenterNamePlateGUIDs = hasuitFramesCenterNamePlateGUIDs
 
 local healthBarsCreated = 0
@@ -220,8 +232,6 @@ local outOfRangeAlpha = hasuitOutOfRangeAlpha
 local arenaSpecIconAlpha = 0.45
 
 
-local rolePriorities
-local classPriorities
 local danUpdateFrameRole
 
 local danUpdateHealthAndAbsorbValues
@@ -242,7 +252,6 @@ local unitsToAddToTable = {}
 
 local danUnitAuraIsFullUpdate = hasuitUnitAuraIsFullUpdate
 
-local danInitializeArenaSpecialIcons
 
 local danRemoveUnitHealthControlNotSafe
 local UnitHealth = UnitHealth
@@ -293,7 +302,7 @@ local danSetScriptRangeMaybe
 
 local danCurrentFrame
 local danCurrentUnit
-local danPlayerFrame
+local hasuitPlayerFrame --also global
 
 local disableColorBackgroundForFrame
 local enableColorBackgroundForFrame
@@ -552,8 +561,8 @@ do
                         removeDisableIfActive() --probably doesn't actually do anything here? wouldn't changeUnitTypeColorBackgrounds always be followed by a group update? not sure
                     end
                     hasuitDoThis_EachUnitFrameForOneUpdate(customUnitFrameFunction_ColoredBackground_Enable)
-                    customUnitFrameFunction_ColoredBackground_Enable(danPlayerFrame)
-                    danUpdateClassColor3(danPlayerFrame)
+                    customUnitFrameFunction_ColoredBackground_Enable(hasuitPlayerFrame)
+                    danUpdateClassColor3(hasuitPlayerFrame)
                     
                 elseif danCurrentUnitTable==arenaUnitFrames then
                     for i=1,#arenaUnitFrames do
@@ -581,8 +590,8 @@ do
                         removeEnableIfActive() --^
                     end
                     hasuitDoThis_EachUnitFrameForOneUpdate(customUnitFrameFunction_ColoredBackground_Disable)
-                    customUnitFrameFunction_ColoredBackground_Disable(danPlayerFrame)
-                    danUpdateClassColor3(danPlayerFrame)
+                    customUnitFrameFunction_ColoredBackground_Disable(hasuitPlayerFrame)
+                    danUpdateClassColor3(hasuitPlayerFrame)
                     
                 elseif danCurrentUnitTable==arenaUnitFrames then
                     for i=1,#arenaUnitFrames do
@@ -1190,16 +1199,16 @@ function danHideUnitFrame2(frame)
         frame.targetOf = nil
     end
     
-    local arenaStuff = frame.arenaStuff
-    if arenaStuff then
-        for i=#arenaStuff,1,-1 do
-            local diminishIcon = arenaStuff[i]
+    local diminishIcons = frame.diminishIcons
+    if diminishIcons then
+        for i=#diminishIcons,1,-1 do
+            local diminishIcon = diminishIcons[i]
             diminishIcon.border:SetAlpha(0)
             diminishIcon.diminishLevel = nil
             diminishIcon:SetAlpha(0)
             diminishIcon.cooldown:Clear()
             
-            tinsert(diminishIcon.unusedTable, tremove(arenaStuff, i))
+            tinsert(diminishIcon.unusedTable, tremove(diminishIcons, i))
         end
         if frame.arenaSpecIcon then --will test stuff like this some time and see what's best to do here. doubt this is best
             local arenaSpecIcon = frame.arenaSpecIcon
@@ -1209,7 +1218,7 @@ function danHideUnitFrame2(frame)
             frame.arenaSpec = nil
         end
         frame.arenaNumber = nil
-        frame.arenaStuff = nil
+        frame.diminishIcons = nil
     end
     frame.specId = nil
     frame.cooldowns = nil
@@ -1394,13 +1403,14 @@ end
 
 
 
-rolePriorities = {
+hasuitRolePriorities = {
     ["TANK"]        = 1000,
     ["NONE"]        = 2000,
     ["DAMAGER"]     = 3000,
     ["HEALER"]      = 4000,
 }
-classPriorities = { --todo spec priorities
+local hasuitRolePriorities = hasuitRolePriorities
+hasuitClassPriorities = { --todo spec priorities
     ["WARRIOR"]     = 200,
     ["PALADIN"]     = 200,
     ["ROGUE"]       = 200,
@@ -1420,6 +1430,7 @@ classPriorities = { --todo spec priorities
     
     ["d/c"]         = 5000,
 }
+local hasuitClassPriorities = hasuitClassPriorities
 
 local danDisablePowerBar2
 
@@ -1441,14 +1452,14 @@ local function danUpdateFrameRole2(skipLastHalf)
         end
         danCurrentFrame.role = role
     end
-    if not skipLastHalf and danCurrentFrame~=danPlayerFrame then
+    if not skipLastHalf and danCurrentFrame~=hasuitPlayerFrame then
         if role == "HEALER" or danCurrentFrame.unitClass=="DEATHKNIGHT" then 
             danEnablePowerBar2()
         else
             danDisablePowerBar2()
         end
-        danCurrentFrame.priority = classPriorities[danCurrentFrame.unitClass] + rolePriorities[danCurrentFrame.role] + danCurrentFrame.id
     end
+    danCurrentFrame.priority = hasuitClassPriorities[danCurrentFrame.unitClass] + hasuitRolePriorities[role] + danCurrentFrame.id
 end
 
 
@@ -1701,6 +1712,7 @@ end
 
 
 
+local _G = _G
 
 
 
@@ -1715,7 +1727,7 @@ local hasuitGetIcon = hasuitGetIcon
 local numberOfTrackedDrs
 local arenaDiminishTextures = {}
 
-tinsert(hasuitDoThis_Player_Login, 1, function()
+tinsert(hasuitDoThis_Addon_Loaded, function()
     do
         local buttonUnits = { --todo improve groupsize changing in combat
             "raid6",
@@ -1780,9 +1792,20 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
                 local clickButton = CreateFrame("Button", "d"..x.."-"..y, hasuitFramesParent, "SecureUnitButtonTemplate") --danclick, for macros to target frames, /click d1-1 will always target player (should just be /target [@player] to be safe with relog in combat until that gets fixed), /click d5-1 will target lowest frame in a party(usually party4 but if group is <6 and not everyone is in party it should target whatever that raid unit is at the bottom), /click d1-2 will target first unit of row 2(unitframe directly below player frame) etc, bored todo option to enable/disable? probably not worth the space in useroptions although that could be a way to make people aware that it's even a feature
                 clickButton:RegisterForClicks("AnyDown")
                 clickButton:SetAttribute("*type1", "target")
-                clickButton:SetAttribute("toggleForVehicle", true) --trying this out
+                clickButton:SetAttribute("toggleForVehicle", true) --seems good? not sure
             end
+            
+            local clickButton = CreateFrame("Button", "hft"..x, hasuitFramesParent, "SecureUnitButtonTemplate") --/click hft1-5, target arena frames
+            clickButton:RegisterForClicks("AnyDown")
+            clickButton:SetAttribute("*type1", "target")
+            clickButton:SetAttribute("toggleForVehicle", true)
+            
+            local clickButton = CreateFrame("Button", "hff"..x, hasuitFramesParent, "SecureUnitButtonTemplate") --/click hff1-5, focus arena frames
+            clickButton:RegisterForClicks("AnyDown")
+            clickButton:SetAttribute("*type1", "focus")
+            clickButton:SetAttribute("toggleForVehicle", true)
         end
+        
         local GetMouseButtonClicked = GetMouseButtonClicked
         local IsMouseButtonDown = IsMouseButtonDown
         local MouselookStop = MouselookStop
@@ -1812,7 +1835,7 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
                 danOnUpdateMouseUpCheckFrame:SetScript("OnUpdate", danOnUpdateMouseUpCheck)
                 local mouseButtonClicked = GetMouseButtonClicked()
                 if mouseButtonClicked=="LeftButton" or mouseButtonClicked=="RightButton" then
-                    MouselookStart()
+                    MouselookStart() --this caused a major problem randomly on the first bg of the new patch. No idea why
                 end
             end)
             
@@ -1836,15 +1859,26 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
         local arenaWidthPlusTwo = arenaWidth+2
         local arenaHeightPlusTwo = arenaHeight+2
         local arenaHeightasd = arenaHeightPlusTwo+1
-        function updateArenaPositions()
-            for i=1,5 do
-                local unit = "arena"..i
+        function updateArenaPositionsMain()
+            for i=1,#arenaUnitFrames do
+                local unit = arenaUnitFrames[i].unit
                 local button = hasuitButtonForUnit[unit]
                 button:SetSize(arenaWidthPlusTwo,arenaHeightPlusTwo)
                 button:SetPoint("TOP", UIParent, "CENTER", arenaX, arenaY-i*arenaHeightasd)
+                
+                local macroTargetFrame = _G["hft"..i] --danclick arena
+                if macroTargetFrame then
+                    macroTargetFrame:SetAttribute("unit", unit)
+                    _G["hff"..i]:SetAttribute("unit", unit)
+                end
             end
         end
-        updateArenaPositions()
+        -- for i=1,5 do
+            -- local unit = "arena"..i
+            -- local button = hasuitButtonForUnit[unit]
+            -- button:SetSize(arenaWidthPlusTwo,arenaHeightPlusTwo)
+            -- button:SetPoint("TOP", UIParent, "CENTER", arenaX, arenaY-i*arenaHeightasd)
+        -- end
     end
     
     
@@ -1863,25 +1897,25 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
     end
     
     hasuitUnitFrameMakeHealthBarMain()
-    danPlayerFrame = danCurrentFrame
-    hasuitPlayerFrame = danPlayerFrame
-    danPlayerFrame.updatingColor = true
-    danPlayerFrame.colorFunction = nil --works itself out for color background updating color3, other things like unit_flags will go through afterward on playerframe but setscript onupdate to nil from this and updatingColor back to true at the same time
-    danPlayerFrame.priority = 0
-    danPlayerFrame.partyNumber = 0
-    danPlayerFrame.updated = hasuitFrameTypeUpdateCount["group"]
+    hasuitPlayerFrame = danCurrentFrame
+    _G["hasuitPlayerFrame"] = hasuitPlayerFrame
+    hasuitPlayerFrame.updatingColor = true
+    hasuitPlayerFrame.colorFunction = nil --works itself out for color background updating color3, other things like unit_flags will go through afterward on playerframe but setscript onupdate to nil from this and updatingColor back to true at the same time
+    -- hasuitPlayerFrame.priority = 0
+    -- hasuitPlayerFrame.partyNumber = 0
+    hasuitPlayerFrame.updated = hasuitFrameTypeUpdateCount["group"]
     
-    danPlayerFrame.border:SetScript("OnEvent", function()
-        danPlayerFrame:SetAlpha(1)
+    hasuitPlayerFrame.border:SetScript("OnEvent", function()
+        hasuitPlayerFrame:SetAlpha(1)
     end)
     
     
-    danPlayerFrame.arenaStuff = {} --todo
-    local arenaStuff = danPlayerFrame.arenaStuff
+    hasuitPlayerFrame.diminishIcons = {} --todo
+    local diminishIcons = hasuitPlayerFrame.diminishIcons
     for i=1,numberOfTrackedDrs do
-        arenaStuff[i] = hasuitGetIcon("optionalBorder")
-        local diminishIcon = arenaStuff[i]
-        diminishIcon:SetParent(danPlayerFrame)
+        diminishIcons[i] = hasuitGetIcon("optionalBorder")
+        local diminishIcon = diminishIcons[i]
+        diminishIcon:SetParent(hasuitPlayerFrame)
         diminishIcon:ClearAllPoints()
         diminishIcon:SetSize(23, 23)
         diminishIcon.size = 23
@@ -1893,20 +1927,21 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
             diminishIcon.active = false
         end)
         diminishIcon.iconTexture:SetTexture(arenaDiminishTextures[i])
-        diminishIcon:SetPoint("BOTTOMRIGHT", danPlayerFrame, "TOPRIGHT", -1-(i-1)*24, 1)
+        diminishIcon:SetPoint("BOTTOMRIGHT", hasuitPlayerFrame, "TOPRIGHT", -1-(i-1)*24, 1)
         diminishIcon.diminishLevel = 0
         diminishIcon.border:SetAlpha(1)
     end
     
     
-    if hasuitGlobal_InstanceType=="arena" then
-        danHideTargetLines() --just to hide playertarget
-    end
+    -- if hasuitGlobal_InstanceType=="arena" then
+        -- danHideTargetLines() --just to hide playertarget --not needed anymore
+    -- end
     
     
     
     C_Timer_After(0, function()
-        danCurrentFrame = danPlayerFrame
+        danUpdateClassColor3(hasuitPlayerFrame) --player's frame can be grey before player_login, but i want hasuitPlayerFrame to be available after addon loaded
+        danCurrentFrame = hasuitPlayerFrame
         danCurrentUnit = "player"
         danEnablePowerBar2()
     end)
@@ -1926,25 +1961,9 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
     
     
     
-    hasuitSetScriptTestGroupRosterUpdateFunction()
+    -- hasuitSetScriptTestGroupRosterUpdateFunction()
     
-    danUpdateGroupUnitFrames()
-    
-    -- local danExists = UnitExists("player")
-    -- if danExists then
-        -- print("dan exists")
-        -- danUpdateGroupUnitFrames()
-    -- else
-        -- print("dan doesn't exist")
-        -- if hasuitGlobal_GroupSize<2 then
-            -- hasuitMakeTestGroupFrames(40)
-            -- hasuitDoThis_OnUpdate(function()
-                -- hasuitMakeTestGroupFrames(0)
-            -- end)
-        -- else
-            -- danUpdateGroupUnitFrames()
-        -- end
-    -- end
+    -- danUpdateGroupUnitFrames()
 end)
 
 
@@ -2131,11 +2150,17 @@ do
         danHideInactiveFrames()
         for i=1,#arenaUnitFrames do
             local frame = arenaUnitFrames[i]
+            local unit = frame.unit
             if frame.hideTimer then
                 frame.hideTimer:Cancel()
                 hideTimerFinished(frame.hideTimer)
             end
-            hasuitUnitFrameForUnit["arena"..i] = nil 
+            -- hasuitUnitFrameForUnit["arena"..i] = nil
+            if unit then
+                hasuitUnitFrameForUnit[unit] = nil
+            end
+            
+            
             -- danHideUnitFrame2(frame)
             -- frame.specialAuraInstanceIDsRemove = {}
         end
@@ -2364,63 +2389,34 @@ danUnitDisconnectedFrame:SetScript("OnEvent", danUnitDisconnectedFunction)
 
 
 
+
 local partyBroken
-local partyBrokenTable = {}
-local function partyBrokenFunction()
-    if partyBroken then
+
+do --groupUnitFrames.setSizesAndSetPoints
+    local partyBrokenTable = {}
+    local function partyBrokenFunction()
+        if partyBroken then
+            for k, v in pairs(partyBrokenTable) do
+                if v.unit and v.broken then
+                    v.text:SetText("|cffff6f6f"..v.unit) --hasuitRed2
+                end
+            end
+        end
+    end
+    local function partyFixedFunction()
         for k, v in pairs(partyBrokenTable) do
             if v.unit and v.broken then
-                v.text:SetText("|cffff6f6f"..v.unit) --hasuitRed2
+                v.text:SetText("")
+                v.broken = false
             end
         end
+        partyBrokenTable = {}
     end
-end
-local function partyFixedFunction()
-    for k, v in pairs(partyBrokenTable) do
-        if v.unit and v.broken then
-            v.text:SetText("")
-            v.broken = false
-        end
-    end
-    partyBrokenTable = {}
-end
-
-local function groupUnitFramesSort()
-    if danCurrentGroupSize<6 then
-        if danCurrentGroupSize-danCurrentPartySize>1 then
-            partyBroken = true --partybroken thing could be improved
-            partyFixedFunction()
-            for i=2,#groupUnitFrames do
-                local frame = groupUnitFrames[i]
-                frame.partyNumber = i+5
-                partyBrokenTable[i] = frame
-                frame.broken = true
-            end
-        elseif partyBroken then
-            partyBroken = nil
-            partyFixedFunction()
-        end
-        if partyBroken then
-            for i=1,danCurrentPartySize do
-                local frame = hasuitUnitFrameForUnit["party"..i]
-                if frame then
-                    partyBrokenTable[i] = nil
-                    frame.partyNumber = i
-                end
-            end
-            partyBrokenFunction()
-        else
-            for i=1,danCurrentPartySize do
-                local frame = hasuitUnitFrameForUnit["party"..i]
-                if frame then
-                    frame.partyNumber = i
-                end
-            end
-        end
         
-        danPlayerFrame.partyNumber = 0
-        
-        sort(groupUnitFrames, function(a,b) --broke after trying to make instant unit updates instead of onupdates. this whole part is terrible anyway
+    local partySort --5 group members or less
+    local raidSort --6 group members or more
+    tinsert(hasuitDoThis_Player_Login, function()
+        partySort = hasuitPartySort or function(a,b)
             local aPartyNumber = a.partyNumber
             local bPartyNumber = b.partyNumber
             if aPartyNumber and bPartyNumber then
@@ -2434,27 +2430,78 @@ local function groupUnitFramesSort()
             else
                 return a.priority or b.priority and false or a.id<b.id
             end
-            
-        end)
-    else
-        if partyBroken then
-            partyBroken = nil
-            partyFixedFunction()
         end
         
-        danPlayerFrame.priority = 0
-        
-        sort(groupUnitFrames, function(a,b)
+        raidSort = hasuitRaidSort or function(a,b)
             return a.priority<b.priority
-        end)
-    end
-    
-    
-    if not InCombatLockdown() then
-        danUpdateGroupPositionsButtons()
-    elseif not updatingGroupPositions then
-        updatingGroupPositions = true
-        hasuitDoThis_AfterCombat(danUpdateGroupPositionsButtons)
+        end
+        
+        if hasuitClassPriorities~=_G["hasuitClassPriorities"] then
+            hasuitClassPriorities = _G["hasuitClassPriorities"]
+        end
+        if hasuitRolePriorities~=_G["hasuitRolePriorities"] then
+            hasuitRolePriorities = _G["hasuitRolePriorities"]
+        end
+        
+        hasuitSetScriptTestGroupRosterUpdateFunction()
+        danUpdateGroupUnitFrames()
+    end)
+    groupUnitFrames.sort = function()
+        if danCurrentGroupSize<6 then --hasuitGlobal_GroupSize
+            if danCurrentGroupSize-danCurrentPartySize>1 then
+                partyBroken = true --partybroken thing could be improved
+                partyFixedFunction()
+                for i=1,#groupUnitFrames do
+                    local frame = groupUnitFrames[i]
+                    if frame~=hasuitPlayerFrame then
+                        frame.partyNumber = i+6
+                        partyBrokenTable[i] = frame
+                        frame.broken = true
+                    end
+                end
+            elseif partyBroken then
+                partyBroken = nil
+                partyFixedFunction()
+            end
+            if partyBroken then
+                for i=1,danCurrentPartySize do
+                    local frame = hasuitUnitFrameForUnit["party"..i]
+                    if frame then
+                        partyBrokenTable[i] = nil
+                        frame.partyNumber = i
+                    end
+                end
+                partyBrokenFunction()
+            else
+                for i=1,danCurrentPartySize do
+                    local frame = hasuitUnitFrameForUnit["party"..i]
+                    if frame then
+                        frame.partyNumber = i
+                    end
+                end
+            end
+            
+            hasuitPlayerFrame.partyNumber = 0
+            
+            sort(groupUnitFrames, partySort)
+        else
+            if partyBroken then
+                partyBroken = nil
+                partyFixedFunction()
+            end
+            
+            hasuitPlayerFrame.priority = 0
+            
+            sort(groupUnitFrames, raidSort)
+        end
+        
+        
+        -- if not InCombatLockdown() then
+            -- danUpdateGroupPositions()
+        -- elseif not updatingGroupPositions then
+            -- updatingGroupPositions = true
+            -- hasuitDoThis_AfterCombat(danUpdateGroupPositions)
+        -- end
     end
 end
 
@@ -2603,9 +2650,10 @@ end
 
 
 local initialize = hasuitFramesInitialize
-local hasuitSpellFunction_Cleu_Diminish = hasuitSpellFunction_Cleu_Diminish
-local trackedDiminishSpells = hasuitTrackedDiminishSpells
-tinsert(hasuitDoThis_Addon_Loaded, function()
+tinsert(hasuitDoThis_Addon_Loaded, #hasuitDoThis_Addon_Loaded-1, function()
+    local hasuitSpellFunction_Cleu_Diminish = hasuitSpellFunction_Cleu_Diminish
+    local trackedDiminishSpells = hasuitTrackedDiminishSpells
+    
     hasuitFramesCenterSetEventType("cleu")
     local drLoadOn
     do --dr loadon
@@ -2639,12 +2687,12 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
     numberOfTrackedDrs = #arenaDiminishTextures
 end)
 
-function danInitializeArenaSpecialIcons()
-    danCurrentFrame.arenaStuff = {}
-    local arenaStuff = danCurrentFrame.arenaStuff
+local function danInitializeArenaSpecialIcons()
+    danCurrentFrame.diminishIcons = {}
+    local diminishIcons = danCurrentFrame.diminishIcons
     for i=1,numberOfTrackedDrs do
-        arenaStuff[i] = hasuitGetIcon("optionalBorder")
-        local diminishIcon = arenaStuff[i]
+        diminishIcons[i] = hasuitGetIcon("optionalBorder")
+        local diminishIcon = diminishIcons[i]
         diminishIcon:SetParent(danCurrentFrame)
         diminishIcon:ClearAllPoints()
         diminishIcon:SetSize(19, 19)
@@ -2690,7 +2738,6 @@ local function danInitializeArenaSpecIcon()
     end)
 end
 
-local arenaSpecIsHealerTable = hasuitSpecIsHealerTable
 function arenaInRange()
     if not hasuitArenaGatesActive and UnitInRange(danCurrentUnit) then
         danCurrentFrame:SetAlpha(1)
@@ -2719,7 +2766,7 @@ danUpdateUnitSpecial["arena"] = function()
     -- end
     
     
-    if not danCurrentFrame.arenaStuff then
+    if not danCurrentFrame.diminishIcons then
         danInitializeArenaSpecialIcons()
     end
     if danCurrentArenaSpec then
@@ -2730,7 +2777,7 @@ danUpdateUnitSpecial["arena"] = function()
                 danAddSpecializationCooldowns(danCurrentArenaSpec)
                 danCurrentFrame.specId = danCurrentArenaSpec
             end
-            if arenaSpecIsHealerTable[danCurrentArenaSpec] then --events get unregistered and re-registered if powerbar already on frame in updateexistingunit right before this
+            if hasuitSpecIsHealerTable[danCurrentArenaSpec] then --events get unregistered and re-registered if powerbar already on frame in updateexistingunit right before this
                 danEnablePowerBar2()
             else
                 danDisablePowerBar2()
@@ -3260,7 +3307,7 @@ local function danUpdateGroupUnits(groupType, number, lastNumber)
                 hasuitUnitFrameMakeHealthBarMain()
             else
                 if hasuitUnitFrameForUnit[danCurrentUnit]~=danCurrentFrame then --could be improved a bit but this/arena's equivalent were the hardest things in the addon to get to work right. need a good reason to try to optimize anything here more than it already is --the way it could be improved is doing something with unitguid and reducing how often danUpdateExistingUnit happens but i forget exactly. i tried before and just couldn't get it to work right that way
-                    if danCurrentFrame~=danPlayerFrame then
+                    if danCurrentFrame~=hasuitPlayerFrame then
                         danUpdateExistingUnit() --this whole system should be reorganized where it's easier to see everything happening to a frame? could work on that when adding more unit types like pets/fake party/fake arena(both of these in world pvp/maybe optionally bgs)/boss units/bg opponents/nameplates(? might be unrelated here)
                     else
                         hasuitUnitFrameForUnit[danCurrentUnit] = danCurrentFrame
@@ -3428,6 +3475,8 @@ function danUpdateArenaUnitFrames()
     end
     
     
+    arenaUnitFrames.updatingUnitTable = true
+    
     endOfUnitFrameUpdateSharedFunction(arenaUnitFrames, updatingAllOtherUnits_local)
     if not updatingAllOtherUnits_local then
         updatingAllOtherUnits = false
@@ -3497,7 +3546,6 @@ end
 
 
 
-
 -- local hasuitDoThis_GroupUnitFramesUpdate_before = hasuitDoThis_GroupUnitFramesUpdate_before
 local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
 local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
@@ -3506,15 +3554,6 @@ function updateAllOtherUnits()
     updatingAllOtherUnits = false
     -- print(hasuitGreen, "update all other")
     danHideInactiveFrames()
-    
-    
-    for i=1,#hasuitUnitFramesForUnitType_Array do
-        local unitTable = hasuitUnitFramesForUnitType_Array[i]
-        if unitTable.sort then
-            unitTable.sort()
-            unitTable.sort = false
-        end
-    end
     
     
     for unitGUID, unit in pairs(hasuitFramesCenterNamePlateGUIDs) do
@@ -3556,6 +3595,18 @@ function updateAllOtherUnits()
         hasuitUnitFrameForUnit["softenemy"] = nil
     end
     
+    
+    
+    
+    
+    for i=1,#hasuitUnitFramesForUnitType_Array do --main thing
+        local unitTable = hasuitUnitFramesForUnitType_Array[i]
+        if unitTable.updatingUnitTable then
+            unitTable.updatingUnitTable = false
+            unitTable.sort()
+            unitTable.setSizesAndSetPoints()
+        end
+    end
     
     
     
@@ -3623,7 +3674,7 @@ function danUpdateGroupUnitFrames() --instant the first time on a gettime now + 
     
     local raid1Exists = UnitExists("raid1")
     if not raid1Exists and danUpdatingRole then
-        danCurrentFrame = danPlayerFrame
+        danCurrentFrame = hasuitPlayerFrame
         danCurrentUnit = "player"
         danUpdateFrameRole2()
     end
@@ -3648,25 +3699,27 @@ function danUpdateGroupUnitFrames() --instant the first time on a gettime now + 
         lastPartySize = danCurrentPartySize
         lastRaidSize = danCurrentGroupSize
     end
-    danPlayerFrame.updated = hasuitFrameTypeUpdateCount["group"]
-    danPlayerFrame:SetAlpha(1)
-    local blackCount = danPlayerFrame.blackCount
+    hasuitPlayerFrame.updated = hasuitFrameTypeUpdateCount["group"]
+    hasuitPlayerFrame:SetAlpha(1)
+    local blackCount = hasuitPlayerFrame.blackCount
     if blackCount then
-        if danPlayerFrame.blackCheckRange then
-            danPlayerFrame.blackCheckRange = false
-            danPlayerFrame.blackCount = blackCount-1
+        if hasuitPlayerFrame.blackCheckRange then
+            hasuitPlayerFrame.blackCheckRange = false
+            hasuitPlayerFrame.blackCount = blackCount-1
             if blackCount==1 then --was 1
-                danCurrentUnitHealth = UnitHealth(danPlayerFrame.unit)
-                danPlayerFrame.colorBackground()
-                tinsert(danPlayerFrame.otherUnitHealthFunctions, danPlayerFrame.colorBackground) --danGiveUnitHealthControl
+                danCurrentUnitHealth = UnitHealth(hasuitPlayerFrame.unit)
+                hasuitPlayerFrame.colorBackground()
+                tinsert(hasuitPlayerFrame.otherUnitHealthFunctions, hasuitPlayerFrame.colorBackground) --danGiveUnitHealthControl
             end
         end
     end
     
     
     
-    groupUnitFrames.sort = groupUnitFramesSort
+    -- groupUnitFrames.sort = groupUnitFramesSort
     
+    
+    groupUnitFrames.updatingUnitTable = true
     
     endOfUnitFrameUpdateSharedFunction(groupUnitFrames, updatingAllOtherUnits_local)
     if not updatingAllOtherUnits_local then
@@ -3686,7 +3739,7 @@ do
     local hasuitDoThis_GroupUnitFramesUpdate_Positions_after = hasuitDoThis_GroupUnitFramesUpdate_Positions_after
     local partyWasBroken
     local lastRaidSize2 = 0
-    function danUpdateGroupPositionsButtons() --should handle people leaving well? but not joining, todo? can look broken if group size changes size/columns in combat atm but probably rare. should never make game unplayable even when that happens?
+    function danUpdateGroupPositions() --should handle people leaving well? but not joining, todo? can look broken if group size changes size/columns in combat atm but probably rare. should never make game unplayable even when that happens?
         updatingGroupPositions = false
         
         
@@ -4018,10 +4071,10 @@ local tempTrackedArenaUnits = { --todo
     ["arena4"] = true,
     ["arena5"] = true,
 }
-local function tempHideArenaStuff(arenaStuff)
-    local arenaStuff = danCurrentFrame.arenaStuff
-    for i=#arenaStuff,1,-1 do
-        local diminishIcon = arenaStuff[i]
+local function tempHideArenaStuff(diminishIcons)
+    local diminishIcons = danCurrentFrame.diminishIcons
+    for i=#diminishIcons,1,-1 do
+        local diminishIcon = diminishIcons[i]
         diminishIcon.diminishLevel = 0
         diminishIcon:SetAlpha(0)
         
@@ -4051,7 +4104,7 @@ do
                 danFullPowerUpdate(danCurrentFrame.powerBar, danCurrentUnit)
             end
             danCurrentFrame:SetAlpha(1)
-            if danCurrentFrame.arenaStuff then
+            if danCurrentFrame.diminishIcons then
                 tempHideArenaStuff()
             end
             if danCurrentFrame.text:GetText()=="unseen" then --rare, happened when shuffle round ended and someone was in a shadowy duel
@@ -4133,9 +4186,9 @@ danArenaUpdateFrame:RegisterEvent("PLAYER_ENTERING_BATTLEGROUND")
 function updateArena(_, event, arg1, arg2) --bored todo this should be remade, one of the few things that survived from UnitFrames1
     if event=="PLAYER_ENTERING_BATTLEGROUND" then --fixing/avoiding potential problems with an arena frame with the wrong class getting used, can happen if frames fail to hide like a wargame that ended 3v1 in the starting gates and then the 1 frame persisted and caused the next game to show 2 ferals when it should've been 1 feral 1 pally
         if #arenaUnitFrames~=0 then
-            for i=1,#arenaUnitFrames do
-                hasuitUnitFrameForUnit["arena"..i] = nil
-            end
+            -- for i=1,#arenaUnitFrames do
+                -- hasuitUnitFrameForUnit["arena"..i] = nil
+            -- end
             hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
             danHideInactiveFrames() --should make a more specific version of this?
         end
@@ -4229,10 +4282,11 @@ danArenaUpdateFrame:SetScript("OnEvent", updateArena)
 hasuitLocal10(function() --arenaEndedFunction
     firstSeen = nil
     hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
-    for i=1,#arenaUnitFrames do
-        hasuitUnitFrameForUnit["arena"..i] = nil
-    end
-    danHideInactiveFrames() --shouldn't need to go through every unit type table here? todo
+    -- for i=1,#arenaUnitFrames do
+        -- hasuitUnitFrameForUnit["arena"..i] = nil
+        -- hasuitUnitFrameForUnit[arenaUnitFrames[i].unit] = nil
+    -- end
+    danHideInactiveFrames()
     
     danHideTargetLines()
     
@@ -4262,19 +4316,19 @@ do
         C_Timer_After(0, danInspectAllGroup2)
     end
     tinsert(hasuitDoThis_Player_Entering_WorldSkipsFirst, function()
-        danPlayerFrame:SetAlpha(1)
+        hasuitPlayerFrame:SetAlpha(1)
         updateTargetBorder()
         C_Timer_After(0, danInspectAllGroup)
         
-        local blackCount = danPlayerFrame.blackCount
+        local blackCount = hasuitPlayerFrame.blackCount
         if blackCount then
-            if danPlayerFrame.blackCheckRange then
-                danPlayerFrame.blackCheckRange = false
-                danPlayerFrame.blackCount = blackCount-1
+            if hasuitPlayerFrame.blackCheckRange then
+                hasuitPlayerFrame.blackCheckRange = false
+                hasuitPlayerFrame.blackCount = blackCount-1
                 if blackCount==1 then --was 1
-                    danCurrentUnitHealth = UnitHealth(danPlayerFrame.unit)
-                    danPlayerFrame.colorBackground()
-                    tinsert(danPlayerFrame.otherUnitHealthFunctions, danPlayerFrame.colorBackground) --danGiveUnitHealthControl
+                    danCurrentUnitHealth = UnitHealth(hasuitPlayerFrame.unit)
+                    hasuitPlayerFrame.colorBackground()
+                    tinsert(hasuitPlayerFrame.otherUnitHealthFunctions, hasuitPlayerFrame.colorBackground) --danGiveUnitHealthControl
                 end
             end
         end

@@ -11,8 +11,6 @@ hasuitFramesParent:SetPoint("CENTER")
 hasuitFramesParent:SetFrameStrata("LOW")
 hasuitFramesParent:SetFrameLevel(11)
 
--- hasuitPlayerFrame is global after player_login
-
 -- hasuitLoginTime = GetTime()
 hasuitPlayerGUID = UnitGUID("player")
 do
@@ -987,6 +985,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         -- hasuitGlobal_GroupSize
         -- hasuitGlobal_RaidFrameWidth
         -- hasuitGlobal_RaidFrameHeight
+        -- hasuitGlobal_ScaleMultiplierFromScreenHeight
         
         -- hasuitGlobal_CooldownDisplayActiveGroup
         -- hasuitGlobal_KICKTextKey
@@ -1006,6 +1005,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         -- hasuitCooldownFont#
         -- hasuitCastBarFont#
         -- hasuitSetupSpellOptions --always changes before initialize
+        -- hasuitFramesOptionsCloseButton --after /hf is used
         
         
         hasuitDoThis_Addon_Loaded = nil --not useful from outside?
@@ -1273,10 +1273,20 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         
         
         
+        hasuitPartySort = nil --5 group members or less
+        hasuitRaidSort = nil  --6 group members or more
+        
+        hasuitButtonForUnit = nil
+        hasuitRolePriorities = nil
+        hasuitClassPriorities = nil
         
         
         
-        --things that might not be useful externally: --Some others should be moved to here too
+        
+        
+        
+        
+        --things that might not be useful externally: --Many others should be moved to here too
         hasuitLocal1 = nil
         hasuitLocal2 = nil
         hasuitLocal3 = nil

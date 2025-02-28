@@ -137,11 +137,11 @@ middleCastBarsController.grow = hasuitMiddleCastBarsGrow
 
 
 
-hasuitCastBarFont26 = CreateFont("hasuitCastBarFont26")
-hasuitCastBarFont24 = CreateFont("hasuitCastBarFont24")
-hasuitCastBarFont20 = CreateFont("hasuitCastBarFont20")
-hasuitCastBarFont18 = CreateFont("hasuitCastBarFont18")
-hasuitCastBarFont14 = CreateFont("hasuitCastBarFont14")
+local hasuitCastBarFont26 = CreateFont("hasuitCastBarFont26")
+local hasuitCastBarFont24 = CreateFont("hasuitCastBarFont24")
+local hasuitCastBarFont20 = CreateFont("hasuitCastBarFont20")
+local hasuitCastBarFont18 = CreateFont("hasuitCastBarFont18")
+local hasuitCastBarFont14 = CreateFont("hasuitCastBarFont14")
 hasuitCastBarFont26:SetFont("Fonts/FRIZQT__.TTF", 26, "OUTLINE")
 hasuitCastBarFont24:SetFont("Fonts/FRIZQT__.TTF", 24, "OUTLINE")
 hasuitCastBarFont20:SetFont("Fonts/FRIZQT__.TTF", 20, "OUTLINE")
