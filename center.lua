@@ -137,7 +137,6 @@ hasuitDoThis_GroupUnitFramesUpdate_Positions_after = {} --wipes at the end if it
 
 
 
-
 do --hasuitDoThis_EachUnitFrameForOneUpdate(func) --todo hasuitDoThis_GroupUnitFramesUpdate/hasuitDoThis_GroupUnitFramesUpdate_after should probably go after the sorting function? some way of limiting it better now that group update function can happen multiple times on the same gettime
     local tinsert = tinsert
     local danRemoveFunctionFromArray
@@ -1296,6 +1295,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitLocal8 = nil
         hasuitLocal9 = nil
         hasuitLocal10 = nil
+        hasuitLocal11 = nil
         
         hasuitActiveScaleMultiplier = nil
         hasuitUninterruptibleBorderSize = nil

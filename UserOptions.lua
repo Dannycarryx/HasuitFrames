@@ -17,6 +17,7 @@ local yChange
 local danCreateCheckButton
 local danCreateEditBox
 local danCreateNewHeader
+local danCreateScrollFrame
 local danSetPointAndDirection
 local createPageBackground
 local createOptionsPages = {
@@ -148,14 +149,25 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
         hasuitSavedUserOptions = savedUserOptions
     end
     
-    local currentVersion = 2
+    local currentVersion = 3
     local savedVersion = savedUserOptions["version"] or 0
     if savedVersion~=currentVersion then
         savedUserOptions["version"] = currentVersion
         
         
-        if savedVersion<2 then
-            savedUserOptions["cdScale"] = 1
+        
+        if savedVersion<3 then
+            tinsert(createOptionsPages, 1, function()
+                createPageBackground(150)
+                danCreateScrollFrame("Custom sorting has been added for both group and arena frames. Check the new customization folder in the HasuitFrames addon folder if interested. It includes automatic macro changing and nameplate number changing to match the way you sort. Read through the comments in the file to see how to set it up.")
+            end)
+            SlashCmdList.HasuitFrames()
+            
+            
+            
+            if savedVersion<2 then
+                savedUserOptions["cdScale"] = 1
+            end
         end
         
         
@@ -231,6 +243,8 @@ local CreateFrame = CreateFrame
 local danBackdrop = hasuitCommonBackdrop
 local danFont25 = CreateFont("hasuitUserOptionsFont25")
 danFont25:SetFont("Fonts/FRIZQT__.TTF", 25, "OUTLINE")
+local danFont20 = CreateFont("hasuitUserOptionsFont20")
+danFont20:SetFont("Fonts/FRIZQT__.TTF", 20, "OUTLINE")
 local danFont16 = CreateFont("hasuitUserOptionsFont16")
 danFont16:SetFont("Fonts/FRIZQT__.TTF", 16, "OUTLINE")
 local danFont14 = CreateFont("hasuitUserOptionsFont14")
@@ -352,6 +366,19 @@ do
         currentY = currentY+yChange-3+(yOffset or 0)
         header:SetPoint(ownPoint,currentOptionsPage,targetPoint,currentX+(xOffset or 0), currentY)
     end
+    function danCreateScrollFrame(s)
+        local scrollFrame = CreateFrame("ScrollFrame", nil, currentOptionsPage, "BackdropTemplate")
+        scrollFrame:SetBackdrop(danBackdrop)
+        scrollFrame:SetBackdropColor(0,0,0, 0.7)
+        scrollFrame:SetBackdropBorderColor(0,0,0)
+        scrollFrame:SetAllPoints()
+        local text = scrollFrame:CreateFontString()
+        text:SetFontObject(danFont20)
+        text:SetText(s)
+        text:SetPoint("BOTTOMLEFT", scrollFrame, "BOTTOMLEFT", 20, 5)
+        text:SetPoint("BOTTOMRIGHT", scrollFrame, "BOTTOMRIGHT", -20, 5)
+        text:SetPoint("TOP", scrollFrame, "TOP", 0, -5)
+    end
     function danSetPointAndDirection(setOwnPoint, setTargetPoint, setX, setY, setYChange)
         ownPoint = setOwnPoint
         targetPoint = setTargetPoint
@@ -421,7 +448,7 @@ end
 
 
 
-local highestPage = #createOptionsPages
+local highestPage
 local function nextPage()
     if currentEditBox then
         editBoxEscape(currentEditBox)
@@ -461,6 +488,8 @@ local function openMainOptionsFirst()
     savedUserOptions["arenaTest"] = 3
     savedUserOptions["raidTest"] = 8
     
+    highestPage = #createOptionsPages
+    
     userOptionsShown = true
     userOptionsFrame:SetClampedToScreen(true)
     userOptionsFrame:SetClampRectInsets(500, -500, 0, 0)
@@ -494,7 +523,7 @@ local function openMainOptionsFirst()
     text:SetText("x")
     text:SetPoint("CENTER",1,1)
     closeButton:SetPoint("TOPRIGHT",userOptionsFrame,"TOPRIGHT")
-    closeButton:SetFrameLevel(10)
+    closeButton:SetFrameLevel(11)
     closeButton:EnableMouse(true)
     closeButton:RegisterForClicks("AnyDown")
     closeButton:SetScript("OnClick", hideUserOptionsFrame)
@@ -510,7 +539,7 @@ local function openMainOptionsFirst()
     text:SetPoint("CENTER",1,1)
     text:SetJustifyH("CENTER")
     nextButton:SetPoint("TOPRIGHT",closeButton,"TOPLEFT")
-    nextButton:SetFrameLevel(10)
+    nextButton:SetFrameLevel(11)
     nextButton:EnableMouse(true)
     nextButton:RegisterForClicks("AnyDown")
     nextButton:SetScript("OnClick", nextPage)

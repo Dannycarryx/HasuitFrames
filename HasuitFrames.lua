@@ -2840,7 +2840,10 @@ function hasuitSpellFunction_Cleu_InterruptCooldownReductionSolarBeam() --solar 
     end
 end
 
-local hasuitVanish96 = hasuitVanish96
+local hasuitVanish96
+function hasuitLocal11(asd)
+    hasuitVanish96 = asd
+end
 function hasuitSpellFunction_Cleu_AppliedCooldownReductionThiefsBargain354827() --might reuse for other stuff later
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]

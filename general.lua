@@ -282,6 +282,8 @@ initialize(378441) --time stop (friendly buff)
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=-72,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1]} --BIG BUFFS ___
 initialize(456574) --Cinder Nectar
 initialize(461063) --Quiet Contemplation --earthen drink racial
+initialize(466393) --Kaja'Cola? mana+health
+initialize(466394) --Kaja'Cola? health
 initialize(GetSpellName(216339)) --Drink
 initialize(GetSpellName(167152)) --Refreshment
 initialize(GetSpellName(216338)) --Food

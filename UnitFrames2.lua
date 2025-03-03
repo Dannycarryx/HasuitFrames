@@ -116,6 +116,7 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function()
     -- arenaUnitFrames.setSizesAndSetPoints = function()end
     arenaUnitFrames.setSizesAndSetPoints = arenaPositionsCheckCombat
     arenaUnitFrames.sort = function()end
+    arenaUnitFrames.onPositionsUpdated = {} --array of custom functions, meant to update /cast [@party1]ability macros or nameplate numbers or whatever else after unitFrames move around
     
     
     groupColoredBackgroundMinimum = savedUserOptions["groupColoredBackgroundMinimum"]
@@ -1219,6 +1220,7 @@ function danHideUnitFrame2(frame)
         end
         frame.arenaNumber = nil
         frame.diminishIcons = nil
+        frame.customArenaPriority = nil
     end
     frame.specId = nil
     frame.cooldowns = nil
@@ -1484,7 +1486,12 @@ end
 do
     local UnitPowerType = UnitPowerType
     local PowerBarColor = PowerBarColor
-    PowerBarColor["POWER_TYPE_FOCUS"] = PowerBarColor["FOCUS"] --for delves because UnitPowerType returns POWER_TYPE_FOCUS for brann instead of FOCUS
+    local blizzard = {}
+    for k, v in pairs(PowerBarColor) do
+        blizzard[k] = v
+    end
+    -- PowerBarColor["POWER_TYPE_FOCUS"] = PowerBarColor["FOCUS"] --for delves because UnitPowerType returns POWER_TYPE_FOCUS for brann instead of FOCUS
+    blizzard["POWER_TYPE_FOCUS"] = PowerBarColor["FOCUS"] --started causing like 100 errors per second if doing the other way in 11.1, in delves only. POWER_TYPE_FOCUS still doesn't exist in the main table
     function danFullPowerUpdate(powerBar, unit)
         powerBar:SetMinMaxValues(0, UnitPowerMax(unit))
         powerBar:SetValue(UnitPower(unit))
@@ -1492,7 +1499,7 @@ do
         if not powerType then
             return
         end
-        local color = PowerBarColor[powerType]
+        local color = blizzard[powerType]
         powerBar:SetStatusBarColor(color.r, color.g, color.b)
         return true
     end
@@ -1871,6 +1878,10 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
                     macroTargetFrame:SetAttribute("unit", unit)
                     _G["hff"..i]:SetAttribute("unit", unit)
                 end
+            end
+            local onPositionsUpdated = arenaUnitFrames.onPositionsUpdated
+            for i=1,#onPositionsUpdated do
+                onPositionsUpdated[i]()
             end
         end
         -- for i=1,5 do
@@ -2436,12 +2447,8 @@ do --groupUnitFrames.setSizesAndSetPoints
             return a.priority<b.priority
         end
         
-        if hasuitClassPriorities~=_G["hasuitClassPriorities"] then
-            hasuitClassPriorities = _G["hasuitClassPriorities"]
-        end
-        if hasuitRolePriorities~=_G["hasuitRolePriorities"] then
-            hasuitRolePriorities = _G["hasuitRolePriorities"]
-        end
+        hasuitClassPriorities = _G["hasuitClassPriorities"]
+        hasuitRolePriorities = _G["hasuitRolePriorities"]
         
         hasuitSetScriptTestGroupRosterUpdateFunction()
         danUpdateGroupUnitFrames()
@@ -2482,6 +2489,7 @@ do --groupUnitFrames.setSizesAndSetPoints
             end
             
             hasuitPlayerFrame.partyNumber = 0
+            hasuitPlayerFrame.priority = 0
             
             sort(groupUnitFrames, partySort)
         else
@@ -2503,6 +2511,8 @@ do --groupUnitFrames.setSizesAndSetPoints
             -- hasuitDoThis_AfterCombat(danUpdateGroupPositions)
         -- end
     end
+    
+    groupUnitFrames.onPositionsUpdated = {} --array of custom functions, meant to update /cast [@party1]ability macros or nameplate numbers or whatever else after unitFrames move around
 end
 
 local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
@@ -3843,6 +3853,11 @@ do
             
             partyWasBroken = nil
             
+        end
+        
+        local onPositionsUpdated = groupUnitFrames.onPositionsUpdated
+        for i=1,#onPositionsUpdated do
+            onPositionsUpdated[i]()
         end
         
         if #hasuitDoThis_GroupUnitFramesUpdate_Positions_after>0 then

@@ -744,8 +744,9 @@ do
                 ["charges"]=2}
             hasuitVanish96 = {cleAura,["spellId"]=11327,    ["priority"]=22,    ["duration"]=96, --Vanish 96, switches to this if Thief's Bargain seen from the rogue
                 ["charges"]=2}
-                
-                
+            hasuitLocal11(hasuitVanish96)
+            
+            
             defensiveCooldowns["ROGUE"]={
                 {cdCle2,["spellId"]=31224,  ["priority"]=21,    ["duration"]=120},--Cloak of Shadows, todo [Bait and Switch]
                 hasuitVanish120, --Vanish, todo if they don't have subterfuge make it 1 charge for that rogue, todo make it possible to show same spellid twice? maybe this should be in offensive too for sub rogue because of the cd reduction
