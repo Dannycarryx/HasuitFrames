@@ -364,7 +364,7 @@ do
     local hasuitDoThis_Group_Roster_UpdateAlways = hasuitDoThis_Group_Roster_UpdateAlways
     local hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = hasuitDoThis_Group_Roster_UpdateGroupSizeChanged
     local danFrame = CreateFrame("Frame")
-    danFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
+    
     -- tinsert(hasuitDoThis_Addon_Loaded, 1, function() --was this
     tinsert(hasuitDoThis_Player_Login, function()
         for i=1,#hasuitDoThis_Group_Roster_UpdateGroupSizeChanged do
@@ -382,7 +382,7 @@ do
             hasuitDoThis_Group_Roster_UpdateAlways[i]()
         end
         
-        
+        danFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
         -- do
             -- local columnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
             -- tinsert(hasuitDoThis_Group_Roster_UpdateColumnsChanged.functions, 1, function()
