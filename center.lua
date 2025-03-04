@@ -1310,7 +1310,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitRolePriorities = nil
         hasuitClassPriorities = nil
         
-        
+        hasuitHideInactiveFrames = nil
         
         
         

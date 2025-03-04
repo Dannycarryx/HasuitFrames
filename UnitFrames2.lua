@@ -1875,11 +1875,20 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
             raidFrameHeightForGroupSize = hasuitRaidFrameHeightForGroupSize
         end
         function updateArenaPositionsMain()
+            if #arenaUnitFrames>3 then --can break in shuffle with custom sort, only happens when there are briefly 4+ arena units in between shuffle rounds?, couldn't figure out exactly what was going wrong but this fixes it
+                hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
+                danHideInactiveFrames()
+                arenaUnitFrames.mainUnitTypeUpdateFunction()
+                return
+            end
+            
             local arenaWidthPlusTwo = raidFrameWidthForGroupSize[#arenaUnitFrames]+2
             local arenaHeightPlusTwo = raidFrameHeightForGroupSize[#arenaUnitFrames]+2
             local arenaHeightPlusThree = arenaHeightPlusTwo+1
             for i=1,#arenaUnitFrames do
-                local unit = arenaUnitFrames[i].unit
+                local unitFrame = arenaUnitFrames[i]
+                unitFrame.arenaNumber = i
+                local unit = unitFrame.unit
                 local button = hasuitButtonForUnit[unit]
                 button:SetSize(arenaWidthPlusTwo,arenaHeightPlusTwo)
                 button:SetPoint("TOP", UIParent, "CENTER", arenaX, arenaY-i*arenaHeightPlusThree)
@@ -3404,9 +3413,9 @@ end
 local function beginningOfUnitFrameUpdateSharedFunction(unitTable)
     local currentTime = GetTime()
     if unitTable.lastUpdateTime == currentTime then
-        if unitTable.attemptToUpdateCount<2 then
-            unitTable.attemptToUpdateCount = unitTable.attemptToUpdateCount+1
-        else
+        -- if unitTable.attemptToUpdateCount<2 then
+            -- unitTable.attemptToUpdateCount = unitTable.attemptToUpdateCount+1
+        -- else
             if not unitTable.timerActive then
                 unitTable.timerActive = true
                 unitTable.needsUpdate = true
@@ -3415,9 +3424,9 @@ local function beginningOfUnitFrameUpdateSharedFunction(unitTable)
                 end)
             end
             return true
-        end
+        -- end
     else
-        unitTable.attemptToUpdateCount = 0
+        -- unitTable.attemptToUpdateCount = 0
         unitTable.lastUpdateTime = currentTime
     end
     unitTable.needsUpdate = false
@@ -3474,11 +3483,11 @@ function danUpdateArenaUnitFrames()
             
             if not danCurrentFrame then
                 hasuitUnitFrameMakeHealthBarMain()
-                danCurrentFrame.arenaNumber = i
+                -- danCurrentFrame.arenaNumber = i
             else
                 if hasuitUnitFrameForUnit[danCurrentUnit]~=danCurrentFrame then
                     danUpdateExistingUnit()
-                    danCurrentFrame.arenaNumber = i
+                    -- danCurrentFrame.arenaNumber = i
                 end
                 
                 
@@ -3564,7 +3573,7 @@ function danHideInactiveFrames()
         end
     end
 end
-
+hasuitHideInactiveFrames = danHideInactiveFrames
 
 
 -- local hasuitDoThis_GroupUnitFramesUpdate_before = hasuitDoThis_GroupUnitFramesUpdate_before
@@ -3667,6 +3676,14 @@ function updateAllOtherUnits()
                 hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
             end
         end
+        
+        -- if arenaUnitFrames.needsUpdate and not arenaUnitFrames.timerActive then
+            -- print("arena needed update?")
+            -- danUpdateArenaUnitFrames()
+        -- elseif groupUnitFrames.needsUpdate and not groupUnitFrames.timerActive then
+            -- print("group needed update?")
+            -- danUpdateGroupUnitFrames()
+        -- end
     end
     
     
