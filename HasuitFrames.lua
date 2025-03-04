@@ -1568,11 +1568,11 @@ danBorderBackdrop = hasuit1PixelBorderBackdrop
 
 
 do
-    local danCurrentUnitFrameWidth
+    local danCurrentUnitFrameWidth = 1
     tinsert(hasuitDoThis_Group_Roster_UpdateWidthChanged.functions, function()
         danCurrentUnitFrameWidth = hasuitGlobal_RaidFrameWidth
     end)
-    local danCurrentUnitFrameHeight
+    local danCurrentUnitFrameHeight = 1
     tinsert(hasuitDoThis_Group_Roster_UpdateHeightChanged.functions, function()
         danCurrentUnitFrameHeight = hasuitGlobal_RaidFrameHeight
     end)

@@ -58,7 +58,7 @@ hasuitRaidSort = function(a,b) --group size greater than or equal to 6
     end
     
     
-    return a.priority<b.priority --copy paste of the main addon's party sort function
+    return a.priority<b.priority --copy paste of the main addon's raid sort function
 end
 
 

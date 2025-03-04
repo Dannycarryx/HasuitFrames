@@ -5,9 +5,7 @@ local hasuitPlayerGUID = hasuitPlayerGUID
 
 
 
-local manaBarHeight = 4
-local arenaWidth = hasuitRaidFrameWidthForGroupSize[3]
-local arenaHeight = hasuitRaidFrameHeightForGroupSize[3]
+local manaBarHeight = hasuitManaBarHeight
 
 
 
@@ -183,8 +181,6 @@ end)
 
 
 
-local frameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize
-local numColumnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
 
 local danGetHealthBar
 local unusedHealthBars = {}
@@ -1040,7 +1036,10 @@ do
     
     local danNumberOfGroupLines = 0
     local danNumberOfArenaLines = 0
-    local danLineWidth = hasuitRaidFrameWidthForGroupSize[3] --todo do something when useroptions can change size
+    local danLineWidth
+    function hasuitLocal14()
+        danLineWidth = hasuitRaidFrameWidthForGroupSize[3]
+    end
     function danMakeHealthBarTargetLine(unit, unitType) --target indicator healthbars in arena
         local line = danGetHealthBar()
         line:SetAlpha(0)
@@ -1093,11 +1092,14 @@ end
 
 
 
-local danCurrentUnitFrameWidth
-local danCurrentUnitFrameWidthPlus2
-local danCurrentUnitFrameWidthPlus3
+local danCurrentUnitFrameWidth = 1
+local danCurrentUnitFrameWidthPlus2 = 3
+local danCurrentUnitFrameWidthPlus3 = 4
 do
-    local frameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize --todo update group size/button stuff here
+    local frameWidthForGroupSize
+    function hasuitLocal12()
+        frameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize --todo update group size/button stuff here
+    end
     tinsert(hasuitDoThis_Group_Roster_UpdateWidthChanged.functions, 1, function()
         danCurrentUnitFrameWidth = frameWidthForGroupSize[danCurrentGroupSize]
         danCurrentUnitFrameWidthPlus2 = danCurrentUnitFrameWidth+2
@@ -1106,11 +1108,14 @@ do
     end)
 end
 
-local danCurrentUnitFrameHeight
-local danCurrentUnitFrameHeightPlus2
-local danCurrentUnitFrameHeightPlus3
+local danCurrentUnitFrameHeight = 1
+local danCurrentUnitFrameHeightPlus2 = 3
+local danCurrentUnitFrameHeightPlus3 = 4
 do
-    local frameHeightForGroupSize = hasuitRaidFrameHeightForGroupSize
+    local frameHeightForGroupSize
+    function hasuitLocal13()
+        frameHeightForGroupSize = hasuitRaidFrameHeightForGroupSize
+    end
     tinsert(hasuitDoThis_Group_Roster_UpdateHeightChanged.functions, 1, function()
         danCurrentUnitFrameHeight = frameHeightForGroupSize[danCurrentGroupSize]
         danCurrentUnitFrameHeightPlus2 = danCurrentUnitFrameHeight+2
@@ -1863,15 +1868,21 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
             end
         end
         
-        local arenaWidthPlusTwo = arenaWidth+2
-        local arenaHeightPlusTwo = arenaHeight+2
-        local arenaHeightasd = arenaHeightPlusTwo+1
+        local raidFrameWidthForGroupSize
+        local raidFrameHeightForGroupSize
+        function hasuitLocal15()
+            raidFrameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize
+            raidFrameHeightForGroupSize = hasuitRaidFrameHeightForGroupSize
+        end
         function updateArenaPositionsMain()
+            local arenaWidthPlusTwo = raidFrameWidthForGroupSize[#arenaUnitFrames]+2
+            local arenaHeightPlusTwo = raidFrameHeightForGroupSize[#arenaUnitFrames]+2
+            local arenaHeightPlusThree = arenaHeightPlusTwo+1
             for i=1,#arenaUnitFrames do
                 local unit = arenaUnitFrames[i].unit
                 local button = hasuitButtonForUnit[unit]
                 button:SetSize(arenaWidthPlusTwo,arenaHeightPlusTwo)
-                button:SetPoint("TOP", UIParent, "CENTER", arenaX, arenaY-i*arenaHeightasd)
+                button:SetPoint("TOP", UIParent, "CENTER", arenaX, arenaY-i*arenaHeightPlusThree)
                 
                 local macroTargetFrame = _G["hft"..i] --danclick arena
                 if macroTargetFrame then
@@ -1956,7 +1967,7 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
         danCurrentUnit = "player"
         danEnablePowerBar2()
     end)
-    
+    -- powerBar:SetHeight(manaBarHeight)
     
     
     local GetNumSubgroupMembers = GetNumSubgroupMembers
@@ -3744,6 +3755,17 @@ groupUnitFrames.mainUnitTypeUpdateFunction = danUpdateGroupUnitFrames
 
 
 do
+    local numColumnsForGroupSize
+    function hasuitLocal16()
+        numColumnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
+        if manaBarHeight~=hasuitManaBarHeight then
+            manaBarHeight = hasuitManaBarHeight
+            if hasuitPlayerFrame.powerBar then
+                hasuitPlayerFrame.powerBar:SetHeight(manaBarHeight)
+            end
+        end
+    end
+    
     -- local hasuitDoThis_GroupUnitFramesUpdate_Positions_before = hasuitDoThis_GroupUnitFramesUpdate_Positions_before
     local hasuitDoThis_GroupUnitFramesUpdate_Positions = hasuitDoThis_GroupUnitFramesUpdate_Positions
     local hasuitDoThis_GroupUnitFramesUpdate_Positions_after = hasuitDoThis_GroupUnitFramesUpdate_Positions_after

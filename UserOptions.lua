@@ -149,18 +149,24 @@ tinsert(hasuitDoThis_Addon_Loaded, 1, function()
         hasuitSavedUserOptions = savedUserOptions
     end
     
-    local currentVersion = 3
+    
+    local currentVersion = 4
     local savedVersion = savedUserOptions["version"] or 0
     if savedVersion~=currentVersion then
         savedUserOptions["version"] = currentVersion
         
         
-        
-        if savedVersion<3 then
+        if savedVersion<4 then
             tinsert(createOptionsPages, 1, function()
                 createPageBackground(150)
-                danCreateScrollFrame("Custom sorting has been added for both group and arena frames. Check the new customization folder in the HasuitFrames addon folder if interested. It includes automatic macro changing and nameplate number changing to match the way you sort. Read through the comments in the file to see how to set it up.")
+                danCreateScrollFrame("Custom unit frame sizes now added as well")
             end)
+            if savedVersion<3 then
+                tinsert(createOptionsPages, 1, function()
+                    createPageBackground(150)
+                    danCreateScrollFrame("Custom sorting has been added for both group and arena frames. Check the new customization folder in the HasuitFrames addon folder if interested. It includes automatic macro changing and nameplate number changing to match the way you sort. Read through the comments in the file to see how to set it up.")
+                end)
+            end
             SlashCmdList.HasuitFrames()
             
             

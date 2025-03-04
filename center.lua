@@ -312,31 +312,61 @@ local GetNumGroupMembers = GetNumGroupMembers
 do
     local danDoThisRelevantSizes = {}
     do
-        local function getDoThisSizeTable(danSizeTable)
-            local relevantGroupSizes = {functions={}}
+        local function getDoThisSizeTable2(mainTable, danSizeTable)
             local j = 1
             for i=1,#danSizeTable do
                 local relevantSize = danSizeTable[i]
                 repeat
-                    relevantGroupSizes[j] = relevantSize
+                    mainTable[j] = relevantSize
                     j = j+1
                 until j>relevantSize
             end
-            tinsert(danDoThisRelevantSizes, relevantGroupSizes)
-            return relevantGroupSizes
+            tinsert(danDoThisRelevantSizes, mainTable)
         end
-        hasuitDoThis_Group_Roster_UpdateWidthChanged =       getDoThisSizeTable({5,8,15,20,24,28,32,36,40}) --todo make this kind of thing work the same way on a table like hasuitRaidFrameWidthForGroupSize? might be nice when useroptions can change frame size and stuff
-        hasuitDoThis_Group_Roster_UpdateHeightChanged =      getDoThisSizeTable({8,10,15,40})
-        -- hasuitDoThis_Group_Roster_UpdateColumnsChanged =     getDoThisSizeTable({5,8,20,24,28,32,36,40})
-        hasuitDoThis_Group_Roster_UpdateGroupSize_5 =        getDoThisSizeTable({5,40})
-        hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 =      getDoThisSizeTable({5,8,40})
+        
+        local function getDoThisSizeTable1(mainTable, thing1)
+            local index = 1
+            local thing2 = {}
+            local currentValue1 = thing1[0]
+            for i=0,#thing1 do
+                local currentValue2 = thing1[i]
+                if currentValue1~=currentValue2 then
+                    currentValue1 = currentValue2
+                    thing2[index] = i-1
+                    index = index+1
+                end
+            end
+            thing2[index] = 40
+            getDoThisSizeTable2(mainTable, thing2)
+        end
+        tinsert(hasuitDoThis_Player_Login, function()
+            getDoThisSizeTable1(hasuitDoThis_Group_Roster_UpdateWidthChanged, hasuitRaidFrameWidthForGroupSize)
+            getDoThisSizeTable1(hasuitDoThis_Group_Roster_UpdateHeightChanged, hasuitRaidFrameHeightForGroupSize)
+            -- getDoThisSizeTable1(hasuitDoThis_Group_Roster_UpdateColumnsChanged, hasuitRaidFrameColumnsForGroupSize)
+            getDoThisSizeTable2(hasuitDoThis_Group_Roster_UpdateGroupSize_5, {5,40})
+            getDoThisSizeTable2(hasuitDoThis_Group_Roster_UpdateGroupSize_5_8, {5,8,40})
+            hasuitLocal12()
+            hasuitLocal13()
+            hasuitLocal14()
+            hasuitLocal15()
+            hasuitLocal16()
+        end)
+        hasuitDoThis_Group_Roster_UpdateWidthChanged =      {functions={}}
+        hasuitDoThis_Group_Roster_UpdateHeightChanged =     {functions={}}
+        hasuitDoThis_Group_Roster_UpdateGroupSize_5 =       {functions={}}
+        hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 =     {functions={}}
+        -- hasuitDoThis_Group_Roster_UpdateHeightChanged =      getDoThisSizeTable2({8,10,15,40})
+        ---- -- hasuitDoThis_Group_Roster_UpdateColumnsChanged =     getDoThisSizeTable2({5,8,20,24,28,32,36,40})
+        -- hasuitDoThis_Group_Roster_UpdateGroupSize_5 =        getDoThisSizeTable2({5,40})
+        -- hasuitDoThis_Group_Roster_UpdateGroupSize_5_8 =      getDoThisSizeTable2({5,8,40})
     end
     
     local hasuitDoThis_Group_Roster_UpdateAlways = hasuitDoThis_Group_Roster_UpdateAlways
     local hasuitDoThis_Group_Roster_UpdateGroupSizeChanged = hasuitDoThis_Group_Roster_UpdateGroupSizeChanged
     local danFrame = CreateFrame("Frame")
     danFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-    tinsert(hasuitDoThis_Addon_Loaded, 1, function() --ends up being #2 (for now?)
+    -- tinsert(hasuitDoThis_Addon_Loaded, 1, function() --was this
+    tinsert(hasuitDoThis_Player_Login, function()
         for i=1,#hasuitDoThis_Group_Roster_UpdateGroupSizeChanged do
             hasuitDoThis_Group_Roster_UpdateGroupSizeChanged[i]()
         end
@@ -447,7 +477,7 @@ end
     -- danFrame:RegisterEvent("CVAR_UPDATE")
 -- end
 
-
+hasuitManaBarHeight = 4
 hasuitRaidFrameWidthForGroupSize = { --hasuitDoThis_Group_Roster_UpdateWidthChanged
     [0]=114,
     114,--1
@@ -717,8 +747,8 @@ if groupSize == 0 then
     groupSize = 1
 end
 hasuitGlobal_GroupSize = groupSize
-hasuitGlobal_RaidFrameWidth = hasuitRaidFrameWidthForGroupSize[groupSize]
-hasuitGlobal_RaidFrameHeight = hasuitRaidFrameHeightForGroupSize[groupSize]
+-- hasuitGlobal_RaidFrameWidth = hasuitRaidFrameWidthForGroupSize[groupSize]
+-- hasuitGlobal_RaidFrameHeight = hasuitRaidFrameHeightForGroupSize[groupSize]
 -- hasuitGlobal_RaidFrameColumns = hasuitRaidFrameColumnsForGroupSize[groupSize]
 
 
@@ -1036,6 +1066,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitDoThis_Player_Target_Changed = nil
         hasuitUserOptionsOnChanged = nil
         
+        hasuitManaBarHeight = nil
         hasuitRaidFrameWidthForGroupSize = nil
         hasuitRaidFrameHeightForGroupSize = nil
         hasuitRaidFrameColumnsForGroupSize = nil
@@ -1296,6 +1327,11 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitLocal9 = nil
         hasuitLocal10 = nil
         hasuitLocal11 = nil
+        hasuitLocal12 = nil
+        hasuitLocal13 = nil
+        hasuitLocal14 = nil
+        hasuitLocal15 = nil
+        hasuitLocal16 = nil
         
         hasuitActiveScaleMultiplier = nil
         hasuitUninterruptibleBorderSize = nil
