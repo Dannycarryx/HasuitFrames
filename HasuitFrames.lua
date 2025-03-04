@@ -27,7 +27,7 @@ local danCurrentSpellOptionsCommon
 local removedAuraSharedFunction
 local updatedAuraSharedFunction
 
-local danUnitAuraIsFullUpdate
+local danUnitAuraIsFullUpdate = function()end
 -- hasuitSortExpirationTime
 local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 
@@ -339,6 +339,7 @@ do --pve stuff, todo put debuffs that player can dispel at a higher priority
     
     local danCommonPveUnitCast =        {["size"]=12,   ["hideCooldownText"]=true,  ["alpha"]=1}
     pveUnitCastSpellOptions =           {["priority"]=495,  ["group"]=danCommonPveUnitCast, ["loadOn"]=hasuitLoadOn_EnablePve}
+    
     
     tinsert(hasuitDoThis_Addon_Loaded, function()
         danCommonPveAura["controllerOptions"] = hasuitController_TopRight_TopRight
@@ -817,7 +818,7 @@ end)
 
 
 local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
-function danUnitAuraIsFullUpdate()
+local function danUnitAuraIsFullUpdateAsd()
     local unit = danCurrentFrame.unit
     local unitGUID = UnitGUID(unit)
     if unitGUID ~= danCurrentFrame.unitGUID then
@@ -885,8 +886,10 @@ function hasuitUnitAuraIsFullUpdate(frame)
 end
 
 
-
-
+function hasuitLocal17()
+    danUnitAuraIsFullUpdate = danUnitAuraIsFullUpdateAsd --error from this when creating hasuitPlayerFrame. Order of things got changed to make customization stuff
+    hasuitUnitAuraIsFullUpdate(hasuitPlayerFrame)
+end
 
 
 
