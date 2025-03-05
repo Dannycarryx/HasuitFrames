@@ -67,11 +67,43 @@ end
 
 
 
-for i=1,#hasuitPlayerFrame.diminishIcons do --DR icons on the bottom of player's frame
-    local diminishIcon = hasuitPlayerFrame.diminishIcons[i]
-    diminishIcon:ClearAllPoints()
-    diminishIcon:SetPoint("TOPRIGHT", hasuitPlayerFrame.border, "BOTTOMRIGHT", -1-(i-1)*24, -1)
-end
+--Player's DR icons follow whatever group frame is in first position and anchor on top of it:
+local lastAttachedFrame
+local playerDiminishIcons = hasuitPlayerFrame.diminishIcons
+tinsert(groupUnitFrames.onPositionsUpdated, function()
+    local currentFrame1 = groupUnitFrames[1]
+    if lastAttachedFrame~=currentFrame1 then
+        lastAttachedFrame = currentFrame1
+        for i=1,#playerDiminishIcons do
+            local diminishIcon = playerDiminishIcons[i]
+            diminishIcon:ClearAllPoints()
+            diminishIcon:SetPoint("BOTTOMRIGHT", currentFrame1.border, "TOPRIGHT", -1-(i-1)*24, 1)
+        end
+    end
+end)
+
+
+
+-- Player's DR icons follow whatever group frame is in last position and anchor below it:
+--[[
+local lastAttachedFrame
+local playerDiminishIcons = hasuitPlayerFrame.diminishIcons
+tinsert(groupUnitFrames.onPositionsUpdated, function()
+    local currentLastFrame = groupUnitFrames[#groupUnitFrames]
+    if lastAttachedFrame~=currentLastFrame then
+        lastAttachedFrame = currentLastFrame
+        for i=1,#playerDiminishIcons do
+            local diminishIcon = playerDiminishIcons[i]
+            diminishIcon:ClearAllPoints()
+            diminishIcon:SetPoint("TOPRIGHT", currentLastFrame.border, "BOTTOMRIGHT", -1-(i-1)*24, -1)
+        end
+    end
+end)
+--]]
+
+
+
+
 
 
 
@@ -96,31 +128,37 @@ end
 
 
 
-
--- example arena frames sorting healer on top, then melee classes, then ranged:
+-- example sorting player in middle: 
 --[[
-local hasuitClassPriorities = hasuitClassPriorities
-local hasuitSpecIsHealerTable = hasuitSpecIsHealerTable
-local sort = sort
-local function arenaSort(a,b)
-    return a.customArenaPriority<b.customArenaPriority
-end
-arenaUnitFrames.sort = function() --the macros to target arena frames 1-5 this way are    /click hft1   to   /click hft5   and the focus macros are   /click hff1   etc, also if you didn't know the macros to target group frames are   /click d1-1   to d5-1 and d1-4 to d5-4, 20 frames can be macroed in total. d5-1 would be the 5th group member in a normal party
-    for i=1,#arenaUnitFrames do
-        local unitFrame = arenaUnitFrames[i]
-        if not unitFrame.customArenaPriority then
-            local customArenaPriority = hasuitClassPriorities[unitFrame.unitClass] + unitFrame.id
-            local specId = unitFrame.specId
-            if specId and hasuitSpecIsHealerTable[specId] then --role doesn't work well for arena units so check spec to see if they're healer instead
-                customArenaPriority = customArenaPriority - 4000 --is healer so put that frame on the bottom. To put it on bottom you could do +4000 instead
+local tinsert = tinsert
+local tremove = tremove
+local repositionPlayerFrame = { --You can control which position the player frame will go for each group size. If you want it to work in raid too add   [6] = 3,   to this table beneath   [5] = 3,   etc, up to   [40] = 20,   (to be 20th position in a 40man raid)
+    [1] = 1,
+    [2] = 1,
+    [3] = 2,
+    [4] = 2,
+    [5] = 3,
+}
+local mainGroupSort = groupUnitFrames.sort
+groupUnitFrames.sort = function()
+    mainGroupSort()
+    local playerPosition = repositionPlayerFrame[#groupUnitFrames]
+    if playerPosition then
+        for i=1,#groupUnitFrames do
+            if groupUnitFrames[i]==hasuitPlayerFrame then
+                local playerFrame = tremove(groupUnitFrames, i)
+                tinsert(groupUnitFrames, playerPosition, playerFrame)
+                break
             end
-            unitFrame.customArenaPriority = customArenaPriority
         end
     end
-    
-    sort(arenaUnitFrames, arenaSort)
 end
 --]]
+
+
+
+
+
 
 
 
@@ -180,6 +218,39 @@ hasuitClassPriorities = { --less important: this also exists and this + role pri
 
 
 
+-- example arena frames sorting healer on top, then melee classes, then ranged:
+--[[
+local hasuitClassPriorities = hasuitClassPriorities
+local hasuitSpecIsHealerTable = hasuitSpecIsHealerTable
+local sort = sort
+local function arenaSort(a,b)
+    return a.customArenaPriority<b.customArenaPriority
+end
+arenaUnitFrames.sort = function() --the macros to target arena frames 1-5 this way are    /click hft1   to   /click hft5   and the focus macros are   /click hff1   etc, also if you didn't know the macros to target group frames are   /click d1-1   to d5-1 and d1-4 to d5-4, 20 frames can be macroed in total. d5-1 would be the 5th group member in a normal party
+    for i=1,#arenaUnitFrames do
+        local unitFrame = arenaUnitFrames[i]
+        if not unitFrame.customArenaPriority then
+            local customArenaPriority = hasuitClassPriorities[unitFrame.unitClass] + unitFrame.id
+            local specId = unitFrame.specId
+            if specId and hasuitSpecIsHealerTable[specId] then --role doesn't work well for arena units so check spec to see if they're healer instead
+                customArenaPriority = customArenaPriority - 4000 --is healer so put that frame on the bottom. To put it on bottom you could do +4000 instead
+            end
+            unitFrame.customArenaPriority = customArenaPriority
+        end
+    end
+    
+    sort(arenaUnitFrames, arenaSort)
+end
+--]]
+
+
+
+
+
+
+
+
+
 -- example changing cyclone @arena123 macros to always match the positions of the sorted arena frames: you should have macros named cyclone1 cyclone2 and cyclone3 for it to work, or however many you want. 
 -- If you only want a cyclone healer macro you could make one named cyclone1 and then use the healer on top sorting for arena frames
 -- This changes all instances of arena1, arena2, and arena3 in macros named cyclone1 2 or 3, so even things like /stopmacro [@arena1,noexists] will be changed
@@ -211,7 +282,9 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
             local previousUnit = resetMacrosOnLogin[j]
             
             
+            
             changeUnitsInMacro("cyclone"..i, previousUnit, currentUnit) --to add more macros just duplicate this line and the one below, and change "cyclone" to whatever other macro name you want, so for example you could make entangle1 entangle2 and entangle3 macros and duplicate this line and change "cyclone"..i to "entangle"..i
+            
             
             
         end
@@ -219,15 +292,16 @@ tinsert(hasuitDoThis_Player_Login, 1, function()
 end)
 tinsert(arenaUnitFrames.onPositionsUpdated, function()
     for i=1,#arenaUnitFrames do
-        local unitFrame = arenaUnitFrames[i]
-        local currentUnit = unitFrame.unit
-        if arenaUnits[i]~=currentUnit then
-            local previousUnit = arenaUnits[i]
-            if previousUnit then
+        local previousUnit = arenaUnits[i]
+        if previousUnit then
+            local currentUnit = arenaUnitFrames[i].unit
+            if previousUnit~=currentUnit and currentUnit then
                 arenaUnits[i] = currentUnit
                 
                 
+                
                 changeUnitsInMacro("cyclone"..i, previousUnit, currentUnit) --duplicate/change this too
+                
                 
                 
             end
@@ -235,7 +309,6 @@ tinsert(arenaUnitFrames.onPositionsUpdated, function()
     end
 end)
 --]]
-
 
 
 
@@ -268,7 +341,6 @@ local function changeUnitsInMacro(macroName, previousUnit, currentUnit)
     end
 end
 local resetMacrosOnLogin = {
-    "target",
     "player",
     "party%d*",
     "raid%d*",
@@ -280,7 +352,9 @@ tinsert(hasuitDoThis_Player_Login, 1, function() --because macros aren't loaded 
             local previousUnit = resetMacrosOnLogin[j]
             
             
+            
             changeUnitsInMacro("heal"..i, previousUnit, currentUnit) --to add more macros just duplicate this line and the one below, and change "heal" to whatever other macro name you want
+            
             
             
         end
@@ -288,15 +362,16 @@ tinsert(hasuitDoThis_Player_Login, 1, function() --because macros aren't loaded 
 end)
 tinsert(groupUnitFrames.onPositionsUpdated, function()
     for i=1,#groupUnitFrames do
-        local unitFrame = groupUnitFrames[i]
-        local currentUnit = unitFrame.unit
-        if partyUnits[i]~=currentUnit then
-            local previousUnit = partyUnits[i]
-            if previousUnit then
+        local previousUnit = partyUnits[i]
+        if previousUnit then
+            local currentUnit = groupUnitFrames[i].unit
+            if previousUnit~=currentUnit and currentUnit and currentUnit~="target" then
                 partyUnits[i] = currentUnit
                 
                 
+                
                 changeUnitsInMacro("heal"..i, previousUnit, currentUnit) --duplicate/change this too
+                
                 
                 
             end

@@ -1,8 +1,11 @@
 Take what you want from this folder and move it to the addons folder like any other addon.
 You can change things to be the way you want and not need to worry about an update overwriting what you did.
 
+
 HasuitFramesCustomSort will put player's frame on bottom if all you do is put it in the addons folder, but you can change it to sort any way you want.
 You can also change the way arena frames are sorted, as well as automatically change @arena123 macros or @party123 macros to match the frames after they get sorted and moved around.
-HasuitNameplates will change numbers to match the way you sort if you use it.
+HasuitNameplates will automatically change numbers to match the way you sort.
+The middle cast bars should also automatically match the sort.
+
 
 HasuitFramesCustomFrameSize does nothing until you uncomment/change things in it.

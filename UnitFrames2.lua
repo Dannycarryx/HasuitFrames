@@ -1830,6 +1830,13 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
             end
         end
         
+        local function onMouseDownMouseLook()
+            danOnUpdateMouseUpCheckFrame:SetScript("OnUpdate", danOnUpdateMouseUpCheck)
+            local mouseButtonClicked = GetMouseButtonClicked()
+            if mouseButtonClicked=="LeftButton" or mouseButtonClicked=="RightButton" then
+                MouselookStart() --this caused a major problem randomly on the first bg of the new patch. No idea why
+            end
+        end
         local RegisterUnitWatch = RegisterUnitWatch
         for i=1,#buttonUnits do
             local unit = buttonUnits[i]
@@ -1843,13 +1850,7 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
             button:SetAttribute("*type1", "target")
             button:SetAttribute("toggleForVehicle", true) --trying this out
             button:SetAttribute("unit", unit)
-            button:SetScript("OnMouseDown", function()
-                danOnUpdateMouseUpCheckFrame:SetScript("OnUpdate", danOnUpdateMouseUpCheck)
-                local mouseButtonClicked = GetMouseButtonClicked()
-                if mouseButtonClicked=="LeftButton" or mouseButtonClicked=="RightButton" then
-                    MouselookStart() --this caused a major problem randomly on the first bg of the new patch. No idea why
-                end
-            end)
+            button:SetScript("OnMouseDown", onMouseDownMouseLook)
             
             
             local RegisterAttributeDriver = RegisterAttributeDriver
@@ -1874,7 +1875,12 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
             raidFrameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize
             raidFrameHeightForGroupSize = hasuitRaidFrameHeightForGroupSize
         end
+        -- local IsBrawlSoloShuffle = C_PvP.IsBrawlSoloShuffle
+        -- local IsRatedSoloShuffle = C_PvP.IsRatedSoloShuffle
+        -- local IsSoloShuffle = C_PvP.IsSoloShuffle
         function updateArenaPositionsMain()
+            -- print(IsSoloShuffle(), IsRatedSoloShuffle(), IsBrawlSoloShuffle())
+            -- if #arenaUnitFrames>3 and IsSoloShuffle() then
             if #arenaUnitFrames>3 then --can break in shuffle with custom sort, only happens when there are briefly 4+ arena units in between shuffle rounds?, couldn't figure out exactly what was going wrong but this fixes it
                 hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
                 danHideInactiveFrames()
