@@ -146,27 +146,27 @@ do --hasuitTempSwiftmend
 end
 --]]
 
---[[
-do
-    local max = 0
-    function hasuitSpellFunction_Cleu_TestingHealingNumbers()
-        if d2anCleuSubevent=="SPELL_PERIODIC_HEAL" or d2anCleuSubevent=="SPELL_HEAL" then
-        -- if d2anCleuSubevent=="SPELL_HEAL" then
-            if type(d15anCleuOther)~="number" then
-                print(hasuitRed2, (d15anCleuOther), d13anCleuSpellName..d12anCleuSpellId)
-            else
-                local amount = d18anCleuOther and d15anCleuOther/1.5 or d15anCleuOther
-                amount = amount-amount%1
+-- [[
+-- do
+    -- local max = 0
+    -- function hasuitSpellFunction_Cleu_TestingHealingNumbers()
+        -- if d2anCleuSubevent=="SPELL_PERIODIC_HEAL" then
+            -- if type(d15anCleuOther)~="number" then
+                -- print(hasuitRed2, (d15anCleuOther), d13anCleuSpellName..d12anCleuSpellId)
+            -- else
+                -- local amount = d18anCleuOther and d15anCleuOther/1.5 or d15anCleuOther
+                -- amount = amount-amount%1
                 -- if max<amount then
                     -- max = amount
-                    -- print("new max:", amount, d13anCleuSpellName)
+                    -- print(hasuitGreen, "new max", amount) --string.format("%.1f", total/danCount)
+                -- else
+                    -- print(amount)
                 -- end
                 
-                print(amount, d13anCleuSpellName)
-            end
-        end
-    end
-end
+            -- end
+        -- end
+    -- end
+-- end
 --]]
 
 
@@ -1808,7 +1808,18 @@ hasuitSpellFunction_Aura_Points2Required = addMultiFunction(function()
     end
 end)
 
-
+-- do
+    -- local GetUnitBuffByAuraInstanceID = C_TooltipInfo.GetUnitBuffByAuraInstanceID
+    -- local GetUnitDebuffByAuraInstanceID = C_TooltipInfo.GetUnitDebuffByAuraInstanceID
+    -- hasuitSpellFunction_Aura_KeepingCalm = addMultiFunction(function() --nvm wasn't needed. I forgot to reset info in my data collection addon and thought ring of fire could either be a disorient or a dot, and there are no points or anything for it. This might be useful for something some time though. --I'm not sure if tooltip info is available immediately. In my data collection addon it still does stuff with IsSpellDataCached(spellId) and RequestLoadSpellData(spellId), but who knows
+        -- local unit = danCurrentFrame.unit
+        -- local tooltip = danCurrentAura["isHelpful"] and GetUnitBuffByAuraInstanceID(unit, danCurrentAura["auraInstanceID"]) or GetUnitDebuffByAuraInstanceID(unit, danCurrentAura["auraInstanceID"])
+        -- local tooltipText = tooltip["lines"] and tooltip["lines"][2] and tooltip["lines"][2]["leftText"]
+        -- if tooltipText==danCurrentSpellOptions["tooltip"] then --would need string.match or gsub or something instead of this
+            -- danMainAuraFunction()
+        -- end
+    -- end)
+-- end
 
 
 --[[ --todo

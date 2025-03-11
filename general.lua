@@ -407,6 +407,7 @@ initializeMultiPlusDiminish(82691) --Ring of Frost, no cast
 
 hasuitSetupSpellOptionsMulti[3] = hasuitBigRedMiddleCastBarsSpellOptions
 initializeMulti(113724, 3) --Ring of Frost cast
+initializeMulti(353082, 3) --Ring of Fire cast
 initializeMultiPlusDiminish(GetSpellName(277784)) --Hex
 hasuitSetupSpellOptionsMulti[3] = nil
 
@@ -436,6 +437,7 @@ initializeMultiPlusDiminish(5484) --Howl of Terror, nightmare?
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=-57,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[2], ["arena"]=danCommonBigBottomLeftArena[2]} --CC can break any damage
 initializePlusDiminish(31661) --Dragon's Breath
+initializePlusDiminish(353084) --Ring of Fire, disorient+dot, not sure this is the right dr type
 initializePlusDiminish(105421) --Blinding Light
 initializePlusDiminish(205364) --Dominate Mind
 initializePlusDiminish(427773) --Blind
@@ -714,7 +716,7 @@ initialize(196555) --Netherwalk
 initialize(186265) --Aspect of the Turtle
 initialize(409293) --Burrow
 initialize(408558) --Phase Shift
-
+initialize(1221107) --Overpowered Barrier, immune to all damage for 3 sec, also invisibility
 
 
 
@@ -760,6 +762,7 @@ hasuitSetupSpellOptionsMulti = {
 }
 initializeMulti(421453) --Ultimate Penitence absorb(cc immunity?) todo improve this since basing this on the absorb buff isn't perfect
 initializeMulti(382440) --Shifting Power, not as important as ultimate penitence but has the same look atm, both are hybrid offensive abilities i guess and cs coming up early can be stronger or weaker than ultimate penitence so idk
+initializeMulti(473909) --Ancient of Lore
 -- initialize(436358) --Demolish, immune to stuns/knockbacks? todo there's no unit_aura for this. it gets cleu applied though for some reason, along with channel start and cast success
 -- initialize("Adaptation") --adapted is the debuff, todo maybe? no unitaura for this
 initialize(354610) --glimpse
@@ -839,9 +842,11 @@ initialize(403876) --Divine Protection
 initialize(389539) --Sentinel
 -- initialize("Eye for an Eye") --?, doesn't exist anymore?
 initialize(55233) --Vampiric Blood
+initialize(1221106) --Overpowered Barrier, can be activated with blink/shimmer, todo make cooldown of that affect this icon?
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=-2,                    ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonBigBottomLeftArenaDefensivesSize25}
-initialize(454863) --Lesser Anti-Magic Shell --30% partial_cc reduction 
+initialize(454863) --Lesser Anti-Magic Shell --30% partial_cc reduction
+initialize(1219209) --Berserker Roar, 50% shorter next cc
 
 
 
@@ -1367,7 +1372,6 @@ initialize(390612) --Frost Bomb
 initialize(5143) --Arcane Missiles
 initialize(198013) --Eye Beam --todo eye beam causes 2 channel start events on the same frame and no cleu cast event. will need a significant change to the setup to get this to not show 2
 initialize(212084) --Fel Devastation, channel
-initialize(353082) --Ring of Fire
 initialize(113656) --Fists of Fury, channel --todo track Heavy-Handed Strikes 100% parry buff
 -- initialize("Rune of Power") --?, Rune of Power, don't think this exists anymore?
 initialize(324536) --Malefic Rapture, todo proper targets inc icon
@@ -1618,7 +1622,6 @@ hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priori
 initialize(391889) --adaptive swarm dot
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=265,                   ["group"]=danCommonTopRightGroupDebuffs[4], ["arena"]=danCommonTopLeftArenaDebuffs[4],}
-initialize(353084) --Ring of Fire
 initialize(114923) --Nether Tempest
 initialize(589) --Shadow Word: Pain
 initialize(204213) --Purge the Wicked

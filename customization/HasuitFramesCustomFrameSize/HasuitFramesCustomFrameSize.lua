@@ -2,6 +2,7 @@
 
 
 -- The point is to overwrite/change things from the main addon. You can control width/height/columns for every group size here.
+-- If you change anything below it'll affect both group and arena frames
 
 -- Things in between --[[ and --]] are commented out. To uncomment/enable something you could just put a space in between -- and [[
 

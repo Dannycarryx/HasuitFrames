@@ -1722,7 +1722,7 @@ end
 
 
 
-
+local highestArenaNumberSeen = 0
 
 local _G = _G
 
@@ -1875,15 +1875,19 @@ tinsert(hasuitDoThis_Addon_Loaded, function()
             raidFrameWidthForGroupSize = hasuitRaidFrameWidthForGroupSize
             raidFrameHeightForGroupSize = hasuitRaidFrameHeightForGroupSize
         end
-        -- local IsBrawlSoloShuffle = C_PvP.IsBrawlSoloShuffle
-        -- local IsRatedSoloShuffle = C_PvP.IsRatedSoloShuffle
-        -- local IsSoloShuffle = C_PvP.IsSoloShuffle
+        local IsSoloShuffle = C_PvP.IsSoloShuffle
         function updateArenaPositionsMain()
-            -- print(IsSoloShuffle(), IsRatedSoloShuffle(), IsBrawlSoloShuffle())
-            -- if #arenaUnitFrames>3 and IsSoloShuffle() then
-            if #arenaUnitFrames>3 then --can break in shuffle with custom sort, only happens when there are briefly 4+ arena units in between shuffle rounds?, couldn't figure out exactly what was going wrong but this fixes it
+            if #arenaUnitFrames>3 and IsSoloShuffle() then --can break in shuffle with custom sort, only happens when there are briefly 4+ arena units in between shuffle rounds?, couldn't figure out exactly what was going wrong but this fixes it --nvm still saw it break once? But this fixes it most of the time
+                
+                if #arenaUnitFrames>highestArenaNumberSeen then
+                    highestArenaNumberSeen = #arenaUnitFrames
+                end
+                
+                
                 hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
                 danHideInactiveFrames()
+                
+                
                 arenaUnitFrames.mainUnitTypeUpdateFunction()
                 return
             end
@@ -3467,6 +3471,10 @@ function danUpdateArenaUnitFrames()
     
     changeUnitTypeColorBackgrounds(arenaColoredBackgroundMinimum>0 and numArenaOpponents>=arenaColoredBackgroundMinimum)
     
+    if numArenaOpponents>highestArenaNumberSeen then
+        highestArenaNumberSeen = numArenaOpponents
+    end
+    
     for i=1, numArenaOpponents do
         danCurrentArenaSpec = GetArenaOpponentSpec(i)
         danCurrentUnit = "arena"..i
@@ -3663,12 +3671,17 @@ function updateAllOtherUnits()
     
     if hasuitGlobal_InstanceType=="arena" then --arenaLines
         local unitType = "group"
-        for i=2,#groupUnitFrames do
-            local unit = groupUnitFrames[i].unit
-            if not hasuitHealthBarTargetLinesForUnits[unit] then
-                danMakeHealthBarTargetLine(unit, unitType)
-            else
-                hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
+        for i=1,#groupUnitFrames do
+            local unitFrame = groupUnitFrames[i]
+            if unitFrame~=hasuitPlayerFrame then
+                local unit = unitFrame.unit
+                if not hasuitHealthBarTargetLinesForUnits[unit] then
+                    danMakeHealthBarTargetLine(unit, unitType)
+                else
+                    hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
+                end
+                
+                unitFrame:SetAlpha(1) --trying a bandaid fix for something that happens pretty rarely. I kind of want to remake a bunch of stuff. This file is terrible --I ended up making a new system to keep track of units in another random addon i made that seems like it might work well and be way more simple. Will work on that for this addon some time
             end
         end
         
@@ -4341,12 +4354,17 @@ danArenaUpdateFrame:SetScript("OnEvent", updateArena)
 
 hasuitLocal10(function() --arenaEndedFunction
     firstSeen = nil
+    
+    
+    for i=1,highestArenaNumberSeen do
+        hasuitUnitFrameForUnit["arena"..i] = nil
+    end
+    highestArenaNumberSeen = 0
+    
+    
     hasuitFrameTypeUpdateCount["arena"] = hasuitFrameTypeUpdateCount["arena"]+1
-    -- for i=1,#arenaUnitFrames do
-        -- hasuitUnitFrameForUnit["arena"..i] = nil
-        -- hasuitUnitFrameForUnit[arenaUnitFrames[i].unit] = nil
-    -- end
     danHideInactiveFrames()
+    
     
     danHideTargetLines()
     

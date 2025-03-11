@@ -73,6 +73,7 @@ initialize(439530)  --Symbiotic Blooms
 initialize(391891)  --adaptive swarm
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_5["group"]} 
+-- initialize(200389)  --cult
 initialize(468152)  --Reactive Resin
 
 local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=10,["alpha"]=1,    ["hideCooldownText"]=true}
@@ -112,15 +113,16 @@ initialize(391889)  --Adaptive Swarm dot
 --[[
 hasuitFramesCenterSetEventType("cleu")
 hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_TestingHealingNumbers}
--- initialize(774) --
+initialize(774) --
 -- initialize(155777) --germ
 -- initialize(188550)  --lifebloom
 -- initialize(33763) --lifebloom
 -- initialize(422090) --treant nourish
 -- initialize(8936) --regr
 -- initialize(50464) --Nourish proc
-initialize(5176) --Wrath
-initialize(190984)--Wrath
+-- initialize(5176) --Wrath
+-- initialize(190984)--Wrath
+-- initialize(474683)--Aessina's Renewal
 hasuitFramesCenterSetEventType("aura")
 --]]
 

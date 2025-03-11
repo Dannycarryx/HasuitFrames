@@ -68,37 +68,31 @@ end
 
 
 --Player's DR icons follow whatever group frame is in first position and anchor on top of it:
-local lastAttachedFrame
+local lastAttachedButton
 local playerDiminishIcons = hasuitPlayerFrame.diminishIcons
+local hasuitButtonForUnit = hasuitButtonForUnit
 tinsert(groupUnitFrames.onPositionsUpdated, function()
-    local currentFrame1 = groupUnitFrames[1]
-    if lastAttachedFrame~=currentFrame1 then
-        lastAttachedFrame = currentFrame1
+    local button1 = hasuitButtonForUnit[groupUnitFrames[1].unit] --not important to read: button1 is guaranteed to stay still until the next groupUnitFrames.onPositionsUpdated, so attach to that instead of the unitFrame which can hop to a different button if its unit changes, even in combat
+    if lastAttachedButton~=button1 then
+        lastAttachedButton = button1
         for i=1,#playerDiminishIcons do
             local diminishIcon = playerDiminishIcons[i]
             diminishIcon:ClearAllPoints()
-            diminishIcon:SetPoint("BOTTOMRIGHT", currentFrame1.border, "TOPRIGHT", -1-(i-1)*24, 1)
+            diminishIcon:SetPoint("BOTTOMRIGHT", button1, "TOPRIGHT", -1-(i-1)*24, 1)
         end
     end
 end)
 
 
 
--- Player's DR icons follow whatever group frame is in last position and anchor below it:
+-- Example player's DR icons anchored below player frame (only good if you sort player last, can overlap other frames if player isn't last)
+-- Pick either this or the one above, or neither are needed if player is always sorted on top. (Or do your own thing like anchoring to UIParent instead of hasuitPlayerFrame.border and putting them on the topleft of the screen like I used to do. To test them you could put diminishIcon:SetAlpha(1) below diminishIcon:SetPoint
 --[[
-local lastAttachedFrame
-local playerDiminishIcons = hasuitPlayerFrame.diminishIcons
-tinsert(groupUnitFrames.onPositionsUpdated, function()
-    local currentLastFrame = groupUnitFrames[#groupUnitFrames]
-    if lastAttachedFrame~=currentLastFrame then
-        lastAttachedFrame = currentLastFrame
-        for i=1,#playerDiminishIcons do
-            local diminishIcon = playerDiminishIcons[i]
-            diminishIcon:ClearAllPoints()
-            diminishIcon:SetPoint("TOPRIGHT", currentLastFrame.border, "BOTTOMRIGHT", -1-(i-1)*24, -1)
-        end
-    end
-end)
+for i=1,#hasuitPlayerFrame.diminishIcons do
+    local diminishIcon = hasuitPlayerFrame.diminishIcons[i]
+    diminishIcon:ClearAllPoints()
+    diminishIcon:SetPoint("TOPRIGHT", hasuitPlayerFrame.border, "BOTTOMRIGHT", -1-(i-1)*24, -1)
+end
 --]]
 
 
@@ -233,7 +227,7 @@ arenaUnitFrames.sort = function() --the macros to target arena frames 1-5 this w
             local customArenaPriority = hasuitClassPriorities[unitFrame.unitClass] + unitFrame.id
             local specId = unitFrame.specId
             if specId and hasuitSpecIsHealerTable[specId] then --role doesn't work well for arena units so check spec to see if they're healer instead
-                customArenaPriority = customArenaPriority - 4000 --is healer so put that frame on the bottom. To put it on bottom you could do +4000 instead
+                customArenaPriority = customArenaPriority - 4000 --is healer so put that frame on the top. To put it on bottom you could do +4000 instead
             end
             unitFrame.customArenaPriority = customArenaPriority
         end
