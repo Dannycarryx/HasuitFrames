@@ -594,7 +594,7 @@ initializeMultiPlusDiminish(228600) --Glacial Spike
 hasuitSetupSpellOptions = rootAuraSpellOptions2 --roots don't break or instantly break
 initializePlusDiminish(114404) --Void Tendril's Grasp, todo track the relevant void tendril's health instead of normal cc break threshold?
 initializePlusDiminish(212638) --Tracker's Net --says any damage breaks it? somehow only seen once
-initializePlusDiminish(451517) --Catch Out, hunter, no broken subevents, When a target affected by Sentinel deals damage to you, they are rooted for 3 sec. May only occur every 1 min per target.
+initialize(451517) --Catch Out, hunter, Sentinel, doesn't break
 initialize(105771) --charge, no dr
 initialize(370970) --the hunt
 initialize(190925) --Harpoon

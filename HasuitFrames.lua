@@ -3067,8 +3067,10 @@ hasuitSpellFunction_Cleu_SuccessCooldownStartPvPTrinket = addMultiFunction(funct
                     if danCurrentIcon then
                         local newExpirationTime = GetTime()+t["minimumDuration"]
                         if not danCurrentIcon.expirationTime or danCurrentIcon.expirationTime<newExpirationTime then
+                            local spellId2 = d12anCleuSpellId
                             d12anCleuSpellId = spellId
                             danCleuCooldownStart(t["differenceFromNormalDuration"])
+                            d12anCleuSpellId = spellId2
                         end
                     end
                 end
@@ -3091,8 +3093,10 @@ hasuitSpellFunction_Cleu_AppliedCooldownStartRacial = addMultiFunction(function(
                     if currentPvpTrinketSpellId==336126 or currentPvpTrinketSpellId==42292 then
                         local newExpirationTime = GetTime()+danCurrentSpellOptions["minimumDuration"]
                         if not danCurrentIcon.expirationTime or danCurrentIcon.expirationTime<newExpirationTime then
+                            local spellId2 = d12anCleuSpellId
                             d12anCleuSpellId = currentPvpTrinketSpellId
                             danCleuCooldownStart(danCurrentSpellOptions["differenceFromNormalDuration"])
+                            d12anCleuSpellId = spellId2
                         end
                     end
                 end
@@ -3110,8 +3114,10 @@ hasuitSpellFunction_Cleu_AppliedRacialNotTrackedAffectingPvpTrinket = addMultiFu
                 if currentPvpTrinketSpellId==336126 or currentPvpTrinketSpellId==42292 then
                     local newExpirationTime = GetTime()+danCurrentSpellOptions["minimumDuration"]
                     if not danCurrentIcon.expirationTime or danCurrentIcon.expirationTime<newExpirationTime then
+                        local spellId2 = d12anCleuSpellId
                         d12anCleuSpellId = currentPvpTrinketSpellId
                         danCleuCooldownStart(danCurrentSpellOptions["differenceFromNormalDuration"])
+                        d12anCleuSpellId = spellId2
                     end
                 end
             end

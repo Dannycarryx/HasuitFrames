@@ -113,7 +113,17 @@ tinsert(hasuitDoThis_UserOptionsLoaded, function()
     userOptionsOnChanged["arenaY"] = arenaPositionsFromOptions
     -- arenaUnitFrames.setSizesAndSetPoints = function()end
     arenaUnitFrames.setSizesAndSetPoints = arenaPositionsCheckCombat
-    arenaUnitFrames.sort = function()end
+    
+    
+    local sort = sort
+    local function arenaSort(a,b)
+        return a.unit<b.unit
+    end
+    arenaUnitFrames.sort = function()
+        sort(arenaUnitFrames, arenaSort)
+    end
+    
+    
     arenaUnitFrames.onPositionsUpdated = {} --array of custom functions, meant to update /cast [@party1]ability macros or nameplate numbers or whatever else after unitFrames move around
     
     
