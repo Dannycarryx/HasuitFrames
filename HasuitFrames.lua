@@ -3531,8 +3531,12 @@ function hasuitSpecialAuraFunction_SoulHots() --one of the very first things mad
     end
 end
 
+
 local danSoulTime = {}
 local danSoulAbility = {}
+local sourceSoulGainedTime = {}
+local sourceSoulLostTime = {}
+local sourceSoulOvergrowthTime = {}
 local sourceHasSoul = {}
 hasuitFramesCenterSetEventType("cleu")
 function hasuitSpellFunction_Cleu_SoulEmpoweredHots1()
@@ -3544,16 +3548,33 @@ function hasuitSpellFunction_Cleu_SoulEmpoweredHots1()
     if d2anCleuSubevent == "SPELL_CAST_SUCCESS" then
         if sourceHasSoul[d4anCleuSourceGuid] then
             danSoulTime[d4anCleuSourceGuid] = currentTime
-            danSoulAbility[d4anCleuSourceGuid] = d12anCleuSpellId
+            if d12anCleuSpellId~=203651 then
+                danSoulAbility[d4anCleuSourceGuid] = d12anCleuSpellId
+            end
+        elseif d12anCleuSpellId==203651 and sourceSoulLostTime[d4anCleuSourceGuid]==currentTime then
+            sourceSoulOvergrowthTime[d4anCleuSourceGuid] = currentTime
         end
     elseif d2anCleuSubevent == "SPELL_AURA_APPLIED" or d2anCleuSubevent=="SPELL_AURA_REFRESH" then
+        local found
         local danSoulTime = danSoulTime[d4anCleuSourceGuid]
-        if danSoulTime and danSoulTime+0.5>=currentTime and danSoulAbility[d4anCleuSourceGuid]==d12anCleuSpellId or d4anCleuSourceGuid==d8anCleuDestGuid and sourceHasSoul[d4anCleuSourceGuid] then
+        local sourceSoulGainedTime = sourceSoulGainedTime[d4anCleuSourceGuid]
+        if sourceHasSoul[d4anCleuSourceGuid] and sourceSoulGainedTime and sourceSoulGainedTime~=currentTime then
+            found = true
+        elseif danSoulTime and danSoulTime+0.5>=currentTime and danSoulAbility[d4anCleuSourceGuid]==d12anCleuSpellId and sourceSoulGainedTime and sourceSoulGainedTime~=currentTime then
+            if d12anCleuSpellId==774 or d12anCleuSpellId==155777 then
+                danSoulAbility[d4anCleuSourceGuid] = nil
+            end
+            found = true
+        elseif (d12anCleuSpellId==774 or d12anCleuSpellId==155777) and (sourceSoulOvergrowthTime[d4anCleuSourceGuid] or 0)+0.5>=currentTime then
+            sourceSoulOvergrowthTime[d4anCleuSourceGuid] = nil
+            found = true
+        end
+        
+        if found then
             if not activeSoulHots[d4anCleuSourceGuid] then
                 activeSoulHots[d4anCleuSourceGuid] = {}
             end
             activeSoulHots[d4anCleuSourceGuid][d8anCleuDestGuid..d12anCleuSpellId] = currentTime
-            
         else
             if activeSoulHots[d4anCleuSourceGuid] and activeSoulHots[d4anCleuSourceGuid][d8anCleuDestGuid..d12anCleuSpellId] then
                 activeSoulHots[d4anCleuSourceGuid][d8anCleuDestGuid..d12anCleuSpellId] = nil
@@ -3566,11 +3587,14 @@ initialize(8936) --regrowth
 initialize(774) --rejuvenation
 initialize(155777) --germination
 initialize(48438) --wild growth
+initialize(203651) --Overgrowth
 
 function hasuitSpellFunction_Cleu_SoulEmpoweredHots2()
     if d2anCleuSubevent == "SPELL_AURA_APPLIED" then
+        sourceSoulGainedTime[d4anCleuSourceGuid] = GetTime()
         sourceHasSoul[d4anCleuSourceGuid] = true
     elseif d2anCleuSubevent == "SPELL_AURA_REMOVED" then --todo do something about unit becoming unseen and losing soul? might work itself out after remaking soul stuff
+        sourceSoulLostTime[d4anCleuSourceGuid] = GetTime()
         sourceHasSoul[d4anCleuSourceGuid] = nil
     end
 end
@@ -3580,6 +3604,11 @@ initialize(114108) --soul of the forest
 
 local soulLoadingFrame = CreateFrame("Frame")
 soulLoadingFrame:SetScript("OnEvent", function(_, event) --todo
+    danSoulTime = {}
+    danSoulAbility = {}
+    sourceSoulGainedTime = {}
+    sourceSoulLostTime = {}
+    sourceSoulOvergrowthTime = {}
     sourceHasSoul = {}
     -- if event=="LOADING_SCREEN_ENABLED" then
         -- for sourceGUID, hasSoul in pairs(sourceHasSoul) do
