@@ -682,11 +682,12 @@ end
 
 
 
-
 local lastEventId
-local hasuitUnitAuraFrame = CreateFrame("Frame")
-hasuitUnitAuraFrame:RegisterEvent("UNIT_AURA")
-hasuitUnitAuraFrame:SetScript("OnEvent", function(_, _, unit, auraTable)
+-- local hasuitUnitAuraFrame = CreateFrame("Frame")
+-- hasuitUnitAuraFrame:RegisterEvent("UNIT_AURA")
+-- hasuitUnitAuraFrame:SetScript("OnEvent", function(_, _, unit, auraTable)
+hasuitUnitAuraFunction = function(_, _, unit, auraTable)
+-- hasuitUnitEventFunctions["UNIT_AURA"] = function(unit, unitFrame, auraTable)
     local currentEventId = GetCurrentEventID()
     if lastEventId == currentEventId then
         return
@@ -694,7 +695,8 @@ hasuitUnitAuraFrame:SetScript("OnEvent", function(_, _, unit, auraTable)
     lastEventId = currentEventId
     
     
-    danCurrentFrame = hasuitUnitFrameForUnit[unit]
+    danCurrentFrame = hasuitUnitFrameForUnit[UnitGUID(unit)]
+    -- danCurrentFrame = unitFrame
     if not danCurrentFrame then
         return --could have a function for units with no unitframe here
     end
@@ -774,7 +776,8 @@ hasuitUnitAuraFrame:SetScript("OnEvent", function(_, _, unit, auraTable)
     if auraTable.isFullUpdate then
         danUnitAuraIsFullUpdate()
     end
-end)
+end
+-- end)
 
 
 

@@ -61,6 +61,9 @@ hasuitUninterruptibleBorderSize = 5
 
 
 
+-- hasuitUnitEventFunctions = {}
+
+
 hasuitUnitFrameForUnit = {}
 hasuitFrameTypeUpdateCount = {}
 
@@ -1070,6 +1073,9 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitRaidFrameWidthForGroupSize = nil
         hasuitRaidFrameHeightForGroupSize = nil
         hasuitRaidFrameColumnsForGroupSize = nil
+        
+        hasuitUnitAuraFunction = nil
+        -- hasuitUnitEventFunctions = nil
         
         hasuitUnitFrameForUnit = nil
         hasuitUpdateAllUnitsForUnitType = nil

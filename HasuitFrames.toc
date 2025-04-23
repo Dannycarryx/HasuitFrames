@@ -1,4 +1,4 @@
-## Interface: 110100
+## Interface: 110105
 ## Title: HasuitFrames
 ## Author: Dannycarry
 ## DefaultState: Enabled
@@ -29,3 +29,4 @@ UserOptions.lua
 disableSomeBlizzardFrames.lua
 testingExternalAddon.lua
 temporary.lua
+registerUnitEvent.lua

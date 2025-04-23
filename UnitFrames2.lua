@@ -3492,6 +3492,12 @@ function danUpdateArenaUnitFrames()
             danCurrentUnitGUID = UnitGUID(danCurrentUnit)
             if danCurrentUnitGUID then
                 danCurrentFrame = hasuitUnitFrameForUnit[danCurrentUnitGUID]
+                if danCurrentFrame and (danCurrentFrame.unitGUID~=danCurrentUnitGUID) then
+                    danCurrentFrame.unitGUID = nil
+                    danCurrentFrame = nil
+                    hasuitUnitFrameForUnit[danCurrentUnitGUID] = nil
+                    print(hasuitRed, "hasuitUnitFrameForUnit[danCurrentUnitGUID] = nil")
+                end
             else
                 
                 
