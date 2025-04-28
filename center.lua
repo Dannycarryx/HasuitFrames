@@ -1126,12 +1126,17 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitSpellFunction_Cleu_SuccessCooldownReductionSpec = nil
         hasuitSpellFunction_Cleu_InterruptCooldownReductionSolarBeam = nil
         hasuitSpellFunction_Cleu_AppliedCooldownReductionThiefsBargain354827 = nil
+        hasuitSpellFunction_Cleu_SpellSummonCooldownReductionTreants = nil
+        hasuitSpellFunction_Cleu_UnitDiedCooldownReductionTreantsEarly = nil
+        hasuitActiveTreantTimersTable = nil
         hasuitSpellFunction_Cleu_SuccessCooldownStart1 = nil
         hasuitSpellFunction_Cleu_SuccessCooldownStart2 = nil
         hasuitSpellFunction_Cleu_HealCooldownStart = nil
         hasuitSpellFunction_Cleu_SpellEmpowerStartCooldownStart2 = nil
         hasuitSpellFunction_Cleu_AppliedCooldownStart = nil
         hasuitSpellFunction_Cleu_RemovedCooldownStart = nil
+        hasuitSpellFunction_Cleu_AppliedCooldownStartIncarnationToIgnoreReforestation = nil
+        hasuitSpellFunction_Cleu_SuccessIncarnationToIgnoreReforestation = nil
         hasuitSpellFunction_Cleu_AppliedCooldownStartPreventMultiple = nil
         hasuitSpellFunction_Cleu_SuccessCooldownStartSolarBeam = nil
         hasuitSpellFunction_Cleu_SuccessCooldownStartPvPTrinket = nil
@@ -1141,6 +1146,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitSpellFunction_Cleu_CooldownStartPet = nil
         hasuitSpellFunction_Cleu_Casting = nil
         hasuitSpellFunction_Cleu_UNIT_DIED = nil
+        hasuitSpellFunction_Cleu_TREANT_UNIT_DIED = nil
         hasuitSpellFunction_Cleu_SoulEmpoweredHots1 = nil
         hasuitSpellFunction_Cleu_SoulEmpoweredHots2 = nil
         

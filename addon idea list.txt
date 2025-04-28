@@ -12,6 +12,7 @@ show the gap between end of cyclone debuff and cast, would be nice to see like 0
 
 
 other important:
+UNIT_COMBAT for ccbreakbars? think i trolled this and had this event on ignore list and then got it confused with something else. Seems useful?
 re-organize cooldowns some. I don't like misc stuff like tremor being in the same group as defensives
 Show freedoms/movement stuff on nameplates
 fix the way icons hide when too many are showing? or whatever the new bug is that's making icon's cooldown swipe show up when they're supposed to be hidden, or whatever's causing that --only ever saw this once

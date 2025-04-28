@@ -368,6 +368,7 @@ do
     local cdCle1    =   hasuitSpellFunction_Cleu_SuccessCooldownStart1
     local cdCle2    =   hasuitSpellFunction_Cleu_SuccessCooldownStart2
     local cdCleT    =   hasuitSpellFunction_Cleu_SuccessCooldownStartPvPTrinket
+    local cleAurI   =   hasuitSpellFunction_Cleu_AppliedCooldownStartIncarnationToIgnoreReforestation
     local cdCleR    =   hasuitSpellFunction_Cleu_AppliedCooldownStartRacial
     local cdCast    =   hasuitSpellFunction_UnitCastSucceeded_CooldownStart
     local cdPet     =   hasuitSpellFunction_Cleu_CooldownStartPet
@@ -377,6 +378,7 @@ do
     local cleAurR   =   hasuitSpellFunction_Cleu_RemovedCooldownStart
     local cleAurP   =   hasuitSpellFunction_Cleu_AppliedCooldownStartPreventMultiple
     
+    local tranqDreamstateAffectedSpells = {} --no way to tell whether someone's playing it other than inspecting
     local shiftingPowerAffectedSpells = {}
     local coldSnapAffectedSpells = {}
     local vanishAffectedSpells = {}
@@ -527,19 +529,41 @@ do
             }
             defensiveCooldowns[105]={--Restoration
                 barkskin60,
-                {cdCle2,["spellId"]=740,    ["priority"]=21,    ["duration"]=180},--Tranquility, todo -20 sec cd talent, seems like there's no way to tell someone's playing it other than watching for cultivation/verdancy/treant wildgrowth/points from -30 sec cd talent, could do something like the blackCheck system for it, once everything is seen release the cd reduction that they would have had etc
+                {cdCle2,["spellId"]=473909, ["priority"]=21,    ["duration"]=90},--Ancient of Lore
+                {cleAurI,["spellId"]=117679,["priority"]=21,    ["duration"]=180},--Incarnation: Tree of Life
                 {cdCle2,["spellId"]=203651, ["priority"]=23,    ["duration"]=60},--Overgrowth
                 -- {cleAurR,["spellId"]=132158,["priority"]=24, ["duration"]=60},--Nature's Swiftness, todo -12 sec? can tell if 35% talent is taken from points
                 -- {cdCle2,["spellId"]=18562,   ["priority"]=25,    ["duration"]=15},--Swiftmend
                 -- {cdCle2,["spellId"]=102693, ["priority"]=26,    ["duration"]=20, --Grove Guardians, todo? there's a -3 sec talent
                     -- ["charges"]=3},
                 {cdCle1,["spellId"]=102342, ["priority"]=29,    ["duration"]=90},--Ironbark
+                {cdCle2,["spellId"]=740,    ["priority"]=30,    ["duration"]=180},--Tranquility, todo -20 sec cd talent, seems like there's no way to tell someone's playing it other than watching for cultivation/verdancy/treant wildgrowth/points from -30 sec cd talent, could do something like the blackCheck system for it, once everything is seen release the cd reduction that they would have had etc
             }
+            
+            tinsert(tranqDreamstateAffectedSpells, 22812) --Barkskin
+            tinsert(tranqDreamstateAffectedSpells, 473909) --Ancient of Lore
+            tinsert(tranqDreamstateAffectedSpells, 117679) --Incarnation: Tree of Life
+            tinsert(tranqDreamstateAffectedSpells, 108238) --Renewal
+            -- tinsert(tranqDreamstateAffectedSpells, 382912) --prob not
+            -- tinsert(tranqDreamstateAffectedSpells, 740) --^
+            tinsert(tranqDreamstateAffectedSpells, 203651) --Overgrowth
+            tinsert(tranqDreamstateAffectedSpells, 102342) --Ironbark
+            
+            hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_SuccessIncarnationToIgnoreReforestation,["loadOn"]=hasuitLoadOn_CooldownDisplay}
+            initialize(33891) --Incarnation: Tree of Life
+            
+            hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_SpellSummonCooldownReductionTreants,["loadOn"]=hasuitLoadOn_CooldownDisplay} --for tree cd reduction, spellOptions for cdr stuff is in HasuitFrames.lua, ancientOfLoreFakeSpellOptions
+            initialize(102693) --Grove Guardians
+            
+            hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_TREANT_UNIT_DIED,["loadOn"]=hasuitLoadOn_CooldownDisplay}
+            initialize(false)
             
             
             hasuitFramesCenterSetEventType("aura")
             hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_Points2CooldownReductionExternal,["CDr"]=20,["affectedSpells"]={102342},["loadOn"]=hasuitLoadOn_CooldownDisplay,["points2"]=0} --Ironbark
             initialize(102342) --Ironbark
+            
+            
             
         end
 
@@ -823,8 +847,7 @@ do
             
             
             defensiveCooldowns["PALADIN"]={
-                {cdCle2,["spellId"]=642,    ["priority"]=22,    ["duration"]=210, --Divine Shield, base 300
-                    ["isPrimary"]=true},
+                {cdCle2,["spellId"]=642,    ["priority"]=22,    ["duration"]=210},--Divine Shield, base 300 --was ["isPrimary"]
                 {cdCle2,["spellId"]=633,    ["priority"]=23,    ["duration"]=420},--Lay on Hands, base 600, todo cd based on missing health healing hands
                 {cdCle2,["spellId"]=471195, ["priority"]=23,    ["duration"]=420},--Lay on Hands, less common, not sure what the difference is. really should switch to spellnames if the setup will work right in other languages
             }
@@ -848,7 +871,7 @@ do
             
             
             hasuitFramesCenterSetEventType("aura")
-            hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_HypoCooldownFunction,["affectedSpells"]={642,633,1022,204018},["unitClass"]="PALADIN",["loadOn"]=hasuitLoadOn_CooldownDisplay}
+            hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_HypoCooldownFunction,["affectedSpells"]={633,1022,204018},["unitClass"]="PALADIN",["loadOn"]=hasuitLoadOn_CooldownDisplay} --had 642 divine shield (in affectedSpells)
             initialize(25771) --Forbearance
             
             hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_Points1HidesOther,["points1"]=-40,["hideSpellId"]=184662,["loadOn"]=hasuitLoadOn_CooldownDisplay} --Shield of Vengeance
@@ -933,6 +956,9 @@ do
             
             hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_InterruptCooldownReductionSolarBeam,["CDr"]=15,["affectedSpells"]={78675},["loadOn"]=hasuitLoadOn_CooldownDisplay}--Solar Beam
             initialize(97547) --Solar Beam interrupt
+            
+            
+            tinsert(tranqDreamstateAffectedSpells, 106839)
             
         end
 
@@ -1198,6 +1224,13 @@ do
                 maimTable,
                 typhoonTable,
             }
+            
+            
+            tinsert(tranqDreamstateAffectedSpells, 22570)
+            tinsert(tranqDreamstateAffectedSpells, 61391)
+            tinsert(tranqDreamstateAffectedSpells, 5211)
+            tinsert(tranqDreamstateAffectedSpells, 99)
+            
         end
 
 
@@ -1483,6 +1516,12 @@ do
     
     
     
+    
+    
+    if #tranqDreamstateAffectedSpells>0 then --prob shouldn't bother with these but idk
+        hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_SuccessCooldownReduction,["CDr"]=4,["affectedSpells"]=tranqDreamstateAffectedSpells,["loadOn"]=hasuitLoadOn_CooldownDisplay}
+        initialize(157982) --Tranquility
+    end
     
     
     if #shiftingPowerAffectedSpells>0 then

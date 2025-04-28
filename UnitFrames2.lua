@@ -2512,7 +2512,8 @@ do --groupUnitFrames.setSizesAndSetPoints
             end
             if partyBroken then
                 for i=1,danCurrentPartySize do
-                    local frame = hasuitUnitFrameForUnit["party"..i]
+                    local unitGUID = UnitGUID("party"..i)
+                    local frame = unitGUID and hasuitUnitFrameForUnit[unitGUID]
                     if frame then
                         partyBrokenTable[i] = nil
                         frame.partyNumber = i
@@ -2521,7 +2522,8 @@ do --groupUnitFrames.setSizesAndSetPoints
                 partyBrokenFunction()
             else
                 for i=1,danCurrentPartySize do
-                    local frame = hasuitUnitFrameForUnit["party"..i]
+                    local unitGUID = UnitGUID("party"..i)
+                    local frame = unitGUID and hasuitUnitFrameForUnit[unitGUID] --was getting the wrong order for my frames pretty rarely when just putting party..i directly in here instead of unitGUID, hopefully unitGUID fixes that
                     if frame then
                         frame.partyNumber = i
                     end
@@ -3021,7 +3023,7 @@ do
                                     
                                     icon.cooldownText:ClearAllPoints()
                                     icon.cooldownText:SetPoint("BOTTOM", icon, "TOP", 1, 1)
-                                    if cooldownOptions["isPrimary"] then --only ice block and divine shield atm
+                                    if cooldownOptions["isPrimary"] then --only ice block atm
                                         icon.isPrimary = true
                                     end
                                     
@@ -3433,9 +3435,9 @@ end
 local function beginningOfUnitFrameUpdateSharedFunction(unitTable)
     local currentTime = GetTime()
     if unitTable.lastUpdateTime == currentTime then
-        -- if unitTable.attemptToUpdateCount<2 then
-            -- unitTable.attemptToUpdateCount = unitTable.attemptToUpdateCount+1
-        -- else
+        if unitTable.attemptToUpdateCount<1 then --uncommented this part again for no particular reason, this is what lets this function get tried multiple times per gettime per unittable, will happen in shuffle and make the transition between rounds update new frame positions slightly faster sometimes
+            unitTable.attemptToUpdateCount = unitTable.attemptToUpdateCount+1
+        else
             if not unitTable.timerActive then
                 unitTable.timerActive = true
                 unitTable.needsUpdate = true
@@ -3444,9 +3446,9 @@ local function beginningOfUnitFrameUpdateSharedFunction(unitTable)
                 end)
             end
             return true
-        -- end
+        end
     else
-        -- unitTable.attemptToUpdateCount = 0
+        unitTable.attemptToUpdateCount = 0
         unitTable.lastUpdateTime = currentTime
     end
     unitTable.needsUpdate = false
@@ -4117,7 +4119,9 @@ local function delayedGatesFunction()
         for i=1, numArenaOpponents do
             if not UnitIsVisible("arena"..i) then
                 local frame = hasuitUnitFrameForUnit["arena"..i]
-                frame.text:SetText("stealth")
+                if frame then --was nil after restarting wow mid-shuffle, or right before the gates opened or something like that
+                    frame.text:SetText("stealth")
+                end
             end
         end
     end

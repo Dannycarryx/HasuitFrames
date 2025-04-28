@@ -2874,6 +2874,54 @@ end
 
 
 
+do
+    local ancientOfLoreFakeSpellOptions =   {["CDr"]=2.5,["affectedSpells"]={473909}} --Ancient of Lore
+    local incarnTreeFakeSpellOptions =      {["CDr"]=5,  ["affectedSpells"]={117679}} --Incarnation: Tree of Life
+    local hasuitActiveTreantTimersTable = {}
+    
+    local function timerFunctionTreants(timer)
+        local destGUID = timer.destGUID
+        hasuitActiveTreantTimersTable[destGUID] = nil
+        
+        local unitFrame = hasuitUnitFrameForUnit[timer.sourceGUID]
+        if unitFrame then
+            local icon = unitFrame.cooldowns and unitFrame.cooldowns[473909] --Ancient of Lore
+            if icon then
+                danCurrentSpellOptions = icon.spellId==473909 and ancientOfLoreFakeSpellOptions or incarnTreeFakeSpellOptions
+                danCurrentFrame = unitFrame
+                danCooldownReductionFunction()
+            end
+        end
+    end
+    
+    function hasuitSpellFunction_Cleu_SpellSummonCooldownReductionTreants()
+        if d2anCleuSubevent=="SPELL_SUMMON" then
+            local unitFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
+            if unitFrame then
+                local timer = C_Timer_NewTimer(15, timerFunctionTreants)
+                if hasuitActiveTreantTimersTable[d8anCleuDestGuid] then --todo
+                    print("hasuitActiveTreantTimersTable[d8anCleuDestGuid]?")
+                end
+                hasuitActiveTreantTimersTable[d8anCleuDestGuid] = timer
+                timer.destGUID = d8anCleuDestGuid
+                timer.sourceGUID = d4anCleuSourceGuid
+            end
+        end
+    end
+    
+    function hasuitSpellFunction_Cleu_TREANT_UNIT_DIED()
+        if d2anCleuSubevent=="UNIT_DIED" then
+            local treantTimer = hasuitActiveTreantTimersTable[d8anCleuDestGuid]
+            if treantTimer then
+                timerFunctionTreants(treantTimer)
+                treantTimer:Cancel()
+            end
+        end
+    end
+end
+
+
+
 
 function danCleuCooldownStart(GriftahsEmbellishingPowder) --there's a ~0.2 second inaccuracy on this for most spells? but not all, and it doesn't seem consistent even for the same spell? little bit of server lag or something. there might be a better way to do this but idk -- local currentTime = GetTime()*2-hasuitLoginTime-d1anCleuTimestamp+hasuitLoginTimestamp
     danCurrentEvent = "CD"
@@ -3009,6 +3057,32 @@ hasuitSpellFunction_Cleu_RemovedCooldownStart = addMultiFunction(function()
         end
     end
 end)
+
+hasuitSpellFunction_Cleu_AppliedCooldownStartIncarnationToIgnoreReforestation = addMultiFunction(function()
+    if d2anCleuSubevent=="SPELL_AURA_APPLIED"then
+        danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
+        if danCurrentFrame then
+            local incarnCastSuccessTime = danCurrentFrame.incarnCastSuccessTime
+            if incarnCastSuccessTime and incarnCastSuccessTime+0.5>GetTime() then
+                danCurrentIcon = danCurrentFrame.cooldowns[d12anCleuSpellId]
+                if danCurrentIcon then
+                    danCleuCooldownStart(0)
+                end
+            end
+        end
+    end
+end)
+function hasuitSpellFunction_Cleu_SuccessIncarnationToIgnoreReforestation()
+    if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
+        local unitFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
+        if unitFrame then
+            unitFrame.incarnCastSuccessTime = GetTime()
+            C_Timer_After(0.5, function()
+                unitFrame.incarnCastSuccessTime = nil
+            end)
+        end
+    end
+end
 
 hasuitSpellFunction_Cleu_AppliedCooldownStartPreventMultiple = addMultiFunction(function() --if used for multiple spellids for the same class/spec will cause problems
     if d2anCleuSubevent=="SPELL_AURA_APPLIED" then

@@ -73,13 +73,15 @@ initialize(439530)  --Symbiotic Blooms
 initialize(391891)  --adaptive swarm
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_5["group"]} 
--- initialize(200389)  --cult
-initialize(468152)  --Reactive Resin
 initialize(1215515)  --Insurance!
+-- initialize(200389)  --cult
 
-local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=10,["alpha"]=1,    ["hideCooldownText"]=true}
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=3, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
-initialize(429222)  --Minor Cenarion Ward
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=3, ["group"]=hasuitHots_5["group"]} 
+initialize(468152)  --Reactive Resin
+
+-- local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=10,["alpha"]=1,    ["hideCooldownText"]=true}
+-- hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=4, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
+-- initialize(429222)  --Minor Cenarion Ward
 
 --end hots
 
