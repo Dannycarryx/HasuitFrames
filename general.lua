@@ -132,10 +132,11 @@ local hasuitController_Middle_Middle = hasuitController_Middle_Middle
 
 
 local danCommonTopLeftGroup         =   {["controllerOptions"]=hasuitController_TopLeft_TopLeft,     ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=1,  }
-local danCommonTopLeftGroupAlpha40  =   {["controllerOptions"]=hasuitController_TopLeft_TopLeft,     ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=0.4,}
+local danCommonTopLeftGroup_Text     =  {["controllerOptions"]=hasuitController_TopLeft_TopLeft,     ["size"]=16,                              ["alpha"]=1,  }
+local danCommonTopLeftGroup_Alpha40  =  {["controllerOptions"]=hasuitController_TopLeft_TopLeft,     ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=0.4,}
 
 local danCommonTopRightArena        =   {["controllerOptions"]=hasuitController_TopRight_TopRight,   ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=1,  }
-local danCommonTopRightArenaAlpha40 =   {["controllerOptions"]=hasuitController_TopRight_TopRight,   ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=0.4,}
+local danCommonTopRightArena_Alpha40 =  {["controllerOptions"]=hasuitController_TopRight_TopRight,   ["size"]=16,  ["hideCooldownText"]=true,  ["alpha"]=0.4,}
 
 
 
@@ -876,7 +877,7 @@ initialize(114018)--shroud of concealment
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=9,                     ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,  ["specialAuraFunction"]=hasuitSpecialAuraFunction_FeignDeath}
 initialize(5384)--Feign Death, track Lifebind?
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=10,                    ["group"]=danCommonTopLeftGroupAlpha40,["arena"]=danCommonTopRightArenaAlpha40,}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=10,                    ["group"]=danCommonTopLeftGroup_Alpha40,["arena"]=danCommonTopRightArena_Alpha40,}
 initialize(32612) --Invisibility, 66 is the 3 sec pre-invis buff todo lower opacity?
 initialize(110960)  --greater invisibility invis --todo override, should make a better override system
 
@@ -933,7 +934,7 @@ initialize(124682) --enveloping mist
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=66,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
 initialize(102352) --main healing cenarion Ward
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=70,                ["group"]=danCommonTopLeftGroupAlpha40,["arena"]=danCommonTopRightArenaAlpha40,} 
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=70,                ["group"]=danCommonTopLeftGroup_Alpha40,["arena"]=danCommonTopRightArena_Alpha40,} 
 initialize(102351) --40% alpha idle cenarion Ward
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=75,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,} 
@@ -941,6 +942,7 @@ initialize(115175) --soothing mist
 initialize(148039) --Barrier of Faith
 initialize(188550) --lifebloom
 initialize(33763) --lifebloom
+initialize(1215515) --Insurance! from rdruid
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=80,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,  ["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulHots, ["specialIconType"]="optionalBorder"}
 initialize(774) --rejuvenation
@@ -982,7 +984,7 @@ initialize(370562) --Stasis, ready
 
 
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=97,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena, ["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulOfTheForest}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=97,                ["group"]=danCommonTopLeftGroup_Text,["arena"]=danCommonTopRightArena, ["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulOfTheForest}
 initialize(114108) --Soul of the Forest
 
 

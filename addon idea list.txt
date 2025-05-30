@@ -9,6 +9,7 @@ fix random error that happened from unit_aura, maybe fixed? we'll see
 make something to help track how accurate cooldowns.lua is
 could show cyclone timing bars on other hard cc/drs too? and only show it when relevant instead of sitting on the icon at full value for a while?
 show the gap between end of cyclone debuff and cast, would be nice to see like 0.08 or whatever to know whether they're likely to get a gcd, also basing it on latency is probably good?
+doesn't work on mac maybe? cc debuffs not being cleared, seems rare but makes addon unusable for people that are affected by it. Might break when cc gets trinketed? idk
 
 
 other important:
@@ -21,8 +22,6 @@ unit_target on pve casts after new system, or maybe onupdate for that
 fake debuffs on party/arena test
 ability to change scale of different things independently like party frames 1.2 and cooldowns still 1?
 reorganize useroptions?
-
-option to ignore party# for <6 sort
 
 enabling people to track their own abilities/custom setups
 make a variable like d12 or d13 and set it for non-cleu so that people can initialize a spellname or spellid and have it not get ignored or however that works. should be able to use spellnames or spellids and not worry about it
@@ -180,6 +179,8 @@ reorganize cooldowns.lua to put everything from each class/spec together?, like 
 maybe auraExpiredEarlyCount could be more efficient? with :Pause()?
 
 option to normalize scrolling health text/in-game health text if possible relative to 10k max health or something to avoid retarded numbers like 200k rejuv tick
+
+soul hots showing on mage that's spellstealing normal hots while the druid has soul up
 
 
 

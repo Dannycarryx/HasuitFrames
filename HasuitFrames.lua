@@ -2881,6 +2881,9 @@ do
     
     local function timerFunctionTreants(timer)
         local destGUID = timer.destGUID
+        -- if destGUID=="" then --todo
+            -- print("timerFunctionTreants destGUID==\"\"")
+        -- end
         hasuitActiveTreantTimersTable[destGUID] = nil
         
         local unitFrame = hasuitUnitFrameForUnit[timer.sourceGUID]
@@ -2899,9 +2902,9 @@ do
             local unitFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
             if unitFrame then
                 local timer = C_Timer_NewTimer(15, timerFunctionTreants)
-                if hasuitActiveTreantTimersTable[d8anCleuDestGuid] then --todo
-                    print("hasuitActiveTreantTimersTable[d8anCleuDestGuid]?")
-                end
+                -- if hasuitActiveTreantTimersTable[d8anCleuDestGuid] then --todo
+                    -- print("hasuitActiveTreantTimersTable[d8anCleuDestGuid]?")
+                -- end
                 hasuitActiveTreantTimersTable[d8anCleuDestGuid] = timer
                 timer.destGUID = d8anCleuDestGuid
                 timer.sourceGUID = d4anCleuSourceGuid
@@ -2909,7 +2912,7 @@ do
         end
     end
     
-    function hasuitSpellFunction_Cleu_TREANT_UNIT_DIED()
+    function hasuitSpellFunction_Cleu_TREANT_UNIT_DIED() --merge?
         if d2anCleuSubevent=="UNIT_DIED" then
             local treantTimer = hasuitActiveTreantTimersTable[d8anCleuDestGuid]
             if treantTimer then
@@ -3059,7 +3062,7 @@ hasuitSpellFunction_Cleu_RemovedCooldownStart = addMultiFunction(function()
 end)
 
 hasuitSpellFunction_Cleu_AppliedCooldownStartIncarnationToIgnoreReforestation = addMultiFunction(function()
-    if d2anCleuSubevent=="SPELL_AURA_APPLIED"then
+    if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
             local incarnCastSuccessTime = danCurrentFrame.incarnCastSuccessTime

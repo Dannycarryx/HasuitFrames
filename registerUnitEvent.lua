@@ -81,6 +81,9 @@ do
             button:SetScript("OnEvent", hasuitUnitAuraFunction)
             button:RegisterUnitEvent("UNIT_AURA", unit)
         end
+        -- local button = hasuitButtonForUnit["target"] --for testing stuff on target from /hf, comment out after done or make it better
+        -- button:SetScript("OnEvent", hasuitUnitAuraFunction)
+        -- button:RegisterUnitEvent("UNIT_AURA", "target")
     end)
 end
 
