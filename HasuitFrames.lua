@@ -409,36 +409,11 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
         iconTypes = hasuitIconTypes
         hasuitIconTypes = nil
     end)
-    local UnitHealth = UnitHealth
-    local UnitGetTotalAbsorbs = UnitGetTotalAbsorbs
-    local function ccBreakOnEvent(ccBreakBar, event, unit)
-        if event=="UNIT_HEALTH" then
-            local currentHealth = UnitHealth(unit)
-            local healthChange = currentHealth - ccBreakBar.ccBreakHealthValue
-            ccBreakBar.ccBreakHealthValue = currentHealth
-            if healthChange<0 then
-                local newValue = ccBreakBar.ccBreakThresholdValue+healthChange
-                ccBreakBar.ccBreakThresholdValue = newValue
-                ccBreakBar:SetValue(newValue)
-            end
-        elseif event=="UNIT_ABSORB_AMOUNT_CHANGED" then
-            local currentAbsorbs = UnitGetTotalAbsorbs(unit)
-            local absorbChange = currentAbsorbs - ccBreakBar.ccBreakAbsorbValue
-            ccBreakBar.ccBreakAbsorbValue = currentAbsorbs
-            if absorbChange<0 then
-                local newValue = ccBreakBar.ccBreakThresholdValue+absorbChange
-                ccBreakBar.ccBreakThresholdValue = newValue
-                ccBreakBar:SetValue(newValue)
-            end
-        -- elseif event=="UNIT_MAXHEALTH" then --try to cancel out health changes from max health events assuming unit_health will fire too with a changed health that didn't come from damage taken, never tested this and not sure exactly how maxhealth events happen now
-            -- local currentHealth = UnitHealth(unit)
-            -- local healthChange = -(currentHealth - ccBreakBar.ccBreakHealthValue)
-            -- ccBreakBar.ccBreakHealthValue = currentHealth
-            -- if healthChange>0 then
-                -- local newValue = ccBreakBar.ccBreakThresholdValue+healthChange
-                -- ccBreakBar.ccBreakThresholdValue = newValue
-                -- ccBreakBar:SetValue(newValue)
-            -- end
+    local function ccBreakOnEvent(ccBreakBar,_,_,damageOrHeal,_,amount)
+        if damageOrHeal=="WOUND" then
+            local newValue = ccBreakBar.ccBreakThresholdValue-amount
+            ccBreakBar.ccBreakThresholdValue = newValue
+            ccBreakBar:SetValue(newValue)
         end
     end
     hasuitCcBreakOnEvent = ccBreakOnEvent
@@ -453,12 +428,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
             local unit = ccBreakBar.frame.unit
             if unit then
                 ccBreakBar.unit = unit
-                ccBreakOnEvent(ccBreakBar, "UNIT_HEALTH", unit)
-                ccBreakOnEvent(ccBreakBar, "UNIT_ABSORB_AMOUNT_CHANGED", unit)
-                -- -- ccBreakOnEvent(ccBreakBar, "UNIT_MAXHEALTH", unit)
-                ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
-                ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
-                -- ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
+                ccBreakBar:RegisterUnitEvent("UNIT_COMBAT", unit)
             end
         end
     end
@@ -468,7 +438,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
             local ccBreakBar = danCurrentIcon.ccBreakBar
             ccBreakBar.unit = nil
             ccBreakBar.fullUpdateActive = nil
-            ccBreakBar:UnregisterAllEvents()
+            ccBreakBar:UnregisterEvent("UNIT_COMBAT")
             local frame = ccBreakBar.frame
             local frameKey = ccBreakBar.frameKey
             if frameKey then
@@ -486,24 +456,24 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
             if danCurrentEvent=="added" then
                 local unit = danCurrentFrame.unit
                 local startingValueOffset = 0
-                local startingHealth = UnitHealth(unit)
-                local startingAbsorb = UnitGetTotalAbsorbs(unit)
-                local preStartingHealth = danCurrentFrame.ccBreakPreStartingHealth
+                -- local startingHealth = UnitHealth(unit)
+                -- local startingAbsorb = 0 --todo
+                -- local preStartingHealth = danCurrentFrame.ccBreakPreStartingHealth
                 local ccBreakBarMaxValue = ccBreakHealthThreshold*danCurrentSpellOptions["ccBreakHealthThresholdMultiplier"]
-                if preStartingHealth then
-                    local change = startingHealth-preStartingHealth
-                    if change<0 then
-                        startingValueOffset = change
-                    end
-                    local change = startingAbsorb-danCurrentFrame.ccBreakPreStartingAbsorb
-                    if change<0 then
-                        startingValueOffset = startingValueOffset+change
-                    end
-                    if startingValueOffset<-ccBreakBarMaxValue then
-                        danCurrentIcon.specialFunction = nil
-                        return
-                    end
-                end
+                -- if preStartingHealth then
+                    -- local change = startingHealth-preStartingHealth
+                    -- if change<0 then
+                        -- startingValueOffset = change
+                    -- end
+                    -- local change = startingAbsorb
+                    -- if change<0 then
+                        -- startingValueOffset = startingValueOffset+change
+                    -- end
+                    -- if startingValueOffset<-ccBreakBarMaxValue then
+                        -- danCurrentIcon.specialFunction = nil
+                        -- return
+                    -- end
+                -- end
                 local ccBreakBars = danCurrentFrame.ccBreakBars
                 if not ccBreakBars then
                     ccBreakBars = {}
@@ -540,8 +510,6 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                     ccBreakBar.frameKey = frameKey
                 end
                 
-                ccBreakBar.ccBreakHealthValue = startingHealth
-                ccBreakBar.ccBreakAbsorbValue = startingAbsorb
                 local colors = iconTypes[danCurrentAura["dispelName"] or ""]
                 danCurrentIcon.border:SetBackdropBorderColor(colors.r,colors.g,colors.b)
                 ccBreakBar:SetStatusBarColor(colors.r,colors.g,colors.b)
@@ -554,9 +522,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
                     ccBreakBar:SetValue(startingValue) --pve durations? won't be great because not every cc is shorter in pvp like frost nova, just get rid of this after, temporary?
                     ccBreakBar.ccBreakThresholdValue = startingValue
                 end
-                ccBreakBar:RegisterUnitEvent("UNIT_HEALTH", unit)
-                ccBreakBar:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", unit)
-                -- ccBreakBar:RegisterUnitEvent("UNIT_MAXHEALTH", unit)
+                ccBreakBar:RegisterUnitEvent("UNIT_COMBAT", unit)
                 ccBreakBar.unit = unit
                 ccBreakBar.ccBreakSpellName = danCurrentAura["name"]
                 ccBreakBar.frame = danCurrentFrame
@@ -565,7 +531,7 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
             if danCurrentEvent=="updated" then --always means fullupdate(right?) which is where unit could change i think?
                 local ccBreakBar = danCurrentIcon.ccBreakBar
                 ccBreakBar.fullUpdateActive = true
-                ccBreakBar:UnregisterAllEvents() --could be improved. something like this is a good reason to remove delay from main unitType update functions? should probably do that actually. not a fan of needing to unregister and reregister events every time here although probably not that bad. this could definitely be improved
+                ccBreakBar:UnregisterEvent("UNIT_COMBAT") --could be improved. something like this is a good reason to remove delay from main unitType update functions? should probably do that actually. not a fan of needing to unregister and reregister events every time here although probably not that bad. this could definitely be improved
                 C_Timer_After(0, function()
                     ccBreakBarUpdatedEventFromFullUpdate(ccBreakBar) --ok idk what im doing here, should work itself out when improving things later
                 end)
@@ -583,34 +549,33 @@ do --breakable cc threshhold bar, trolled and thought more than 1 unit_health co
     local hasuitDoThis_OnUpdate = hasuitDoThis_OnUpdate
     hasuitFramesCenterSetEventType("cleu")
     hasuitSpellFunction_Cleu_CcBreakThreshold = addMultiFunction(function()
-        if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
-            local frame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
-            if frame and not frame.ccBreakPreStartingHealth then
-                local unit = frame.unit
-                frame.ccBreakPreStartingHealth = UnitHealth(unit)
-                frame.ccBreakPreStartingAbsorb = UnitGetTotalAbsorbs(unit)
-                hasuitDoThis_OnUpdate(function() --based on assumption that damage can happen between cleu aura applied and unit_aura
-                    frame.ccBreakPreStartingHealth = nil
-                    frame.ccBreakPreStartingAbsorb = nil
-                end)
-            end
+        -- if d2anCleuSubevent=="SPELL_AURA_APPLIED" then
+            -- local frame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
             
-        elseif d2anCleuSubevent=="SPELL_AURA_REFRESH" then
+            -- if frame and not frame.ccBreakPreStartingHealth then  --todo fill in the gap?
+                -- local unit = frame.unit
+                -- frame.ccBreakPreStartingHealth = UnitHealth(unit)
+                -- hasuitDoThis_OnUpdate(function()
+                    -- frame.ccBreakPreStartingHealth = nil
+                -- end)
+            -- end
+            
+        -- elseif d2anCleuSubevent=="SPELL_AURA_REFRESH" then
+        if d2anCleuSubevent=="SPELL_AURA_REFRESH" then
             local frame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
             if frame then
                 local ccBreakBars = frame.ccBreakBars
                 if ccBreakBars then
-                    local ccBreakBar = frame.ccBreakBars[d4anCleuSourceGuid..d12anCleuSpellId] or ccBreakBars[d12anCleuSpellId] --works out decently even with no sourceunit, only problem i can think of is a duplicate spellid replacing an older one, deleting its spot in this table, and then a third dr will have no way of getting set right because the unitaura event will be an updated instead of added. would have to iterate through and match instanceids or something like that, or do a fake added event with the ccbreakbar function. or better yet iterate through the instanceids of the unitframe and find the one(s) for the relevant spellid that isn't on the unitframe yet
+                    local ccBreakBar = ccBreakBars[d4anCleuSourceGuid..d12anCleuSpellId] or ccBreakBars[d12anCleuSpellId] --works out decently even with no sourceunit, only problem i can think of is a duplicate spellid replacing an older one, deleting its spot in this table, and then a third dr will have no way of getting set right because the unitaura event will be an updated instead of added. would have to iterate through and match instanceids or something like that, or do a fake added event with the ccbreakbar function. or better yet iterate through the instanceids of the unitframe and find the one(s) for the relevant spellid that isn't on the unitframe yet
                     if ccBreakBar then
-                        local unit = frame.unit
-                        ccBreakBar.ccBreakHealthValue = UnitHealth(unit)
-                        ccBreakBar.ccBreakAbsorbValue = UnitGetTotalAbsorbs(unit)
                         local startingValue = ccBreakHealthThreshold*danCurrentSpellOptions["ccBreakHealthThresholdMultiplier"]
                         ccBreakBar:SetValue(startingValue)
                         ccBreakBar.ccBreakThresholdValue = startingValue
                     end
                 end
             end
+            
+            
         end
     end)
 end

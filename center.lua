@@ -19,9 +19,12 @@ do
 end
 
 
+
 hasuitOutOfRangeAlpha = 0.55
-hasuitCcBreakHealthThreshold = 460000 --todo base it on level or patch or something? to not have to change this in the future
-hasuitCcBreakHealthThresholdPve = 280000
+
+hasuitCcBreakHealthThreshold = 900000 --ignores ilvl and just takes a flat amount of damage to break, starts being rng whether it breaks from more damage after like 800-900k? not sure what the number is exactly
+hasuitCcBreakHealthThresholdWeak = 0.3333333 --300000/hasuitCcBreakHealthThreshold --this one is based on ilvl? or something weird like too many direct damage events idk
+hasuitCcBreakHealthThresholdPve = 450000
 
 hasuitClassColorsHexList = { --string.format("Hexadecimal: %X", number)
     ["DEATHKNIGHT"] = "|cffC41E3A",

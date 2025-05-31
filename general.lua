@@ -436,35 +436,43 @@ initializeMultiPlusDiminish(5484) --Howl of Terror, nightmare?
 --Cacophonous Roar 200% on intimidating shout but no1 takes it? seems good
 --Forger of Mountains 200% and -30 sec on landslide, very rarely taken. there's no way this talent isn't worth taking most of the time, even more true with Cacophonous
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=-57,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[2], ["arena"]=danCommonBigBottomLeftArena[2]} --CC can break any damage
-initializePlusDiminish(31661) --Dragon's Breath
-initializePlusDiminish(353084) --Ring of Fire, disorient+dot, not sure this is the right dr type
-initializePlusDiminish(105421) --Blinding Light
-initializePlusDiminish(205364) --Dominate Mind
-initializePlusDiminish(427773) --Blind
-initializePlusDiminish(2094) --Blind
-initializePlusDiminish(198909) --Song of Chi-Ji debuff
 
-hasuitSetupSpellOptionsMulti = {
-                          hasuitSetupSpellOptions,
-                          hasuitBigRedMiddleCastBarsSpellOptions,
+
+hasuitSetupSpellOptionsMulti = { --CC can break threshold weak debuffs
+                          {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=-57,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[2], ["arena"]=danCommonBigBottomLeftArena[2], ["specialAuraFunction"]=hasuitSpecialAuraFunction_CcBreakThreshold, ["specialIconType"]="ccBreak",["ccBreakHealthThresholdMultiplier"]=hasuitCcBreakHealthThresholdWeak}, --could combine specialAuraFunction and specialIconType in a more efficient way i think, after breaking up mainaurafunction
+                          {hasuitSpellFunction_Cleu_CcBreakThreshold,   ["ccBreakHealthThresholdMultiplier"]=hasuitCcBreakHealthThresholdWeak},
 }
-initializeMultiPlusDiminish(198898, 2) --Song of Chi-Ji cast only
+initializeMultiPlusDiminish(31661) --Dragon's Breath
+initializeMultiPlusDiminish(353084) --Ring of Fire, disorient+dot, not sure this is the right dr type
+initializeMultiPlusDiminish(105421) --Blinding Light
+initializeMultiPlusDiminish(205364) --Dominate Mind
+initializeMultiPlusDiminish(427773) --Blind
+initializeMultiPlusDiminish(2094) --Blind
+initializeMultiPlusDiminish(198909) --Song of Chi-Ji debuff
+
+hasuitSetupSpellOptionsMulti[3] = hasuitBigRedMiddleCastBarsSpellOptions
+initializeMulti(198898, 3) --Song of Chi-Ji cast only
 
 hasuitFramesCenterSetDrType("incapacitate") --sheep
 initializeMultiPlusDiminish(GetSpellName(118)) --Polymorph
 initializeMultiPlusDiminish(GetSpellName(383121)) --Mass Polymorph, rare so not sure if there are other spellids
 initializeMultiPlusDiminish(20066) --Repentance
-initializePlusDiminish(2637) --Hibernate, never seen but tested and exists
-initializePlusDiminish(213691) --Scatter Shot
-initializePlusDiminish(115078) --Paralysis
-initializePlusDiminish(1776) --Gouge
-initializePlusDiminish(6770) --Sap
-initializePlusDiminish(107079) --Quaking Palm
-initializePlusDiminish(99) --Incapacitating Roar
-initializePlusDiminish(217832) --imprison
-initializePlusDiminish(3355  ) --freezing trap
-initializePlusDiminish(200196) --holy word: chastise, incap
+hasuitSetupSpellOptionsMulti[3] = nil
+
+initializeMultiPlusDiminish(2637) --Hibernate, never seen but tested and exists
+initializeMultiPlusDiminish(213691) --Scatter Shot
+initializeMultiPlusDiminish(115078) --Paralysis
+initializeMultiPlusDiminish(1776) --Gouge
+initializeMultiPlusDiminish(6770) --Sap
+initializeMultiPlusDiminish(107079) --Quaking Palm
+initializeMultiPlusDiminish(99) --Incapacitating Roar
+initializeMultiPlusDiminish(217832) --imprison
+initializeMultiPlusDiminish(3355  ) --freezing trap
+initializeMultiPlusDiminish(200196) --holy word: chastise, incap
+
+
+
+
 
 
 hasuitFramesCenterSetDrType("silence")
