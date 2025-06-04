@@ -3309,10 +3309,13 @@ hasuitSpellFunction_Cleu_Casting = addMultiFunction(function()
                     local _, _, texture, startTime, endTime
                     if sourceUnit then
                         _, _, texture, startTime, endTime = sourceCastTable.castingInfo(sourceUnit)
-                        startTime = startTime/1000
-                        endTime = endTime/1000
-                        duration = endTime-startTime
-                    else
+                        if startTime then --changed much later, untested
+                            startTime = startTime/1000
+                            endTime = endTime/1000
+                            duration = endTime-startTime
+                        end
+                    end
+                    if not startTime then
                         startTime = GetTime()
                         duration = danCurrentSpellOptions["backupDuration"]
                         endTime = startTime+duration

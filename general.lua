@@ -275,7 +275,7 @@ hasuitFramesCenterSetDrType("incapacitate") --sheep
 hasuitSetupSpellOptions = hasuitSetupSpellOptionsMulti[1]
 hasuitSetupSpellOptions_CycloneTimerBar = hasuitSetupSpellOptions
 initializePlusDiminish(221527) --imprison immune
-initializePlusDiminish(203337) --freezing trap
+initializePlusDiminish(203337) --freezing trap immune
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=-75,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[1], ["arena"]=danCommonBigBottomLeftArena[1],  ["specialIconType"]="greenBorder"} --immune friendly cc
 initialize(378441) --time stop (friendly buff)
@@ -405,6 +405,7 @@ initializeMultiPlusDiminish(207685) --sigil of misery
 initializeMultiPlusDiminish(202274) --Hot Trub?
 hasuitFramesCenterSetDrType("incapacitate") --sheep
 initializeMultiPlusDiminish(82691) --Ring of Frost, no cast
+initializeMultiPlusDiminish(3355  ) --freezing trap, used to be with weak ccs
 
 hasuitSetupSpellOptionsMulti[3] = hasuitBigRedMiddleCastBarsSpellOptions
 initializeMulti(113724, 3) --Ring of Frost cast
@@ -439,8 +440,8 @@ initializeMultiPlusDiminish(5484) --Howl of Terror, nightmare?
 
 
 hasuitSetupSpellOptionsMulti = { --CC can break threshold weak debuffs
-                          {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=-57,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[2], ["arena"]=danCommonBigBottomLeftArena[2], ["specialAuraFunction"]=hasuitSpecialAuraFunction_CcBreakThreshold, ["specialIconType"]="ccBreak",["ccBreakHealthThresholdMultiplier"]=hasuitCcBreakHealthThresholdWeak}, --could combine specialAuraFunction and specialIconType in a more efficient way i think, after breaking up mainaurafunction
-                          {hasuitSpellFunction_Cleu_CcBreakThreshold,   ["ccBreakHealthThresholdMultiplier"]=hasuitCcBreakHealthThresholdWeak},
+                          {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=-57,["overridesSame"]=true,    ["group"]=danCommonBigGroupDebuffs[2], ["arena"]=danCommonBigBottomLeftArena[2], ["specialAuraFunction"]=hasuitSpecialAuraFunction_CcBreakThreshold, ["specialIconType"]="ccBreak",["ccBreakHealthThresholdMultiplier"]=hasuitCcBreakHealthThresholdWeakMultiplier}, --could combine specialAuraFunction and specialIconType in a more efficient way i think, after breaking up mainaurafunction
+                          {hasuitSpellFunction_Cleu_CcBreakThreshold,   ["ccBreakHealthThresholdMultiplier"]=hasuitCcBreakHealthThresholdWeakMultiplier},
 }
 initializeMultiPlusDiminish(31661) --Dragon's Breath
 initializeMultiPlusDiminish(353084) --Ring of Fire, disorient+dot, not sure this is the right dr type
@@ -467,7 +468,6 @@ initializeMultiPlusDiminish(6770) --Sap
 initializeMultiPlusDiminish(107079) --Quaking Palm
 initializeMultiPlusDiminish(99) --Incapacitating Roar
 initializeMultiPlusDiminish(217832) --imprison
-initializeMultiPlusDiminish(3355  ) --freezing trap
 initializeMultiPlusDiminish(200196) --holy word: chastise, incap
 
 
@@ -839,7 +839,7 @@ initialize(122278) --Dampen Harm
 initialize(122783) --Diffuse Magic
 initialize(264735) --Survival of the Fittest
 initialize("Prismatic Cloak") --?
-initialize(198111) --Temporal Shield
+initialize(198111) --Temporal Shield --?
 initialize(33206) --Pain Suppression
 initialize(108271) --Astral Shift
 initialize(104773) --Unending Resolve
@@ -950,7 +950,6 @@ initialize(115175) --soothing mist
 initialize(148039) --Barrier of Faith
 initialize(188550) --lifebloom
 initialize(33763) --lifebloom
-initialize(1215515) --Insurance! from rdruid
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=80,                ["group"]=danCommonTopLeftGroup,    ["arena"]=danCommonTopRightArena,  ["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulHots, ["specialIconType"]="optionalBorder"}
 initialize(774) --rejuvenation
@@ -1009,6 +1008,7 @@ hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priori
 initialize(205655) --Dome of Mist
 initialize(353503) --Counteract Magic
 -- initialize(33891) --Incarnation: Tree of Life, todo show timer of 117679 somehow, could do something like icon turns red if actual tree is missing but incarn is up, todo show which is the main 30 sec duration and which is a proc?
+initialize(1215515) --Insurance! from rdruid
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=106,["loadOn"]=hasuitLoadOn_PartySize,["group"]=danCommonTopLeftGroup,["arena"]=danCommonTopRightArena,} 
 initialize(97463) --Rallying Cry, should this be party only? todo stuff like this and earthen should show on the player that cast it in groupsize>5, just not spam 20 frames at once
@@ -1362,6 +1362,7 @@ initializeMulti(365350) --Arcane Surge
 initializeMulti(191634) --Stormkeeper
 initializeMulti(353128) --Arcanosphere, channel
 initializeMulti(436358) --Demolish, channel, todo gets 2 casts like eye beam
+initializeMulti(443028) --Celestial Conduit ^?
 
 hasuitFramesCenterSetEventType("unitCasting")
 hasuitSetupSpellOptions = hasuitYellowMiddleCastBarsSpellOptions

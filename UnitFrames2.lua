@@ -3608,6 +3608,42 @@ end
 hasuitHideInactiveFrames = danHideInactiveFrames
 
 
+local function createArenaLines()
+    local unitType = "group"
+    for i=1,#groupUnitFrames do
+        local unitFrame = groupUnitFrames[i]
+        if unitFrame~=hasuitPlayerFrame then
+            local unit = unitFrame.unit
+            if not hasuitHealthBarTargetLinesForUnits[unit] then
+                danMakeHealthBarTargetLine(unit, unitType)
+            else
+                hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
+            end
+            
+            unitFrame:SetAlpha(1) --trying a bandaid fix for something that happens pretty rarely. I kind of want to remake a bunch of stuff. This file is terrible --I ended up making a new system to keep track of units in another random addon i made that seems like it might work well and be way more simple. Will work on that for this addon some time
+        end
+    end
+    
+    local unitType = "arena"
+    for i=1,#arenaUnitFrames do
+        local unit = arenaUnitFrames[i].unit
+        
+        if not hasuitHealthBarTargetLinesForUnits[unit] then
+            danMakeHealthBarTargetLine(unit, unitType)
+        else
+            hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
+        end
+    end
+    
+    -- if arenaUnitFrames.needsUpdate and not arenaUnitFrames.timerActive then
+        -- print("arena needed update?")
+        -- danUpdateArenaUnitFrames()
+    -- elseif groupUnitFrames.needsUpdate and not groupUnitFrames.timerActive then
+        -- print("group needed update?")
+        -- danUpdateGroupUnitFrames()
+    -- end
+end
+
 -- local hasuitDoThis_GroupUnitFramesUpdate_before = hasuitDoThis_GroupUnitFramesUpdate_before
 local hasuitDoThis_GroupUnitFramesUpdate = hasuitDoThis_GroupUnitFramesUpdate
 local hasuitDoThis_GroupUnitFramesUpdate_after = hasuitDoThis_GroupUnitFramesUpdate_after
@@ -3687,40 +3723,8 @@ function updateAllOtherUnits()
     end
     
     
-    if hasuitGlobal_InstanceType=="arena" then --arenaLines
-        local unitType = "group"
-        for i=1,#groupUnitFrames do
-            local unitFrame = groupUnitFrames[i]
-            if unitFrame~=hasuitPlayerFrame then
-                local unit = unitFrame.unit
-                if not hasuitHealthBarTargetLinesForUnits[unit] then
-                    danMakeHealthBarTargetLine(unit, unitType)
-                else
-                    hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
-                end
-                
-                unitFrame:SetAlpha(1) --trying a bandaid fix for something that happens pretty rarely. I kind of want to remake a bunch of stuff. This file is terrible --I ended up making a new system to keep track of units in another random addon i made that seems like it might work well and be way more simple. Will work on that for this addon some time
-            end
-        end
-        
-        local unitType = "arena"
-        for i=1,#arenaUnitFrames do
-            local unit = arenaUnitFrames[i].unit
-            
-            if not hasuitHealthBarTargetLinesForUnits[unit] then
-                danMakeHealthBarTargetLine(unit, unitType)
-            else
-                hasuitHealthBarTargetLinesForUnits[unit].colorSet = false
-            end
-        end
-        
-        -- if arenaUnitFrames.needsUpdate and not arenaUnitFrames.timerActive then
-            -- print("arena needed update?")
-            -- danUpdateArenaUnitFrames()
-        -- elseif groupUnitFrames.needsUpdate and not groupUnitFrames.timerActive then
-            -- print("group needed update?")
-            -- danUpdateGroupUnitFrames()
-        -- end
+    if hasuitGlobal_InstanceType=="arena" then --arenaLines --?
+        createArenaLines()
     end
     
     
@@ -4232,14 +4236,18 @@ do
             
             
         end
-        for _, line in pairs(hasuitHealthBarTargetLinesForUnits) do
-            if line.oldOtherUnitHealthFunctionsLines then
-                line:SetAlpha(0)
-                line:UnregisterEvent("UNIT_MAXHEALTH")
-                danRemoveUnitHealthControlNotSafe(line.oldOtherUnitHealthFunctionsLines, line.healthFunctionLines)
-                line.oldOtherUnitHealthFunctionsLines = nil
-            end
-        end
+        
+        danHideTargetLines() --bored todo, was creating extra lines on arena frames occasionally. this is a lazy fix
+        createArenaLines() --^
+        
+        -- for _, line in pairs(hasuitHealthBarTargetLinesForUnits) do
+            -- if line.oldOtherUnitHealthFunctionsLines then
+                -- line:SetAlpha(0)
+                -- line:UnregisterEvent("UNIT_MAXHEALTH")
+                -- danRemoveUnitHealthControlNotSafe(line.oldOtherUnitHealthFunctionsLines, line.healthFunctionLines)
+                -- line.oldOtherUnitHealthFunctionsLines = nil
+            -- end
+        -- end
     end
 end
 

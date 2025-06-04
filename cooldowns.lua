@@ -710,7 +710,7 @@ do
             {cleAura,["spellId"]=342246,["priority"]=30,    ["duration"]=50},--Alter Time, base 60
         }
         defensiveCooldowns[62]={--Arcane
-            {cdCle2,["spellId"]=198111, ["priority"]=22,    ["duration"]=45},--Temporal Shield
+            -- {cdCle2,["spellId"]=198111, ["priority"]=22,    ["duration"]=45},--Temporal Shield --not sure this exists anymore
             {cdCle2,["spellId"]=235450, ["priority"]=27,    ["duration"]=25},--Prismatic Barrier --are these shared between this/blazing/ice barrier when switching spec?
         }
         defensiveCooldowns[63]={--Fire
@@ -727,7 +727,7 @@ do
         tinsert(shiftingPowerAffectedSpells, 110960)
         tinsert(shiftingPowerAffectedSpells, 414660)
         tinsert(shiftingPowerAffectedSpells, 342246)
-        tinsert(shiftingPowerAffectedSpells, 198111)
+        -- tinsert(shiftingPowerAffectedSpells, 198111)
         tinsert(shiftingPowerAffectedSpells, 235450)
         tinsert(shiftingPowerAffectedSpells, 87023)
         tinsert(shiftingPowerAffectedSpells, 235313)
@@ -1379,8 +1379,10 @@ do
             {cdCle2,["spellId"]=382440, ["priority"]=2, ["duration"]=60},--Shifting Power
             {cdCle2,["spellId"]=31661,  ["priority"]=3, ["duration"]=45},--Dragon's Breath --todo all specs 387807 Casting Ice Lance on Frozen targets reduces the cooldown of your loss of control abilities by 2 sec.
         }
-        -- crowdControlCooldowns[62]={--Arcane
-        -- }
+        crowdControlCooldowns[62]={--Arcane
+            {cdCle2,["spellId"]=198100, ["priority"]=4, ["duration"]=20, --Kleptomania
+                ["startAlpha"]=lowStartAlpha},
+        }
         -- crowdControlCooldowns[63]={--Fire
         -- }
         -- crowdControlCooldowns[64]={--Frost
@@ -1395,6 +1397,7 @@ do
         -- end
         
         tinsert(shiftingPowerAffectedSpells, 31661) --dragon's breath
+        tinsert(shiftingPowerAffectedSpells, 198100) --Kleptomania
 
 
 

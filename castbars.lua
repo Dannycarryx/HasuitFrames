@@ -62,6 +62,7 @@ hasuitMiddleCastBarsAllowChannelingForSpellId = { --should this be an ignore lis
     [353128]=true,  --Arcanosphere
     [198100]=true,  --Kleptomania
     [436358]=true,  --Demolish
+    [443028]=true,  --Celestial Conduit
     [115175]=true,  --Soothing Mist
     [47757]=true,   --Penance
     [47758]=true,   --Penance

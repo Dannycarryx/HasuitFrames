@@ -23,7 +23,7 @@ end
 hasuitOutOfRangeAlpha = 0.55
 
 hasuitCcBreakHealthThreshold = 900000 --ignores ilvl and just takes a flat amount of damage to break, starts being rng whether it breaks from more damage after like 800-900k? not sure what the number is exactly
-hasuitCcBreakHealthThresholdWeak = 0.3333333 --300000/hasuitCcBreakHealthThreshold --this one is based on ilvl? or something weird like too many direct damage events idk
+hasuitCcBreakHealthThresholdWeakMultiplier = 0.3333333 --300000/hasuitCcBreakHealthThreshold --this one is based on ilvl? or something weird like too many direct damage events idk
 hasuitCcBreakHealthThresholdPve = 450000
 
 hasuitClassColorsHexList = { --string.format("Hexadecimal: %X", number)
@@ -1281,6 +1281,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitSetIconText = nil
         hasuitUnusedTextFrames = nil
         hasuitCcBreakHealthThreshold = nil
+        hasuitCcBreakHealthThresholdWeakMultiplier = nil
         hasuitCcBreakHealthThresholdPve = nil
         hasuitClassColorsHexList = nil
         hasuitPlayerGUID = nil
