@@ -19,7 +19,6 @@ local danCleanController
 local danSortController
 local danAddToUnitFrameController
 
--- local iconFramesCreated = 0
 local danBorderBackdrop
 
 local danCurrentSpellOptions
@@ -27,7 +26,6 @@ local danCurrentSpellOptionsCommon
 local removedAuraSharedFunction
 local updatedAuraSharedFunction
 
-local danUnitAuraIsFullUpdate = function()end
 -- hasuitSortExpirationTime
 local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 
@@ -645,6 +643,7 @@ end
 
 
 
+local danUnitAuraIsFullUpdate
 
 
 local lastEventId
@@ -776,89 +775,185 @@ end
 
 
 
+local danSharedIconFunction
 
-
-
-
-
-
-
-
-
-local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
-local function danUnitAuraIsFullUpdateAsd()
-    local unit = danCurrentFrame.unit
-    local unitGUID = UnitGUID(unit)
-    if unitGUID ~= danCurrentFrame.unitGUID then
-        hasuitUpdateAllUnitsForUnitType[danCurrentFrame.unitType]()
-        return
+do
+    local hasuitMissingAuras_SpellNameArray = {}
+    local hasuitMissingAuras_SpellOptionsArray = {}
+    local hasuitMissingAuras_SpellNameTracked = {}
+    
+    do
+        local initializeMulti = hasuitFramesInitializeMulti
+        function hasuitFramesInitializeMissingAura(spellId, spellOptions) --do 1 spell per priority
+            local spellName = GetSpellName(spellId)
+            hasuitSetupSpellOptionsMulti = {spellOptions}
+            initializeMulti(spellName)
+            tinsert(hasuitMissingAuras_SpellNameArray, spellName)
+            tinsert(hasuitMissingAuras_SpellOptionsArray, spellOptions)
+            if not spellOptions["texture"] then
+                spellOptions["texture"] = GetSpellTexture(spellId)
+            end
+            hasuitMissingAuras_SpellNameTracked[spellName] = true
+        end
     end
     
-    local frameAuraInstanceIDs = danCurrentFrame.auraInstanceIDs
-    local recentlyChecked = {}
     
-    for i=1,2 do
-        local danFilter = i==2 and "HARMFUL" or nil
-        for i=1,255 do
-            danCurrentAura = GetAuraDataByIndex(unit, i, danFilter)
-            if not danCurrentAura then
-                break
-            end
-            local stuff = hasuitUnitAuraFunctions[danCurrentAura["spellId"]] or hasuitUnitAuraFunctions[danCurrentAura["name"]]
-            if stuff then
-                local auraInstanceID = danCurrentAura["auraInstanceID"]
-                local icons = frameAuraInstanceIDs[auraInstanceID]
-                if icons then
-                    danCurrentEvent = "updated"
-                    for j=1, #icons do
-                        danCurrentIcon = icons[j]
-                        updatedAuraSharedFunction()
-                    end
-                else --looking at this later, shouldn't there need to be something for danCurrentFrame.specialAuraInstanceIDsRemove[auraInstanceID]? i want to redo stuff related to that and hypo
-                    danCurrentEvent = "added"
-                    for j=1, #stuff do
-                        danCurrentSpellOptions = stuff[j]
-                        danCurrentSpellOptions[1]()
-                    end
+    local function recycleMissingAura(icon)
+        icon.iconTexture:SetVertexColor(1,1,1)
+        icon.missingAuras[icon.spellName] = nil
+        icon.missingAuras = nil
+        icon.spellName = nil
+        icon.recycle = nil
+        -- icon.startTime = nil
+        -- icon.expirationTime = nil
+    end
+    hasuitRecycleMissingAura = recycleMissingAura
+    
+    local UnitIsDeadOrGhost = UnitIsDeadOrGhost
+    
+    local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
+    function danUnitAuraIsFullUpdate()
+        local unit = danCurrentFrame.unit
+        local unitGUID = UnitGUID(unit)
+        if unitGUID ~= danCurrentFrame.unitGUID then
+            hasuitUpdateAllUnitsForUnitType[danCurrentFrame.unitType]()
+            return
+        end
+        
+        local frameAuraInstanceIDs = danCurrentFrame.auraInstanceIDs
+        local recentlyChecked = {}
+        
+        local missingAuras = danCurrentFrame.missingAuras
+        local motwFound = {}
+        
+        for i=1,2 do
+            local danFilter = i==2 and "HARMFUL" or nil
+            for i=1,255 do
+                danCurrentAura = GetAuraDataByIndex(unit, i, danFilter)
+                if not danCurrentAura then
+                    break
                 end
-                recentlyChecked[auraInstanceID] = true
+                -- local spellId = danCurrentAura["spellId"]
+                local spellName = danCurrentAura["name"]
+                
+                if hasuitMissingAuras_SpellNameTracked[spellName] then
+                    motwFound[spellName] = danCurrentAura
+                end
+                
+                local stuff = hasuitUnitAuraFunctions[danCurrentAura["spellId"]] or hasuitUnitAuraFunctions[spellName]
+                if stuff then
+                    local auraInstanceID = danCurrentAura["auraInstanceID"]
+                    local icons = frameAuraInstanceIDs[auraInstanceID]
+                    if icons then
+                        danCurrentEvent = "updated"
+                        for j=1, #icons do
+                            danCurrentIcon = icons[j]
+                            updatedAuraSharedFunction()
+                        end
+                    else --looking at this later, shouldn't there need to be something for danCurrentFrame.specialAuraInstanceIDsRemove[auraInstanceID]? i want to redo stuff related to that and hypo
+                        danCurrentEvent = "added"
+                        for j=1, #stuff do
+                            danCurrentSpellOptions = stuff[j]
+                            danCurrentSpellOptions[1]()
+                        end
+                    end
+                    recentlyChecked[auraInstanceID] = true
+                end
             end
         end
-    end
-    local iconsToRemove = {}
-    for auraInstanceID in pairs(frameAuraInstanceIDs) do
-        if not recentlyChecked[auraInstanceID] then
-            tinsert(iconsToRemove, auraInstanceID)
-        end
-    end
-    for i=1,#iconsToRemove do
-        local auraInstanceID = iconsToRemove[i]
-        local icons = frameAuraInstanceIDs[auraInstanceID]
-        -- danCurrentEvent = "removed"
-        for i=1, #icons do
-            local cooldown = icons[i].cooldown
-            if cooldown.auraExpiredEarlyCount then
-                cooldown.auraExpiredEarlyCount = nil
-                cooldown:SetScript("OnHide", nil)
+        
+        
+        
+        for i=1,#hasuitMissingAuras_SpellNameArray do --todo make better, probably initialize into hasuitUnitAuraFunctions[spellId] from just above too
+            local spellName = hasuitMissingAuras_SpellNameArray[i] --also don't show on dead units
+            local motwIcon = missingAuras[spellName]
+            danCurrentAura = motwFound[spellName]
+            if not danCurrentAura then
+                local unitType = danCurrentFrame.unitType
+                if unitType=="group" then --todo
+                    -- local playerOnly = danCurrentSpellOptionsCommon["playerOnly"]
+                    -- if playerOnly and d4anCleuSourceGuid~=hasuitPlayerGUID then
+                        -- return
+                    -- end
+                    
+                    if not motwIcon then
+                        
+                        danCurrentSpellOptions = hasuitMissingAuras_SpellOptionsArray[i]
+                        danCurrentSpellOptionsCommon = danCurrentSpellOptions[unitType]
+                        
+                        local icon = danGetIcon("") --hasuitSpellFunction_Cleu_AuraMissing
+                        danCurrentIcon = icon
+                        
+                        danSharedIconFunction()
+                        icon.iconTexture:SetTexture(danCurrentSpellOptions["texture"])
+                        icon.spellName = spellName
+                        icon.iconTexture:SetVertexColor(1, 0.55, 0.55)
+                        missingAuras[spellName] = icon
+                        icon.missingAuras = missingAuras
+                        icon.recycle = recycleMissingAura
+                        
+                        if danCurrentFrame.dead then
+                            icon:SetAlpha(0)
+                            icon.alpha = 0
+                        end
+                        
+                        -- danCurrentEvent = "cleuMissing"
+                        
+                        -- icon.playerOnly = playerOnly
+                        
+                        -- local currentTime = GetTime()
+                        -- icon.startTime = currentTime
+                        -- icon.expirationTime = currentTime
+                    end
+                    
+                    
+                elseif motwIcon then
+                    danCooldownDoneRecycle(motwIcon.cooldown)
+                end
+                
+            elseif motwIcon then
+                danCooldownDoneRecycle(motwIcon.cooldown)
+                
             end
-            
-            cooldown:Clear()
-            danCooldownDoneRecycle(cooldown)
         end
-        frameAuraInstanceIDs[auraInstanceID] = nil
+        
+        
+        
+        
+        local iconsToRemove = {}
+        for auraInstanceID in pairs(frameAuraInstanceIDs) do
+            if not recentlyChecked[auraInstanceID] then
+                tinsert(iconsToRemove, auraInstanceID)
+            end
+        end
+        for i=1,#iconsToRemove do
+            local auraInstanceID = iconsToRemove[i]
+            local icons = frameAuraInstanceIDs[auraInstanceID]
+            -- danCurrentEvent = "removed"
+            for i=1, #icons do
+                local cooldown = icons[i].cooldown
+                if cooldown.auraExpiredEarlyCount then
+                    cooldown.auraExpiredEarlyCount = nil
+                    cooldown:SetScript("OnHide", nil)
+                end
+                
+                cooldown:Clear()
+                danCooldownDoneRecycle(cooldown)
+            end
+            frameAuraInstanceIDs[auraInstanceID] = nil
+        end
     end
-end
-function hasuitUnitAuraIsFullUpdate(frame)
-    danCurrentFrame = frame
-    danUnitAuraIsFullUpdate()
-end
+    function hasuitUnitAuraIsFullUpdate(frame)
+        danCurrentFrame = frame
+        danUnitAuraIsFullUpdate()
+    end
 
 
-function hasuitLocal17()
-    danUnitAuraIsFullUpdate = danUnitAuraIsFullUpdateAsd --error from this when creating hasuitPlayerFrame. Order of things got changed to make customization stuff
-    hasuitUnitAuraIsFullUpdate(hasuitPlayerFrame)
+    -- function hasuitLocal17()
+        -- danUnitAuraIsFullUpdate = danUnitAuraIsFullUpdate --error from this when creating hasuitPlayerFrame. Order of things got changed to make customization stuff
+        -- hasuitUnitAuraIsFullUpdate(hasuitPlayerFrame)
+    -- end
 end
-
 
 
 
@@ -1228,6 +1323,7 @@ do
     local cooldownTextTimerAsd = C_Timer_NewTimer(0, function()end)
     cooldownTextTimerAsd:Cancel()
 
+    -- local iconFramesCreated = 0
     function danGetIcon(iconType) --todo aura hide checks whether the aura is active and if not hides like normal, if it still is cooldown:setscript(hide, show()) something like this to prevent icons lighting up briefly when cooldown is done but no remove event
         local unusedTable = unusedIcons[iconType]
         if #unusedTable>0 then
@@ -1662,7 +1758,7 @@ end
 
 
 
-local function danSharedIconFunction()
+function danSharedIconFunction()
     danAddToUnitFrameController()
     danCurrentIcon:SetParent(danCurrentIcon.controller)
     danCurrentIcon:ClearAllPoints()
@@ -1790,58 +1886,11 @@ end)
 -- end
 
 
---[[ --todo
-danAuraMissingFunction = addMultiFunction(function(icon)
-    danCurrentIcon = danGetIcon("missing")
-    danSharedIconFunction()
-    danCurrentIcon.iconTexture:SetTexture(danCurrentAura["icon"])
-    local expirationTime = danCurrentAura["expirationTime"]
-    danCurrentIcon.expirationTime = expirationTime
-    danCurrentIcon.startTime = expirationTime-danCurrentAura["duration"]
-    local cooldown = danCurrentIcon.cooldown
-    cooldown:SetCooldown(danCurrentIcon.startTime, danCurrentAura["duration"])
-    
-    if not danCurrentSpellOptionsCommon["hideCooldownText"] then
-        danCurrentIcon.cooldownText:SetFontObject(cooldownTextFonts[danCurrentIcon.size])
-        startCooldownTimerText(danCurrentIcon)
-        danCurrentIcon.cooldownTextShown = true
-    else
-        danCurrentIcon.cooldownText:SetText("")
-    end
-    
-    cooldown:SetScript("OnCooldownDone", auraExpiredOnCooldownDone)
-    local auraInstanceID = danCurrentAura["auraInstanceID"]
-    if not danCurrentFrame.auraInstanceIDs[auraInstanceID] then
-        danCurrentFrame.auraInstanceIDs[auraInstanceID] = {danCurrentIcon}
-    else
-        tinsert(danCurrentFrame.auraInstanceIDs[auraInstanceID], danCurrentIcon)
-    end
-    
-    if danCurrentSpellOptions["textKey"] then
-        danSetIconText(danCurrentSpellOptions["textKey"], danCurrentSpellOptions["actualText"])
-    elseif danCurrentAura["applications"]>0 then
-        if danCurrentAura["applications"]>1 then
-            danSetIconText(11, danCurrentAura["applications"])
-        else
-            danSetIconText(11, "")
-        end
-    end
-    
-    local specialFunction = danCurrentSpellOptions["specialAuraFunction"]
-    if specialFunction then
-        danCurrentIcon.specialFunction = specialFunction
-        specialFunction()
-    end
-end)
 
 
-danAuraMissingFunctionHidesWhileActive = addMultiFunction(function()
-    danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
-    if danCurrentSpellOptionsCommon then
-        
-    end
-end)
-]]
+
+
+
 
 local hypoCooldownTimerDone
 function hasuitLocal5(func)
@@ -2433,11 +2482,71 @@ end
 
 
 
-
 hasuitFramesCenterSetEventType("cleu") --make sure to always check subevent even if a spellid only has one subevent (and a function is made just for that spellid, like solar beam). d 12 can be damage amount from swings. honestly should probably base all cleu and spell_aura stuff on spellname instead of spellid(with GetSpellName on initialize for different languages) and have an ignore list for certain spellids. would make everything easier and even more efficient, especially easier for new spells getting added like oppressing roar randomly has a new spellid that does the same thing in tww. looks like the only difference is one removes 1 enrage effect
 
+
+do
+    local recycleMissingAura = hasuitRecycleMissingAura
+    
+    hasuitSpellFunction_Cleu_AuraMissing = addMultiFunction(function() --todo timer to show these before the aura falls off, like 1 minute left on motw an icon should appear, variable in spelloptions
+        if d2anCleuSubevent=="SPELL_AURA_REMOVED" then --maybe do something with inBigRange?
+            danCurrentFrame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
+            if danCurrentFrame then
+                danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
+                if danCurrentSpellOptionsCommon then
+                    -- local playerOnly = danCurrentSpellOptionsCommon["playerOnly"]
+                    -- if playerOnly and d4anCleuSourceGuid~=hasuitPlayerGUID then
+                        -- return
+                    -- end
+                    local missingAuras = danCurrentFrame.missingAuras
+                    if not missingAuras[d13anCleuSpellName] then
+                        local icon = danGetIcon("")
+                        danCurrentIcon = icon
+                        
+                        danSharedIconFunction()
+                        icon.iconTexture:SetTexture(danCurrentSpellOptions["texture"])
+                        icon.spellName = d13anCleuSpellName
+                        icon.iconTexture:SetVertexColor(1, 0.55, 0.55)
+                        missingAuras[d13anCleuSpellName] = icon
+                        icon.missingAuras = missingAuras
+                        icon.recycle = recycleMissingAura
+                        
+                        -- if danCurrentFrame.dead then
+                            -- icon:SetAlpha(0)
+                            -- icon.alpha = 0
+                        -- end
+                        
+                        -- danCurrentEvent = "cleuMissing"
+                        
+                        -- icon.playerOnly = playerOnly
+                        
+                        -- local currentTime = GetTime()
+                        -- icon.startTime = currentTime
+                        -- icon.expirationTime = currentTime
+                    end
+                end
+            end
+            
+        elseif d2anCleuSubevent=="SPELL_AURA_APPLIED" then
+            local unitFrame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
+            if unitFrame then
+                local icon = unitFrame.missingAuras[d13anCleuSpellName]
+                if icon then
+                    danCooldownDoneRecycle(icon.cooldown)
+                end
+            end
+            
+        end
+    end)
+end
+
+
+
+
+
+
 hasuitSpellFunction_Cleu_Interrupted = addMultiFunction(function() --todo could do something with extraSchool 17th parameter
-    if d2anCleuSubevent=="SPELL_INTERRUPT" then 
+    if d2anCleuSubevent=="SPELL_INTERRUPT" then
         danCurrentFrame = hasuitUnitFrameForUnit[d8anCleuDestGuid]
         if danCurrentFrame then
             danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
@@ -3368,6 +3477,10 @@ do
                 end
             end
         end
+        for spellName, icon in pairs(frame.missingAuras) do
+            icon:SetAlpha(1)
+            icon.alpha = 1
+        end
     end
     hasuitNotDead = notDead
     local UnitIsDeadOrGhost = UnitIsDeadOrGhost
@@ -3406,6 +3519,12 @@ do
                 end
             end
         end
+        
+        for spellName, icon in pairs(frame.missingAuras) do
+            icon:SetAlpha(0)
+            icon.alpha = 0
+        end
+        
     end
     hasuitUnitDiedFunction = unitDiedFunction
     

@@ -68,19 +68,27 @@ initialize(157982)  --Tranquility
 
 
 --------------------------------hots 5, above hots 1/grows left
-hasuitSetupSpellOptions = hasuitHots_5
+local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=18,["alpha"]=1,["hideCooldownText"]=true}
+local spellOptions = {hasuitSpellFunction_Cleu_AuraMissing,         ["priority"]=1, ["group"]=danCommon}
+hasuitFramesInitializeMissingAura(1126, spellOptions) --Mark of the Wild aka motw, do 1 spell per priority for this
+-- hasuitFramesInitializeMissingAura(432661, spellOptions) --motw becomes this spellid if on an npc.. ..and cleu doesn't fire for the replacement even though it fires for removing 1126, todo
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_5["group"]}
 initialize(439530)  --Symbiotic Blooms
 initialize(391891)  --adaptive swarm
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=2, ["group"]=hasuitHots_5["group"]} 
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=3, ["group"]=hasuitHots_5["group"]}
 initialize(1215515)  --Insurance!
 -- initialize(200389)  --cult
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=3, ["group"]=hasuitHots_5["group"]} 
+local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=12,["alpha"]=1,["hideCooldownText"]=true}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=4, ["group"]=danCommon}
 initialize(468152)  --Reactive Resin
 
+
+
 -- local danCommon = {["controllerOptions"]=hasuitController_Hots5_BottomRight_BottomRight,["size"]=10,["alpha"]=1,    ["hideCooldownText"]=true}
--- hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=4, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
+-- hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsPlayer,      ["priority"]=5, ["group"]=danCommon,    ["loadOn"]=hasuitLoadOn_PartySize}
 -- initialize(429222)  --Minor Cenarion Ward
 
 --end hots

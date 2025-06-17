@@ -34,9 +34,9 @@ do --cooldowns loadon
     
     local hasuitUnitFramesForUnitType_Array = hasuitUnitFramesForUnitType_Array
 
-    local recycleCooldownIcon
+    local danRecycleCooldownIcon
     function hasuitLocal3(func)
-        recycleCooldownIcon = func
+        danRecycleCooldownIcon = func
     end
     
     local arenaCrowdControlSpellUpdateFrame = hasuitArenaCrowdControlSpellUpdateFrame
@@ -83,7 +83,7 @@ do --cooldowns loadon
                             if frame.cooldownPriorities then
                                 for _, icon in pairs(frame.cooldownPriorities) do
                                     if icon.recycle then
-                                        recycleCooldownIcon(icon)
+                                        danRecycleCooldownIcon(icon)
                                     end
                                 end
                                 frame.cooldowns = {}
@@ -531,7 +531,7 @@ do
                 barkskin60,
                 {cdCle2,["spellId"]=473909, ["priority"]=21,    ["duration"]=90},--Ancient of Lore
                 {cleAurI,["spellId"]=117679,["priority"]=21,    ["duration"]=180},--Incarnation: Tree of Life
-                {cdCle2,["spellId"]=203651, ["priority"]=23,    ["duration"]=60},--Overgrowth
+                -- {cdCle2,["spellId"]=203651, ["priority"]=23,    ["duration"]=60},--Overgrowth
                 -- {cleAurR,["spellId"]=132158,["priority"]=24, ["duration"]=60},--Nature's Swiftness, todo -12 sec? can tell if 35% talent is taken from points
                 -- {cdCle2,["spellId"]=18562,   ["priority"]=25,    ["duration"]=15},--Swiftmend
                 -- {cdCle2,["spellId"]=102693, ["priority"]=26,    ["duration"]=20, --Grove Guardians, todo? there's a -3 sec talent
@@ -806,7 +806,9 @@ do
         defensiveCooldowns[256]={--Discipline
             {cdCle1,["spellId"]=33206,  ["priority"]=25,    ["duration"]=180, --Pain Suppression
                 ["charges"]=2},
-            {cdCle2,["spellId"]=47536,  ["priority"]=30,    ["duration"]=90},--Rapture
+            -- {cdCle2,["spellId"]=47536,  ["priority"]=30,    ["duration"]=90},--Rapture
+            
+            
             -- {cdCle2,["spellId"]=421453,  ["priority"]=29,    ["duration"]=240},--Ultimate Penitence, todo each penance bolt -2 sec cd if they take it, and change below if so
             {cdCle2,["spellId"]=62618,  ["priority"]=32,    ["duration"]=180},--Power Word: Barrier, only 20% now?
             {cdCle2,["spellId"]=271466, ["priority"]=32,    ["duration"]=180},--Luminous Barrier
@@ -865,7 +867,7 @@ do
                 blessingOfProtection1,
                 blessingOfSpellwarding1,
                 -- {cdCle2,["spellId"]=210256,     ["group"]=26,    ["duration"]=45},--Blessing of Sanctuary, group only, todo separate it from defensives? maybe just put it in its own controller, maybe get rid of unitType priority stuff if i do that
-                {cdCle2,["spellId"]=210256, ["priority"]=26,    ["duration"]=45, --Blessing of Sanctuary
+                {cdCle2,["spellId"]=210256, ["priority"]=26,    ["duration"]=60, --Blessing of Sanctuary
                     ["size"]=22},
             }
             
@@ -931,9 +933,9 @@ do
         do
             local cdCleSB=hasuitSpellFunction_Cleu_SuccessCooldownStartSolarBeam
             
-            local skullBashTableHidden=
+            local skullBashTableLow=
                 {cdCle2,["spellId"]=106839, ["priority"]=2,["duration"]=15,  --Skull Bash hidden
-                    ["startAlpha"]=0}
+                    ["startAlpha"]=lowStartAlpha}
             local skullBashTable=
                 {cdCle2,["spellId"]=106839, ["priority"]=2,["duration"]=15}  --Skull Bash normal
             
@@ -941,7 +943,7 @@ do
             -- }
             interruptCooldowns[102]={--Balance
                 {cdCleSB,["spellId"]=78675, ["priority"]=1, ["duration"]=60},--Solar Beam
-                skullBashTableHidden,
+                -- skullBashTableLow, --would overlap ccs atm?
             }
             interruptCooldowns[103]={--Feral
                 skullBashTable,
@@ -950,7 +952,7 @@ do
                 skullBashTable,
             }
             interruptCooldowns[105]={--Restoration
-                skullBashTableHidden,
+                skullBashTableLow,
             }
             
             

@@ -1514,6 +1514,7 @@ hasuitFramesCenterSetEventType("aura")
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=-73,                   ["group"]=danCommonTopRightGroupDebuffs[4],     } --DOTs/damage debuffs ___ todo different priority for dispel protection stuff if player actually has dispel
 initialize(316099)--unstable affliction dot group
 initialize(342938)--unstable affliction dot group
+initialize(1219045)--unstable affliction dot group, new?
 
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=210,                   ["group"]=danCommonTopRightGroupDebuffs[1], ["arena"]=danCommonTopLeftArenaDebuffs[1],}
@@ -1596,6 +1597,7 @@ initialize(335467) --Devouring Plague
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=245,                                                               ["arena"]=danCommonTopLeftArenaDebuffs[4]}
 initialize(316099)--unstable affliction dot arena
 initialize(342938)--unstable affliction dot arena
+initialize(1219045)--unstable affliction dot arena, new?
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=246,                   ["group"]=danCommonTopRightGroupDebuffs[4], ["arena"]=danCommonTopLeftArenaDebuffs[4],}
 initialize(34914) --vampiric touch
 initialize(188389) --Flame Shock
@@ -1610,6 +1612,10 @@ initialize(386997) --Soul Rot
 -- initialize("Bane of Shadows") --?
 initialize(207771) --?, Fiery Brand, dealing 40% less damage to dh that cast it? not dispellable, todo? important to know if this is on player and what it does
 
+
+
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=253,                   ["group"]=danCommonTopRightGroupDebuffs[3], ["arena"]=danCommonTopLeftArenaDebuffs[3],}
+initialize(87023) --Cauterize dot
 
 hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_SourceIsNotPlayer,  ["priority"]=255,                   ["group"]=danCommonTopRightGroupDebuffs[3], ["arena"]=danCommonTopLeftArenaDebuffs[3],}
 initialize(274838) --Feral Frenzy

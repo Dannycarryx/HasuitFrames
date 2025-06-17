@@ -387,7 +387,8 @@ do
         for i=1,#hasuitDoThis_Group_Roster_UpdateAlways do
             hasuitDoThis_Group_Roster_UpdateAlways[i]()
         end
-        hasuitLocal17() --the problem was controlleroptions not being set from danRbgFunction()
+        hasuitUnitAuraIsFullUpdate(hasuitPlayerFrame)
+        -- hasuitLocal17() --the problem was controlleroptions not being set from danRbgFunction()
         danFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
         -- do
             -- local columnsForGroupSize = hasuitRaidFrameColumnsForGroupSize
@@ -1089,6 +1090,8 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitFramesInitializeMulti = nil
         hasuitFramesInitializeMultiPlusDiminish = nil
         hasuitSetupSpellOptionsMulti = nil
+        hasuitFramesInitializeMissingAura = nil
+        
         hasuitFramesCenterAddMultiFunction = nil
         hasuitFramesCenterSetEventTypeFromFunction = nil
         hasuitFramesCenterAddToAllTable = nil
@@ -1152,6 +1155,8 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitSpellFunction_Cleu_TREANT_UNIT_DIED = nil
         hasuitSpellFunction_Cleu_SoulEmpoweredHots1 = nil
         hasuitSpellFunction_Cleu_SoulEmpoweredHots2 = nil
+        hasuitSpellFunction_Cleu_AuraMissing = nil
+        hasuitRecycleMissingAura = nil
         
         hasuitSpellFunction_UnitCastSucceeded_CooldownStart = nil
         hasuitSpellFunction_UnitCastSucceeded_ChangedTalents = nil
@@ -1348,7 +1353,7 @@ tinsert(hasuitDoThis_Player_Entering_WorldFirstOnly, function() --This is a list
         hasuitLocal14 = nil
         hasuitLocal15 = nil
         hasuitLocal16 = nil
-        hasuitLocal17 = nil
+        -- hasuitLocal17 = nil
         
         hasuitActiveScaleMultiplier = nil
         hasuitUninterruptibleBorderSize = nil
