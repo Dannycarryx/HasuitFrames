@@ -643,7 +643,7 @@ end
 
 
 
-local danUnitAuraIsFullUpdate
+local danUnitAuraIsFullUpdate = function()end --don't change this
 
 
 local lastEventId
@@ -804,15 +804,13 @@ do
         icon.missingAuras = nil
         icon.spellName = nil
         icon.recycle = nil
-        -- icon.startTime = nil
-        -- icon.expirationTime = nil
     end
     hasuitRecycleMissingAura = recycleMissingAura
     
     local UnitIsDeadOrGhost = UnitIsDeadOrGhost
     
     local hasuitUpdateAllUnitsForUnitType = hasuitUpdateAllUnitsForUnitType
-    function danUnitAuraIsFullUpdate()
+    local function unitAuraIsFullUpdate()
         local unit = danCurrentFrame.unit
         local unitGUID = UnitGUID(unit)
         if unitGUID ~= danCurrentFrame.unitGUID then
@@ -865,7 +863,7 @@ do
         
         
         for i=1,#hasuitMissingAuras_SpellNameArray do --todo make better, probably initialize into hasuitUnitAuraFunctions[spellId] from just above too
-            local spellName = hasuitMissingAuras_SpellNameArray[i] --also don't show on dead units
+            local spellName = hasuitMissingAuras_SpellNameArray[i]
             local motwIcon = missingAuras[spellName]
             danCurrentAura = motwFound[spellName]
             if not danCurrentAura then
@@ -949,10 +947,10 @@ do
     end
 
 
-    -- function hasuitLocal17()
-        -- danUnitAuraIsFullUpdate = danUnitAuraIsFullUpdate --error from this when creating hasuitPlayerFrame. Order of things got changed to make customization stuff
-        -- hasuitUnitAuraIsFullUpdate(hasuitPlayerFrame)
-    -- end
+    function hasuitLocal17()
+        danUnitAuraIsFullUpdate = unitAuraIsFullUpdate --error from this when creating hasuitPlayerFrame. Order of things got changed to make customization stuff
+        hasuitUnitAuraIsFullUpdate(hasuitPlayerFrame)
+    end
 end
 
 
@@ -1458,10 +1456,10 @@ function danCooldownDoneRecycle(cooldown)
     if danCurrentIcon.overridesSame then
         local overrode = danCurrentIcon.overrode
         if danCurrentIcon.overridden then
-            danCurrentIcon.cooldownText:Show() --sketchy
+            -- danCurrentIcon.cooldownText:Show() --sketchy
         end
         if overrode then
-            overrode.cooldownText:Show() --sketchy
+            -- overrode.cooldownText:Show() --sketchy
             overrode.overridden = false
             danCurrentIcon.overrode = nil
         end
@@ -1476,6 +1474,9 @@ function danCooldownDoneRecycle(cooldown)
         danCurrentIcon.text = nil
         danCurrentIcon.textFrame = nil
     end
+    
+    danCurrentIcon.startTime = nil --added later randomly
+    danCurrentIcon.expirationTime = nil --^
     
     danCleanController(danCurrentIcon.controller)
 end
@@ -1715,11 +1716,13 @@ do
                         highestY = nextYPlacement
                     end
                 else
-                    icon:SetAlpha(0)
+                    -- icon:SetAlpha(0)
+                    icon:SetPoint(ownPoint, setPointOn, targetPoint, 0, -10000)
                 end
             else
-                icon.cooldownText:Hide()
-                icon:SetAlpha(0)
+                -- icon.cooldownText:Hide()
+                -- icon:SetAlpha(0)
+                icon:SetPoint(ownPoint, setPointOn, targetPoint, 0, -10000)
             end
         end
         local controller2 = controller.controller2
@@ -2487,6 +2490,7 @@ hasuitFramesCenterSetEventType("cleu") --make sure to always check subevent even
 
 do
     local recycleMissingAura = hasuitRecycleMissingAura
+    local UnitPlayerControlled = UnitPlayerControlled
     
     hasuitSpellFunction_Cleu_AuraMissing = addMultiFunction(function() --todo timer to show these before the aura falls off, like 1 minute left on motw an icon should appear, variable in spelloptions
         if d2anCleuSubevent=="SPELL_AURA_REMOVED" then --maybe do something with inBigRange?
@@ -2494,6 +2498,11 @@ do
             if danCurrentFrame then
                 danCurrentSpellOptionsCommon = danCurrentSpellOptions[danCurrentFrame.unitType]
                 if danCurrentSpellOptionsCommon then
+                    
+                    if not UnitPlayerControlled(danCurrentFrame.unit) then
+                        return --todo
+                    end
+                    
                     -- local playerOnly = danCurrentSpellOptionsCommon["playerOnly"]
                     -- if playerOnly and d4anCleuSourceGuid~=hasuitPlayerGUID then
                         -- return
@@ -3140,11 +3149,19 @@ hasuitSpellFunction_Cleu_AppliedCooldownStartIncarnationToIgnoreReforestation = 
         danCurrentFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if danCurrentFrame then
             local incarnCastSuccessTime = danCurrentFrame.incarnCastSuccessTime
-            if incarnCastSuccessTime and incarnCastSuccessTime+0.5>GetTime() then
-                danCurrentIcon = danCurrentFrame.cooldowns[d12anCleuSpellId]
-                if danCurrentIcon then
-                    danCleuCooldownStart(0)
+            if incarnCastSuccessTime then
+                if incarnCastSuccessTime+0.5>GetTime() then
+                    danCurrentIcon = danCurrentFrame.cooldowns[d12anCleuSpellId]
+                    if danCurrentIcon then
+                        danCleuCooldownStart(0)
+                    end
                 end
+            else
+                local unitFrame = danCurrentFrame
+                unitFrame.incarnAuraAppliedTime = GetTime()
+                C_Timer_After(0.5, function()
+                    unitFrame.incarnAuraAppliedTime = nil
+                end)
             end
         end
     end
@@ -3153,10 +3170,24 @@ function hasuitSpellFunction_Cleu_SuccessIncarnationToIgnoreReforestation()
     if d2anCleuSubevent=="SPELL_CAST_SUCCESS" then
         local unitFrame = hasuitUnitFrameForUnit[d4anCleuSourceGuid]
         if unitFrame then
-            unitFrame.incarnCastSuccessTime = GetTime()
-            C_Timer_After(0.5, function()
-                unitFrame.incarnCastSuccessTime = nil
-            end)
+            local incarnAuraAppliedTime = unitFrame.incarnAuraAppliedTime --rare if ever for this to matter, SPELL_CAST_SUCCESS happens before aura applied, but saw the cd bug once
+            if incarnAuraAppliedTime then
+                if incarnAuraAppliedTime+0.5>GetTime() then
+                    danCurrentIcon = unitFrame.cooldowns[117679]
+                    if danCurrentIcon then
+                        local realSpellId = d12anCleuSpellId
+                        d12anCleuSpellId = 117679
+                        danCurrentFrame = unitFrame
+                        danCleuCooldownStart(0)
+                        d12anCleuSpellId = realSpellId
+                    end
+                end
+            else
+                unitFrame.incarnCastSuccessTime = GetTime()
+                C_Timer_After(0.5, function()
+                    unitFrame.incarnCastSuccessTime = nil
+                end)
+            end
         end
     end
 end
@@ -3289,6 +3320,10 @@ end)
 do
     local timeStopIgnoreList = { --not tested since making cd text
         [378441] = true, --Time Stop, not sure if this would get ignored by other dragon's time stop. putting this here does nothing for self time stop because aura applied happens before success for self cast. Could do cdAura instead and initialize the cd first
+        [336126] = true, --Gladiator's Medallion, ignore these because the event corrects it anyway? and it bugs because of that i think, bad if outside of arena though?
+        [42292] = true, --PvP Trinket
+        [336135] = true, --Adaptation?
+        [336139] = true, --Adaptation?
     }
     function hasuitSpellFunction_Cleu_378441TimeStop() --could do something with :Pause() instead, cd text was broken for it when i originally tried to do it that way (omnicc)
         if d2anCleuSubevent=="SPELL_AURA_APPLIED" then --todo cleaner interaction with hypo and make it work if hypo is the only source of cd, it probably won't atm, also the hypo stuff here is completely untested. probably has a bad interaction with charges so bop..
@@ -3640,17 +3675,17 @@ end
 
 
 
-function hasuitSpecialAuraFunction_SoulOfTheForest() --similar to feign death, todo this isn't used yet, something like this can help fix soul hots probably
-    if danCurrentEvent=="recycled" then
-        danCurrentIcon.frame.hasSoul = nil
-        danCurrentIcon.frame = nil
+-- function hasuitSpecialAuraFunction_SoulOfTheForest() --similar to feign death, todo this isn't used yet, something like this can help fix soul hots probably
+    -- if danCurrentEvent=="recycled" then
+        -- danCurrentIcon.frame.hasSoul = nil
+        -- danCurrentIcon.frame = nil
         
-    else
-        danCurrentIcon.frame = danCurrentFrame
-        danCurrentFrame.hasSoul = true
+    -- else
+        -- danCurrentIcon.frame = danCurrentFrame
+        -- danCurrentFrame.hasSoul = true
         
-    end
-end
+    -- end
+-- end
 
 
 

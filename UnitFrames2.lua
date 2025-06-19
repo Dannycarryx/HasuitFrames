@@ -2890,6 +2890,9 @@ do
         icon.cooldownTextTimer2:Cancel()
         icon.cooldownText:SetText("")
         
+        icon.startTime = nil --added later randomly
+        icon.expirationTime = nil --^
+        
         
         icon.cooldownText:ClearAllPoints()
         icon.cooldownText:SetPoint("CENTER", icon, "CENTER", 1, 0)
@@ -2902,8 +2905,6 @@ do
         icon.active = false
         icon:SetAlpha(0)
         icon.cooldown:Clear()
-        icon.startTime = nil --added later after seeing leftover lay on hands cd affect counterspell via shifting power (i assume), gave counterspell that was off-cd an incorrect 215 sec cd and no lowered opacity, didn't get reset from the refresh shuffle function
-        icon.expirationTime = nil --^ this is the one that matters i think
         icon.recycle(icon)
         
         hasuitCleanController(icon.controller)

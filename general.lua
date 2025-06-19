@@ -991,7 +991,7 @@ initialize(370562) --Stasis, ready
 
 
 
-hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=97,                ["group"]=danCommonTopLeftGroup_Text,["arena"]=danCommonTopRightArena, ["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulOfTheForest}
+hasuitSetupSpellOptions = {hasuitSpellFunction_Aura_MainFunction,       ["priority"]=97,                ["group"]=danCommonTopLeftGroup_Text,["arena"]=danCommonTopRightArena} --["specialAuraFunction"]=hasuitSpecialAuraFunction_SoulOfTheForest
 initialize(114108) --Soul of the Forest
 
 
@@ -1298,6 +1298,7 @@ initializeMulti(359073) --Eternity Surge --todo inc based on dest guid for cleu
 initializeMulti(382411) --Eternity Surge --359077 is damage
 initializeMulti(396286) --Upheaval cast
 initializeMulti(408092) --Upheaval cast, rare, todo cc category for knocked in the air like this?
+initializeMulti(1217413)--Slicing Winds
 
 
 hasuitSetupSpellOptionsMulti = { --priority_2

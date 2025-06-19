@@ -1337,7 +1337,8 @@ do
 
 
         crowdControlCooldowns["HUNTER"]={
-            {cdCle2,["spellId"]=19577,  ["priority"]=3, ["duration"]=55},--Intimidation base 60, do people take -5?
+            {cdCle2,["spellId"]=19577,  ["priority"]=3, ["duration"]=50},--Intimidation base 60
+            {cdCle2,["spellId"]=474421, ["priority"]=3, ["duration"]=50},--Intimidation2
             {cdCle2,["spellId"]=187650, ["priority"]=4, ["duration"]=25},--Freezing Trap, 30 base, do people take -5?
             {cdCle2,["spellId"]=213691, ["priority"]=5, ["duration"]=30},--Scatter Shot, doesn't share with binding anymore, shares with bursting now todo
             {cdCle2,["spellId"]=109248, ["priority"]=6, ["duration"]=45},--Binding Shot
@@ -1350,7 +1351,7 @@ do
         -- crowdControlCooldowns[255]={--Survival
         -- }
         
-        hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_SuccessCooldownReduction,["CDr"]=0.5,["affectedSpells"]={19577, 109248},["loadOn"]=hasuitLoadOn_CooldownDisplay} --intimidation and binding shot
+        hasuitSetupSpellOptions = {hasuitSpellFunction_Cleu_SuccessCooldownReduction,["CDr"]=0.5,["affectedSpells"]={19577,474421,109248},["loadOn"]=hasuitLoadOn_CooldownDisplay} --intimidation and binding shot
         initialize(259495) --wildfire bomb
         initialize(19434) --Aimed Shot
         initialize(34026) --bm kill command
@@ -1628,7 +1629,8 @@ function hasuitResetCooldowns(frame) --not great but works now
             icon.cooldown:Clear()
             -- icon.alpha = 1
             icon:SetAlpha(icon.alpha)
-            icon.expirationTime = nil
+            icon.startTime = nil --added later randomly
+            icon.expirationTime = nil --this was here
             if icon.hypoExpirationTime then
                 icon.hypoExpirationTime = nil
                 if icon.specialTimer then

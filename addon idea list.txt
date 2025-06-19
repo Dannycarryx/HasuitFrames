@@ -14,6 +14,7 @@ doesn't work on mac maybe? cc debuffs not being cleared, seems rare but makes ad
 
 other important:
 make special case for sorting rejuv/germ above the cutoff or whatever
+check range for missing auras? UnitIsVisible maybe
 re-organize cooldowns some. I don't like misc stuff like tremor being in the same group as defensives
 Show freedoms/movement stuff on nameplates
 fix the way icons hide when too many are showing? or whatever the new bug is that's making icon's cooldown swipe show up when they're supposed to be hidden, or whatever's causing that --only ever saw this once

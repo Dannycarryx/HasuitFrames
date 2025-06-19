@@ -27,14 +27,14 @@ tinsert(hasuitDoThis_Player_Login, function()
     
     if hideBlizzardParty or hideBlizzardArena or hideBlizzardRaid then
         
-        if EditModeSystemSettingsDialog then
-            EditModeSystemSettingsDialog:SetPropagateKeyboardInput(true)
-        end
+        -- if EditModeSystemSettingsDialog then
+            -- EditModeSystemSettingsDialog:SetPropagateKeyboardInput(true)
+        -- end
         
-        if EventToastManagerFrame then
-            EventToastManagerFrame:SetPropagateMouseClicks(true)
-            -- EventToastManagerFrame.currentDisplayingToast:SetPropagateMouseClicks(true) --todo
-        end
+        -- if EventToastManagerFrame then
+            -- EventToastManagerFrame:SetPropagateMouseClicks(true)
+            -- -- -- EventToastManagerFrame.currentDisplayingToast:SetPropagateMouseClicks(true) --todo
+        -- end
         
         
         local type = type
